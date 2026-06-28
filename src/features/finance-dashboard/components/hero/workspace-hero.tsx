@@ -38,7 +38,7 @@ export function WorkspaceHero({
                 账单分析
               </h1>
               <p className="max-w-xl text-xs leading-5 text-muted-foreground sm:border-l sm:border-border/60 sm:pl-3">
-              汇总当前文件的收支、币种、标签和消费节奏，筛选条件或汇率调整后会同步更新下方图表与明细。
+                汇总当前文件的收支、币种、标签和消费节奏，筛选条件或汇率调整后会同步更新下方图表与明细。
               </p>
             </div>
           </div>

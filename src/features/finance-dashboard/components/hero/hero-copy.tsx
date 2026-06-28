@@ -24,7 +24,8 @@ export function HeroCopy() {
           看清你的每一笔消费
         </h1>
         <p className="max-w-2xl border-l border-border/80 bg-background/30 py-1 pl-4 text-sm leading-7 text-muted-foreground backdrop-blur-sm md:text-base">
-          上传 iCost 导出的 Excel，系统会在本地整理收入、支出、标签、币种和每日消费强度。筛选条件或汇率变更后，指标、图表和交易明细会同步更新。
+          上传 iCost 导出的
+          Excel，系统会在本地整理收入、支出、标签、币种和每日消费强度。筛选条件或汇率变更后，指标、图表和交易明细会同步更新。
         </p>
       </div>
       <div className="grid max-w-xl grid-cols-3 border border-border/70 bg-card/45 text-center font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase backdrop-blur">

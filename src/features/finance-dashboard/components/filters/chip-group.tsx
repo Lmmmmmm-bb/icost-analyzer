@@ -44,7 +44,10 @@ export function ChipGroup({
         {visible.map((item) => (
           <Fragment key={item}>
             {separatorBefore === item ? (
-              <Separator orientation="vertical" className="mx-1 h-6 self-center" />
+              <Separator
+                orientation="vertical"
+                className="mx-1 h-6 self-center"
+              />
             ) : null}
             <Button
               type="button"

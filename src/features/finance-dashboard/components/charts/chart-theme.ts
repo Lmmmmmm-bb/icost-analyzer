@@ -21,9 +21,4 @@ export const TAG_COLOR_ACTIVE = "#F2BE62"
 export const WEEK_COLOR = "rgba(224, 162, 59, 0.22)"
 export const WEEKEND_COLOR = "#E0A23B"
 export const HEATMAP_COLORS = ["#f8fafc", "#F6E6BF", "#E0A23B", "#F26157"]
-export const HEATMAP_DARK_COLORS = [
-  "#262626",
-  "#4A3722",
-  "#A36D2C",
-  "#EF6A5B",
-]
+export const HEATMAP_DARK_COLORS = ["#262626", "#4A3722", "#A36D2C", "#EF6A5B"]

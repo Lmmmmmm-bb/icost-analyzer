@@ -14,7 +14,11 @@ import {
   WEEK_COLOR,
   WEEKEND_COLOR,
 } from "./chart-theme"
-import type { MonthlyItem, SummaryItem, WeekItem } from "../../model/analytics-types"
+import type {
+  MonthlyItem,
+  SummaryItem,
+  WeekItem,
+} from "../../model/analytics-types"
 import { dateKey } from "../../model/date"
 import { formatMoney } from "../../model/money"
 

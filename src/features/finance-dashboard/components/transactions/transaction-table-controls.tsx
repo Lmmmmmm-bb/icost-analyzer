@@ -1,7 +1,25 @@
-import { selectClassName } from "../shared/control-class-names"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import type { DetailSort } from "./types"
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200]
+
+const DETAIL_SORT_OPTIONS = [
+  { value: "date", label: "按日期排序" },
+  { value: "amount", label: "按金额排序" },
+] satisfies Array<{ value: DetailSort; label: string }>
+
+const PAGE_SIZE_SELECT_OPTIONS = PAGE_SIZE_OPTIONS.map((size) => ({
+  value: String(size),
+  label: `${size} / 页`,
+}))
 
 type TransactionTableControlsProps = {
   pageSize: number
@@ -20,30 +38,45 @@ export function TransactionTableControls({
 }: TransactionTableControlsProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <select
-        className={selectClassName()}
+      <Select
+        items={DETAIL_SORT_OPTIONS}
         value={detailSort}
-        onChange={(event) =>
-          onDetailSortChange(event.target.value as DetailSort)
-        }
+        onValueChange={(value) => onDetailSortChange(value as DetailSort)}
       >
-        <option value="date">按日期排序</option>
-        <option value="amount">按金额排序</option>
-      </select>
-      <select
-        className={selectClassName()}
-        value={pageSize}
-        onChange={(event) => {
+        <SelectTrigger size="sm" className="w-[7.5rem]">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end">
+          <SelectGroup>
+            {DETAIL_SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <Select
+        items={PAGE_SIZE_SELECT_OPTIONS}
+        value={String(pageSize)}
+        onValueChange={(value) => {
           onPageChange(1)
-          onPageSizeChange(Number(event.target.value))
+          onPageSizeChange(Number(value))
         }}
       >
-        {PAGE_SIZE_OPTIONS.map((size) => (
-          <option key={size} value={size}>
-            {size} / 页
-          </option>
-        ))}
-      </select>
+        <SelectTrigger size="sm" className="w-[6.5rem]">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end">
+          <SelectGroup>
+            {PAGE_SIZE_SELECT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   )
 }

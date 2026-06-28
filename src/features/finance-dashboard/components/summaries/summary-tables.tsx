@@ -1,9 +1,29 @@
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import type { SummaryItem } from "../../model/analytics-types"
 import { DashboardPanel } from "../shared/dashboard-panel"
-import { selectClassName } from "../shared/control-class-names"
 import { CategorySummaryTable } from "./category-summary-table"
 import { TagSummaryTable } from "./tag-summary-table"
 import type { SummarySort, TagSort } from "./types"
+
+const SUMMARY_SORT_OPTIONS = [
+  { value: "amount", label: "按总支出" },
+  { value: "count", label: "按笔数" },
+  { value: "avg", label: "按笔均" },
+] satisfies Array<{ value: SummarySort; label: string }>
+
+const TAG_SORT_OPTIONS = [
+  { value: "amount", label: "按总支出" },
+  { value: "count", label: "按笔数" },
+  { value: "days", label: "按覆盖天数" },
+] satisfies Array<{ value: TagSort; label: string }>
 
 type SummaryTablesProps = {
   categoryRows: SummaryItem[]
@@ -34,17 +54,24 @@ export function SummaryTables({
         title="分类汇总表"
         description="点击行可筛选一级分类。"
         action={
-          <select
-            className={selectClassName()}
+          <Select
+            items={SUMMARY_SORT_OPTIONS}
             value={summarySort}
-            onChange={(event) =>
-              onSummarySortChange(event.target.value as SummarySort)
-            }
+            onValueChange={(value) => onSummarySortChange(value as SummarySort)}
           >
-            <option value="amount">按总支出</option>
-            <option value="count">按笔数</option>
-            <option value="avg">按笔均</option>
-          </select>
+            <SelectTrigger size="sm" className="w-[7.5rem]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                {SUMMARY_SORT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         }
       >
         <CategorySummaryTable
@@ -57,15 +84,24 @@ export function SummaryTables({
         title="标签汇总表"
         description="覆盖天数表示该标签下有支出记录的不同自然日数量。"
         action={
-          <select
-            className={selectClassName()}
+          <Select
+            items={TAG_SORT_OPTIONS}
             value={tagSort}
-            onChange={(event) => onTagSortChange(event.target.value as TagSort)}
+            onValueChange={(value) => onTagSortChange(value as TagSort)}
           >
-            <option value="amount">按总支出</option>
-            <option value="count">按笔数</option>
-            <option value="days">按覆盖天数</option>
-          </select>
+            <SelectTrigger size="sm" className="w-[8rem]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                {TAG_SORT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         }
       >
         <TagSummaryTable rows={tagRows} onTagSelect={onTagSelect} />

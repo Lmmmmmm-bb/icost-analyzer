@@ -27,11 +27,7 @@ import { SummaryTables } from "./components/summaries/summary-tables"
 import type { SummarySort, TagSort } from "./components/summaries/types"
 import { TransactionTable } from "./components/transactions/transaction-table"
 import type { DetailSort } from "./components/transactions/types"
-import type {
-  Filters,
-  RateMap,
-  Transaction,
-} from "./model/types"
+import type { Filters, RateMap, Transaction } from "./model/types"
 import {
   getDateRange,
   getDimensions,
