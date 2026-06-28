@@ -248,7 +248,7 @@ export function FinanceDashboard() {
       {!hasTransactions ? (
         <EntryHero uploadState={uploadState} onUpload={uploadWorkbook} />
       ) : (
-        <>
+        <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 [animation-delay:90ms] md:px-8 lg:gap-6 lg:px-10 lg:py-6">
           <WorkspaceHero
             fileName={fileName}
             rangeText={rangeText}
@@ -258,70 +258,68 @@ export function FinanceDashboard() {
             onReplaceFile={resetWorkbook}
           />
 
-          <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-6 [animation-delay:90ms] md:px-8 lg:gap-6 lg:px-10">
-            <DashboardAlerts
-              invalidDateRange={invalidDateRange}
-              missingRates={missingRates}
-            />
+          <DashboardAlerts
+            invalidDateRange={invalidDateRange}
+            missingRates={missingRates}
+          />
 
-            <FilterPanel
-              filters={filters}
-              dimensions={dimensions}
-              onFiltersChange={setFilters}
-              onResetDrill={resetDrill}
-            />
+          <FilterPanel
+            filters={filters}
+            dimensions={dimensions}
+            onFiltersChange={setFilters}
+            onResetDrill={resetDrill}
+          />
 
-            <MetricGrid stats={stats} />
+          <RateSettings
+            dimensions={dimensions}
+            rateInputs={rateInputs}
+            onRateInputsChange={setRateInputs}
+            onRatesChange={setRates}
+          />
 
-            {filtered.length ? (
-              <>
-                <AnalysisCharts
-                  options={chartOptions}
-                  drillCategory={drillCategory}
-                  rankLevel={rankLevel}
-                  onApplyMonth={applyMonth}
-                  onDrillCategoryChange={setDrillCategory}
-                  onRankLevelChange={setRankLevel}
-                  onTagSelect={selectTag}
-                />
+          <MetricGrid stats={stats} />
 
-                <SummaryTables
-                  categoryRows={sortedCategoryRows}
-                  tagRows={sortedTagRows}
-                  expenseTotal={expenseTotal}
-                  summarySort={summarySort}
-                  tagSort={tagSort}
-                  onSummarySortChange={setSummarySort}
-                  onTagSortChange={setTagSort}
-                  onCategorySelect={selectCategory}
-                  onTagSelect={selectTag}
-                />
-              </>
-            ) : (
-              <NoResultEmptyState />
-            )}
+          {filtered.length ? (
+            <>
+              <AnalysisCharts
+                options={chartOptions}
+                drillCategory={drillCategory}
+                rankLevel={rankLevel}
+                onApplyMonth={applyMonth}
+                onDrillCategoryChange={setDrillCategory}
+                onRankLevelChange={setRankLevel}
+                onTagSelect={selectTag}
+              />
 
-            <RateSettings
-              dimensions={dimensions}
-              rateInputs={rateInputs}
-              onRateInputsChange={setRateInputs}
-              onRatesChange={setRates}
-            />
+              <SummaryTables
+                categoryRows={sortedCategoryRows}
+                tagRows={sortedTagRows}
+                expenseTotal={expenseTotal}
+                summarySort={summarySort}
+                tagSort={tagSort}
+                onSummarySortChange={setSummarySort}
+                onTagSortChange={setTagSort}
+                onCategorySelect={selectCategory}
+                onTagSelect={selectTag}
+              />
+            </>
+          ) : (
+            <NoResultEmptyState />
+          )}
 
-            <TransactionTable
-              rows={detailRows}
-              pagedRows={pagedRows}
-              safePage={safePage}
-              totalPages={totalPages}
-              pageSize={pageSize}
-              detailSort={detailSort}
-              rates={rates}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-              onDetailSortChange={setDetailSort}
-            />
-          </div>
-        </>
+          <TransactionTable
+            rows={detailRows}
+            pagedRows={pagedRows}
+            safePage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            detailSort={detailSort}
+            rates={rates}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onDetailSortChange={setDetailSort}
+          />
+        </div>
       )}
     </main>
   )
