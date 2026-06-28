@@ -51,8 +51,15 @@ export function formatMoney(value: number, compact = false) {
 }
 
 export function splitTags(raw: string) {
-  return raw
-    .split(/[，,、;；|\s]+/)
+  const separators = /[，,、;；|]+/
+  const tagPattern = /#[^#，,、;；|]+/g
+  const tags = raw.includes("#")
+    ? raw
+        .split(separators)
+        .flatMap((part) => part.match(tagPattern) ?? part.split(/\s+/))
+    : raw.split(/[，,、;；|\s]+/)
+
+  return tags
     .map((tag) => tag.trim())
     .filter((tag) => tag && !/^(?:19|20)\d{2}年?$/.test(tag))
 }
