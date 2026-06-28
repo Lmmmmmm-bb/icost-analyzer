@@ -12,11 +12,7 @@ import { Input } from "@/components/ui/input"
 import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
 import type { Dimensions, Filters } from "../../model/types"
 import { ChipGroup } from "./chip-group"
-import {
-  ALL_YEARS_OPTION,
-  QUICK_RANGES,
-  TRANSACTION_TYPES,
-} from "./filter-options"
+import { QUICK_RANGES, TRANSACTION_TYPES } from "./filter-options"
 import { FilterRow } from "./filter-row"
 
 type FilterPanelProps = {
@@ -61,31 +57,19 @@ export function FilterPanel({
       <CardContent className="px-0">
         <FilterRow label="时间" contentClassName="flex flex-col gap-3" inline>
           <ChipGroup
-            title="快捷时间"
-            items={QUICK_RANGES}
-            value={[filters.quickRange]}
+            title="时间"
+            items={[...QUICK_RANGES, ...dimensions.years]}
+            value={[filters.year || filters.quickRange]}
             showTitle={false}
-            onChange={(next) =>
-              onFiltersChange((current) => ({
-                ...current,
-                quickRange: next.at(-1) ?? ALL_RANGE,
-                year: "",
-                startDate: "",
-                endDate: "",
-              }))
-            }
-          />
-          <ChipGroup
-            title="年份"
-            items={[ALL_YEARS_OPTION, ...dimensions.years]}
-            value={[filters.year || ALL_YEARS_OPTION]}
-            titleInline
+            separatorBefore={dimensions.years[0]}
             onChange={(next) => {
-              const selected = next.at(-1)
+              const selected = next.at(-1) ?? ALL_RANGE
+              const isYear = dimensions.years.includes(selected)
+
               onFiltersChange((current) => ({
                 ...current,
-                year: selected && selected !== ALL_YEARS_OPTION ? selected : "",
-                quickRange: ALL_RANGE,
+                quickRange: isYear ? ALL_RANGE : selected,
+                year: isYear ? selected : "",
                 startDate: "",
                 endDate: "",
               }))

@@ -1,4 +1,7 @@
+import { Fragment } from "react"
+
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 
 type ChipGroupProps = {
   title: string
@@ -8,6 +11,7 @@ type ChipGroupProps = {
   limit?: number
   showTitle?: boolean
   titleInline?: boolean
+  separatorBefore?: string
 }
 
 function toggleValue(values: string[], value: string) {
@@ -24,6 +28,7 @@ export function ChipGroup({
   limit,
   showTitle = true,
   titleInline = false,
+  separatorBefore,
 }: ChipGroupProps) {
   const visible = limit ? items.slice(0, limit) : items
   return (
@@ -37,16 +42,20 @@ export function ChipGroup({
       ) : null}
       <div className="flex flex-wrap gap-1.5">
         {visible.map((item) => (
-          <Button
-            key={item}
-            type="button"
-            size="xs"
-            variant={value.includes(item) ? "default" : "outline"}
-            className="font-mono tracking-[0.04em] shadow-none transition-transform hover:-translate-y-px"
-            onClick={() => onChange(toggleValue(value, item))}
-          >
-            {item}
-          </Button>
+          <Fragment key={item}>
+            {separatorBefore === item ? (
+              <Separator orientation="vertical" className="mx-1 h-6 self-center" />
+            ) : null}
+            <Button
+              type="button"
+              size="xs"
+              variant={value.includes(item) ? "default" : "outline"}
+              className="font-mono tracking-[0.04em] shadow-none transition-transform hover:-translate-y-px"
+              onClick={() => onChange(toggleValue(value, item))}
+            >
+              {item}
+            </Button>
+          </Fragment>
         ))}
       </div>
     </div>

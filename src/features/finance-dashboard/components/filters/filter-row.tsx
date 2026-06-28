@@ -26,7 +26,7 @@ export function FilterRow({
     >
       <div
         className={cn(
-          "border-b border-border/70 px-4 py-3 font-mono text-[10px] tracking-[0.18em] text-muted-foreground uppercase transition-colors group-hover/filter-row:text-foreground md:border-r md:border-b-0 md:border-border/70",
+          "flex items-center border-b border-border/70 px-4 py-3 font-mono text-[10px] tracking-[0.18em] text-muted-foreground uppercase transition-colors group-hover/filter-row:text-foreground md:border-r md:border-b-0 md:border-border/70",
           inline && "border-r border-b-0 border-border/70"
         )}
       >

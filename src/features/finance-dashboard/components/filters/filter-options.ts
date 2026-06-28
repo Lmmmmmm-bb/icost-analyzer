@@ -1,7 +1,5 @@
 import { ALL_RANGE } from "../../model/constants"
 
-export const ALL_YEARS_OPTION = "全部年份"
-
 export const QUICK_RANGES = [
   ALL_RANGE,
   "今年",
