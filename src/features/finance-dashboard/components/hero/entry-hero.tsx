@@ -1,6 +1,6 @@
 import { HeroCopy } from "./hero-copy"
-import { HeroScanLine } from "./hero-scan-line"
 import { UploadCard } from "./upload-card"
+import { useFileDrop } from "./use-file-drop"
 
 const ENTRY_STEPS = [
   ["01", "拖入 iCost 导出的 Excel"],
@@ -9,25 +9,46 @@ const ENTRY_STEPS = [
 ] as const
 
 type EntryHeroProps = {
-  fileName: string
   error: string
   onUpload: (file: File) => void
 }
 
-export function EntryHero({ fileName, error, onUpload }: EntryHeroProps) {
+export function EntryHero({ error, onUpload }: EntryHeroProps) {
+  const { isDragging, dropProps } = useFileDrop(onUpload)
+
   return (
-    <section className="relative flex min-h-svh items-center overflow-hidden">
-      <HeroScanLine />
+    <section
+      className="relative flex min-h-svh items-center overflow-hidden py-8 md:py-12"
+      {...dropProps}
+    >
+      {isDragging ? (
+        <div
+          aria-hidden="true"
+          className="ledger-drop-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-dashed border-foreground/45 bg-background/55 shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--background),transparent_26%),0_22px_90px_color-mix(in_oklch,var(--foreground),transparent_90%)] backdrop-blur-md"
+        >
+          <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-[0_18px_60px_color-mix(in_oklch,var(--foreground),transparent_90%)] backdrop-blur-xl">
+            <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
+              松开即可上传
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              已识别到文件拖入页面，松开后会在本地解析 iCost Excel。
+            </p>
+            <div className="mt-2 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+              Drop anywhere · .xlsx / .xls
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-[8%] bottom-[10%] hidden h-72 w-72 border border-border/70 bg-card/25 shadow-[24px_24px_0_color-mix(in_oklch,var(--foreground),transparent_94%)] lg:block"
+        className="ledger-float pointer-events-none absolute right-[8%] bottom-[10%] hidden h-72 w-72 border border-border/55 bg-card/15 shadow-[22px_22px_42px_color-mix(in_oklch,var(--foreground),transparent_96%)] backdrop-blur-sm lg:block"
       />
-      <div className="ledger-rise relative mx-auto grid w-full max-w-7xl gap-8 px-5 py-10 md:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-end lg:px-10">
-        <div className="flex flex-col gap-8">
+      <div className="ledger-rise relative z-20 mx-auto grid w-full max-w-7xl gap-8 px-5 py-10 md:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-end lg:gap-12 lg:px-10">
+        <div className="flex flex-col gap-9">
           <HeroCopy />
           <EntrySteps />
         </div>
-        <UploadCard fileName={fileName} error={error} onUpload={onUpload} />
+        <UploadCard error={error} onUpload={onUpload} />
       </div>
     </section>
   )
@@ -36,11 +57,13 @@ export function EntryHero({ fileName, error, onUpload }: EntryHeroProps) {
 function EntrySteps() {
   return (
     <div className="grid max-w-3xl gap-3 sm:grid-cols-3">
-      {ENTRY_STEPS.map(([step, label]) => (
+      {ENTRY_STEPS.map(([step, label], index) => (
         <div
           key={step}
-          className="border border-border/70 bg-card/70 p-4 shadow-sm backdrop-blur"
+          className="group relative overflow-hidden border border-border/70 bg-card/70 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/90 hover:shadow-[0_16px_42px_color-mix(in_oklch,var(--foreground),transparent_95%)]"
+          style={{ animationDelay: `${140 + index * 70}ms` }}
         >
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
           <div className="font-mono text-[10px] tracking-[0.22em] text-muted-foreground uppercase">
             Step {step}
           </div>

@@ -3,11 +3,11 @@ export function DashboardBackdrop() {
     <>
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_14%_8%,color-mix(in_oklch,var(--primary),transparent_86%),transparent_24rem),radial-gradient(circle_at_88%_18%,color-mix(in_oklch,var(--chart-1),transparent_84%),transparent_22rem),linear-gradient(rgba(148,163,184,0.075)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.075)_1px,transparent_1px)] bg-[size:100%_100%,100%_100%,48px_48px,48px_48px]"
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_18%_8%,color-mix(in_oklch,var(--primary),transparent_94%),transparent_24rem),linear-gradient(rgba(148,163,184,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.055)_1px,transparent_1px)] bg-[size:100%_100%,56px_56px,56px_56px]"
       />
       <div
         aria-hidden="true"
-        className="ledger-noise pointer-events-none fixed inset-0 mix-blend-multiply"
+        className="ledger-noise pointer-events-none fixed inset-0 opacity-70 mix-blend-multiply"
       />
       <div
         aria-hidden="true"

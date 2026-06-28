@@ -23,17 +23,21 @@ export function ChartShell({
   children,
 }: ChartShellProps) {
   return (
-    <Card className="relative gap-0 bg-card/92 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_70px_color-mix(in_oklch,var(--foreground),transparent_94%)]">
+    <Card className="group/chart relative gap-0 overflow-hidden bg-card/92 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-[0_18px_70px_color-mix(in_oklch,var(--foreground),transparent_94%)]">
+      <div
+        aria-hidden="true"
+        className="absolute top-4 right-4 size-10 border border-border/60 bg-background/25 opacity-70 transition-transform duration-500 group-hover/chart:rotate-6"
+      />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
-      <CardHeader className="border-b border-border/70 p-4">
+      <CardHeader className="relative border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
-          <span className="size-1.5 bg-primary" />
+          <span className="size-1.5 bg-primary shadow-[0_0_0_4px_color-mix(in_oklch,var(--primary),transparent_90%)]" />
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
         {action ? <CardAction>{action}</CardAction> : null}
       </CardHeader>
-      <CardContent className="bg-[linear-gradient(180deg,color-mix(in_oklch,var(--muted),transparent_74%),transparent_36%)] p-4">
+      <CardContent className="relative bg-[linear-gradient(180deg,color-mix(in_oklch,var(--muted),transparent_74%),transparent_36%)] p-4">
         {children}
       </CardContent>
     </Card>

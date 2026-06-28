@@ -265,7 +265,7 @@ export function FinanceDashboard() {
       <DashboardBackdrop />
 
       {!hasTransactions ? (
-        <EntryHero fileName={fileName} error={error} onUpload={handleUpload} />
+        <EntryHero error={error} onUpload={handleUpload} />
       ) : (
         <>
           <WorkspaceHero
@@ -277,7 +277,7 @@ export function FinanceDashboard() {
             onReplaceFile={resetWorkbook}
           />
 
-          <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-6 px-5 py-6 [animation-delay:90ms] md:px-8 lg:px-10">
+          <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-6 [animation-delay:90ms] md:px-8 lg:gap-6 lg:px-10">
             <DashboardAlerts
               invalidDateRange={invalidDateRange}
               missingRates={missingRates}
