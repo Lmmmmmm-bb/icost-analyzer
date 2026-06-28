@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+demo.html
+example.xlsx
 
 # Editor directories and files
 .vscode/*
