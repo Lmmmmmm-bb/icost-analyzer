@@ -36,9 +36,13 @@ export function FilterPanel({
   const dateInputClassName = "h-7 w-[9rem] px-2 font-mono text-[11px]"
 
   return (
-    <Card className="gap-0 bg-card/95 py-0 backdrop-blur-sm">
+    <Card className="relative gap-0 bg-card/95 py-0 shadow-[0_16px_64px_color-mix(in_oklch,var(--foreground),transparent_96%)] backdrop-blur-sm">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
       <CardHeader className="border-b border-border/70 p-4">
-        <CardTitle>筛选器</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <span className="size-1.5 bg-primary" />
+          筛选器
+        </CardTitle>
         <CardDescription>
           时间、类型、币种、分类、标签与关键词会联动刷新全部分析模块。
         </CardDescription>
@@ -133,6 +137,7 @@ export function FilterPanel({
         <FilterRow label="关键词">
           <Input
             placeholder="搜索备注、分类、标签、地点、币种……"
+            className="bg-background/70"
             value={filters.keyword}
             onChange={(event) =>
               onFiltersChange((current) => ({

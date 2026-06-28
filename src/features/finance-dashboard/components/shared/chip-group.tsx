@@ -34,7 +34,7 @@ export function ChipGroup({
             type="button"
             size="xs"
             variant={value.includes(item) ? "default" : "outline"}
-            className="font-mono tracking-[0.04em]"
+            className="font-mono tracking-[0.04em] shadow-none transition-transform hover:-translate-y-px"
             onClick={() => onChange(toggleValue(value, item))}
           >
             {item}

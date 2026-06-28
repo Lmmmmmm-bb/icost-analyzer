@@ -16,8 +16,10 @@ function transactionTypeVariant(transaction: Transaction) {
 
 export function TransactionRow({ transaction, rates }: TransactionRowProps) {
   return (
-    <TableRow>
-      <TableCell>{transaction.dateText}</TableCell>
+    <TableRow className="group/tx">
+      <TableCell className="font-mono text-[11px] text-muted-foreground transition-colors group-hover/tx:text-foreground">
+        {transaction.dateText}
+      </TableCell>
       <TableCell>
         <Badge variant={transactionTypeVariant(transaction)}>
           {transaction.type}
@@ -42,14 +44,16 @@ export function TransactionRow({ transaction, rates }: TransactionRowProps) {
           ))}
         </div>
       </TableCell>
-      <TableCell>{transaction.currency}</TableCell>
-      <TableCell>
+      <TableCell className="font-mono text-[11px]">{transaction.currency}</TableCell>
+      <TableCell className="font-mono text-[11px] tabular-nums">
         {transaction.amount.toLocaleString("zh-CN", {
           maximumFractionDigits: 3,
         })}{" "}
         {transaction.currency}
       </TableCell>
-      <TableCell>{formatMoney(toRmb(transaction, rates))}</TableCell>
+      <TableCell className="font-mono text-[11px] font-medium tabular-nums">
+        {formatMoney(toRmb(transaction, rates))}
+      </TableCell>
     </TableRow>
   )
 }
