@@ -32,7 +32,7 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
   )
 
   return (
-    <Card className="group/upload relative gap-0 overflow-hidden bg-card/90 py-0 shadow-ledger-card backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-ledger-card-hover lg:w-[440px]">
+    <Card className="group/upload relative gap-0 overflow-hidden bg-card/90 py-0 shadow-ledger-card backdrop-blur-xl transition-shadow duration-300 hover:shadow-ledger-card-hover lg:w-[440px]">
       <div
         aria-hidden="true"
         className="absolute -top-10 -right-10 size-28 rotate-12 border border-border/60 bg-background/35 transition-transform duration-500 group-hover/upload:rotate-6"

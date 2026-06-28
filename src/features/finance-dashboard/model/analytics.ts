@@ -73,12 +73,14 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
   let reimburse = 0
   let maxExpense = 0
   let expenseCount = 0
+  const monthSet = new Set<string>()
   const daySet = new Set<string>()
   const currencySet = new Set<string>()
   const tagSet = new Set<string>()
 
   for (const tx of filtered) {
     const rmb = toRmb(tx, rates)
+    monthSet.add(tx.monthKey)
     daySet.add(tx.dayKey)
     currencySet.add(tx.currency)
     tx.tags.forEach((tag) => tagSet.add(tag))
@@ -92,12 +94,14 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
     if (isReimburse(tx)) reimburse += Math.abs(rmb)
   }
 
+  const months = monthSet.size || 1
   const days = daySet.size || 1
   return {
     totalExpense,
     totalIncome,
     net: totalIncome - totalExpense,
     count: filtered.length,
+    monthlyExpense: totalExpense / months,
     dailyExpense: totalExpense / days,
     avgExpense: totalExpense / (expenseCount || 1),
     maxExpense,

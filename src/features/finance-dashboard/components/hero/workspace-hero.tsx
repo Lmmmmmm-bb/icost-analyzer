@@ -1,29 +1,25 @@
 import { Button } from "@/components/ui/button"
 
-import type { Dimensions } from "../../model/types"
+import type { MetricStats } from "../../model/analytics-types"
 import { HeroMetrics } from "./hero-metrics"
 
 type WorkspaceHeroProps = {
   fileName: string
   rangeText: string
-  totalCount: number
-  filteredCount: number
-  dimensions: Dimensions
+  stats: MetricStats
   onReplaceFile: () => void
 }
 
 export function WorkspaceHero({
   fileName,
   rangeText,
-  totalCount,
-  filteredCount,
-  dimensions,
+  stats,
   onReplaceFile,
 }: WorkspaceHeroProps) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex max-w-2xl flex-col gap-1.5">
+        <div className="flex max-w-2xl flex-col gap-3">
           <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
             <span className="h-px w-7 bg-foreground/30" />
             Analysis dashboard
@@ -38,6 +34,9 @@ export function WorkspaceHero({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground lg:pt-5">
+          <span className="max-w-full truncate border bg-card/80 px-3 py-2 font-mono shadow-ledger-tag backdrop-blur sm:max-w-[18rem]">
+            覆盖时间 {rangeText}
+          </span>
           <span className="max-w-full truncate border bg-card/80 px-3 py-2 font-mono shadow-ledger-tag backdrop-blur sm:max-w-[28rem]">
             {fileName}
           </span>
@@ -50,12 +49,7 @@ export function WorkspaceHero({
           </Button>
         </div>
       </div>
-      <HeroMetrics
-        rangeText={rangeText}
-        totalCount={totalCount}
-        filteredCount={filteredCount}
-        dimensions={dimensions}
-      />
+      <HeroMetrics stats={stats} />
     </section>
   )
 }

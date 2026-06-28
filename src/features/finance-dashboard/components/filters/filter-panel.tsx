@@ -41,7 +41,7 @@ export function FilterPanel({
     <Card className="relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm">
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
-          <span className="size-1.5 bg-primary" />
+          <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
           筛选器
         </CardTitle>
         <CardDescription>

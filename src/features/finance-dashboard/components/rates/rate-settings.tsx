@@ -1,19 +1,12 @@
 import { useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 import { BASE_CURRENCY, DEFAULT_RATES } from "../../model/constants"
 import { unique } from "../../model/collections"
 import type { Dimensions, RateMap } from "../../model/types"
+import { DashboardPanel } from "../shared/dashboard-panel"
 import { makeRateInputs } from "./rate-inputs"
 
 type RateSettingsProps = {
@@ -47,26 +40,23 @@ export function RateSettings({
   }
 
   return (
-    <Card className="gap-0 py-0">
-      <CardHeader className="border-b border-border/70 p-4">
-        <CardTitle>汇率设置</CardTitle>
-        <CardDescription>
-          {BASE_CURRENCY} 固定为 1；非法或空汇率不会写入计算。
-        </CardDescription>
-        <CardAction>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              onRatesChange(DEFAULT_RATES)
-              onRateInputsChange(makeRateInputs(DEFAULT_RATES))
-            }}
-          >
-            恢复默认汇率
-          </Button>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="grid gap-3 p-4 sm:grid-cols-3 lg:grid-cols-7">
+    <DashboardPanel
+      title="汇率设置"
+      description={`${BASE_CURRENCY} 固定为 1；非法或空汇率不会写入计算。`}
+      action={
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={() => {
+            onRatesChange(DEFAULT_RATES)
+            onRateInputsChange(makeRateInputs(DEFAULT_RATES))
+          }}
+        >
+          恢复默认汇率
+        </Button>
+      }
+    >
+      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-7">
         {currencies.map((currency) => {
           const raw = rateInputs[currency] ?? ""
           const value = Number(raw)
@@ -88,7 +78,7 @@ export function RateSettings({
             </label>
           )
         })}
-      </CardContent>
-    </Card>
+      </div>
+    </DashboardPanel>
   )
 }

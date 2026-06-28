@@ -98,6 +98,27 @@ function tooltipStyle(theme?: ChartTheme) {
   }
 }
 
+function pieLegend(items: SummaryItem[]) {
+  return {
+    type: "scroll" as const,
+    bottom: 0,
+    left: "center",
+    icon: "circle",
+    itemWidth: 8,
+    itemHeight: 8,
+    itemGap: 10,
+    pageIconSize: 9,
+    pageTextStyle: { color: chartMutedTextColor(), fontSize: 10 },
+    textStyle: {
+      color: chartMutedTextColor(),
+      fontSize: 10,
+      width: 72,
+      overflow: "truncate" as const,
+    },
+    data: items.map((item) => item.name),
+  }
+}
+
 export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
   const axis = axisStyle()
   return {
@@ -174,11 +195,12 @@ export function createPieOption(items: SummaryItem[]): EChartsOption {
       formatter: "{b}<br/>¥{c} · {d}%",
       ...tooltipStyle(),
     },
+    legend: pieLegend(items),
     series: [
       {
         type: "pie",
-        radius: ["54%", "80%"],
-        center: ["50%", "52%"],
+        radius: ["44%", "68%"],
+        center: ["50%", "43%"],
         padAngle: 1,
         data: items.map((item) => ({
           name: item.name,
@@ -265,11 +287,12 @@ export function createCurrencyOption(items: SummaryItem[]): EChartsOption {
       formatter: "{b}<br/>¥{c} · {d}%",
       ...tooltipStyle(),
     },
+    legend: pieLegend(items),
     series: [
       {
         type: "pie",
-        radius: ["50%", "76%"],
-        center: ["50%", "50%"],
+        radius: ["42%", "66%"],
+        center: ["50%", "43%"],
         data: items.map((item) => ({
           name: item.name,
           value: Number(item.amount.toFixed(2)),

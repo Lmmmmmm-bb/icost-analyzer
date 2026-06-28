@@ -1,42 +1,84 @@
-import type { Dimensions } from "../../model/types"
-import { MetricCard } from "../shared/metric-card"
+import { Card, CardContent } from "@/components/ui/card"
+
+import type { MetricStats } from "../../model/analytics-types"
+import { formatMoney } from "../../model/money"
 
 type HeroMetricsProps = {
-  rangeText: string
-  totalCount: number
-  filteredCount: number
-  dimensions: Dimensions
+  stats: MetricStats
 }
 
-export function HeroMetrics({
-  rangeText,
-  totalCount,
-  filteredCount,
-  dimensions,
-}: HeroMetricsProps) {
+type MetricItem = {
+  label: string
+  value: string
+  caption?: string
+}
+
+export function HeroMetrics({ stats }: HeroMetricsProps) {
+  const primaryMetrics: MetricItem[] = [
+    {
+      label: "总支出",
+      value: formatMoney(stats.totalExpense),
+      caption: `${stats.expenseCount} 笔支出`,
+    },
+    {
+      label: "总收入",
+      value: formatMoney(stats.totalIncome),
+      caption: "不包含转账",
+    },
+    {
+      label: "净结余",
+      value: formatMoney(stats.net),
+      caption: "总收入 - 总支出",
+    },
+    {
+      label: "交易笔数",
+      value: `${stats.count} 笔`,
+      caption: "当前筛选后的交易总数",
+    },
+  ]
+  const secondaryMetrics: MetricItem[] = [
+    { label: "月均支出", value: formatMoney(stats.monthlyExpense) },
+    { label: "日均支出", value: formatMoney(stats.dailyExpense) },
+    { label: "笔均支出", value: formatMoney(stats.avgExpense) },
+    { label: "最大单笔", value: formatMoney(stats.maxExpense) },
+    { label: "退款/报销", value: formatMoney(stats.reimburse) },
+    { label: "涉及货币", value: `${stats.currencyCount} 种` },
+    { label: "涉及标签", value: `${stats.tagCount} 个` },
+  ]
+
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-      <MetricCard
-        label="覆盖时间"
-        value={rangeText}
-        caption="基于上传数据的最早与最晚交易"
-      />
-      <MetricCard
-        label="记录总数"
-        value={`${totalCount}`}
-        caption={`当前筛选 ${filteredCount} 条`}
-      />
-      <MetricCard
-        label="涉及币种"
-        value={`${dimensions.currencies.length}`}
-        caption={dimensions.currencies.join(" / ") || "等待数据"}
-      />
-      <MetricCard
-        label="涉及标签"
-        value={`${dimensions.tags.length}`}
-        caption="空标签不参与标签统计"
-      />
-      <MetricCard label="汇率说明" value="手动" caption="修改后全局实时重算" />
-    </div>
+    <Card className="relative gap-0 overflow-hidden bg-card/90 py-0 shadow-ledger-panel backdrop-blur-xl">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
+      <CardContent className="p-0">
+        <div className="grid divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+          {primaryMetrics.map((metric) => (
+            <div key={metric.label} className="relative flex flex-col gap-2 p-4">
+              <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+                {metric.label}
+              </div>
+              <div className="font-heading text-2xl leading-tight font-semibold tracking-tight tabular-nums">
+                {metric.value}
+              </div>
+              <div className="text-sm text-muted-foreground">{metric.caption}</div>
+            </div>
+          ))}
+        </div>
+        <div className="grid border-t border-border/70 bg-background/35 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7">
+          {secondaryMetrics.map((metric) => (
+            <div
+              key={metric.label}
+              className="flex min-h-14 flex-col justify-between gap-1.5 border-r border-b border-border/70 px-3 py-2.5 xl:border-b-0 xl:last:border-r-0"
+            >
+              <div className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+                {metric.label}
+              </div>
+              <div className="font-heading text-base leading-none font-semibold tracking-tight tabular-nums">
+                {metric.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   )
 }

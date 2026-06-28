@@ -20,7 +20,6 @@ import { NoResultEmptyState } from "./components/feedback/empty-states"
 import { FilterPanel } from "./components/filters/filter-panel"
 import { EntryHero } from "./components/hero/entry-hero"
 import { WorkspaceHero } from "./components/hero/workspace-hero"
-import { MetricGrid } from "./components/metrics/metric-grid"
 import { RateSettings } from "./components/rates/rate-settings"
 import { makeRateInputs } from "./components/rates/rate-inputs"
 import { SummaryTables } from "./components/summaries/summary-tables"
@@ -123,7 +122,6 @@ export function FinanceDashboard() {
   const rangeText = dateRange
     ? `${dateKey(dateRange.start)} → ${dateKey(dateRange.end)}`
     : "等待上传"
-
   const categoryPie = useMemo(
     () =>
       drillCategory
@@ -252,9 +250,7 @@ export function FinanceDashboard() {
           <WorkspaceHero
             fileName={fileName}
             rangeText={rangeText}
-            totalCount={transactions.length}
-            filteredCount={filtered.length}
-            dimensions={dimensions}
+            stats={stats}
             onReplaceFile={resetWorkbook}
           />
 
@@ -276,8 +272,6 @@ export function FinanceDashboard() {
             onRateInputsChange={setRateInputs}
             onRatesChange={setRates}
           />
-
-          <MetricGrid stats={stats} />
 
           {filtered.length ? (
             <>

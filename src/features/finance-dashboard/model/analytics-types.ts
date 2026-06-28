@@ -10,6 +10,7 @@ export type MetricStats = {
   totalIncome: number
   net: number
   count: number
+  monthlyExpense: number
   dailyExpense: number
   avgExpense: number
   maxExpense: number

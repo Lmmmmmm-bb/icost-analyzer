@@ -49,7 +49,10 @@ export function TransactionTable({
   return (
     <Card className="gap-0 py-0">
       <CardHeader className="border-b border-border/70 p-4">
-        <CardTitle>交易明细</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
+          交易明细
+        </CardTitle>
         <CardDescription>
           共 {rows.length} 条筛选结果，外币保留原金额并展示人民币折算。
         </CardDescription>
