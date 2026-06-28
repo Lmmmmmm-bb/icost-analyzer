@@ -36,7 +36,7 @@ export function FilterPanel({
   const dateInputClassName = "h-7 w-[9rem] px-2 font-mono text-[11px]"
 
   return (
-    <Card className="shadow-ledger-panel relative gap-0 bg-card/95 py-0 backdrop-blur-sm">
+    <Card className="relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">

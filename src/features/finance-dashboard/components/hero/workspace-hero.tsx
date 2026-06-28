@@ -38,7 +38,7 @@ export function WorkspaceHero({
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span className="shadow-ledger-tag max-w-full truncate border bg-card/80 px-3 py-2 font-mono backdrop-blur sm:max-w-[28rem]">
+            <span className="max-w-full truncate border bg-card/80 px-3 py-2 font-mono shadow-ledger-tag backdrop-blur sm:max-w-[28rem]">
               {fileName}
             </span>
             <Button

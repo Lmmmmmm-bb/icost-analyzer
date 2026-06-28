@@ -1,6 +1,10 @@
+import { useCallback } from "react"
+
 import { HeroCopy } from "./hero-copy"
+import { ParsingStatusOverlay } from "./parsing-status"
 import { UploadCard } from "./upload-card"
 import { useFileDrop } from "./use-file-drop"
+import type { WorkbookUploadState } from "./use-workbook-upload"
 
 const ENTRY_STEPS = [
   ["01", "拖入 iCost 导出的 Excel"],
@@ -9,12 +13,20 @@ const ENTRY_STEPS = [
 ] as const
 
 type EntryHeroProps = {
-  error: string
+  uploadState: WorkbookUploadState
   onUpload: (file: File) => void
 }
 
-export function EntryHero({ error, onUpload }: EntryHeroProps) {
-  const { isDragging, dropProps } = useFileDrop(onUpload)
+export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
+  const handleFileDrop = useCallback(
+    (file: File) => {
+      if (!uploadState.isParsing) onUpload(file)
+    },
+    [onUpload, uploadState.isParsing]
+  )
+  const { isDragging, dropProps } = useFileDrop(handleFileDrop, {
+    disabled: uploadState.isParsing,
+  })
 
   return (
     <section
@@ -24,9 +36,9 @@ export function EntryHero({ error, onUpload }: EntryHeroProps) {
       {isDragging ? (
         <div
           aria-hidden="true"
-          className="ledger-drop-overlay shadow-ledger-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-dashed border-foreground/45 bg-background/55 backdrop-blur-md"
+          className="ledger-drop-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-dashed border-foreground/45 bg-background/55 shadow-ledger-overlay backdrop-blur-md"
         >
-          <div className="ledger-drop-card shadow-ledger-popover max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center backdrop-blur-xl">
+          <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-ledger-popover backdrop-blur-xl">
             <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
               松开即可上传
             </div>
@@ -39,16 +51,19 @@ export function EntryHero({ error, onUpload }: EntryHeroProps) {
           </div>
         </div>
       ) : null}
+      {uploadState.showParsingStatus ? (
+        <ParsingStatusOverlay fileName={uploadState.parsingFileName} />
+      ) : null}
       <div
         aria-hidden="true"
-        className="ledger-float shadow-ledger-float pointer-events-none absolute right-[8%] bottom-[10%] hidden h-72 w-72 border border-border/55 bg-card/15 backdrop-blur-sm lg:block"
+        className="ledger-float pointer-events-none absolute right-[8%] bottom-[10%] hidden h-72 w-72 border border-border/55 bg-card/15 shadow-ledger-float backdrop-blur-sm lg:block"
       />
       <div className="ledger-rise relative z-20 mx-auto grid w-full max-w-7xl gap-8 px-5 py-10 md:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-end lg:gap-12 lg:px-10">
         <div className="flex flex-col gap-9">
           <HeroCopy />
           <EntrySteps />
         </div>
-        <UploadCard error={error} onUpload={onUpload} />
+        <UploadCard uploadState={uploadState} onUpload={onUpload} />
       </div>
     </section>
   )

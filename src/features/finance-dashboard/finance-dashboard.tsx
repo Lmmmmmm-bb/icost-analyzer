@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import {
   ALL_RANGE,
@@ -45,14 +45,13 @@ import {
   getStats,
   getWeekSummary,
   makeRateInputs,
-  parseWorkbook,
   summarizeBy,
   toRmb,
   unique,
 } from "./model/utils"
+import { useWorkbookUpload } from "./components/hero/use-workbook-upload"
 
 export function FinanceDashboard() {
-  const uploadSeq = useRef(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [fileName, setFileName] = useState("")
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
@@ -67,7 +66,6 @@ export function FinanceDashboard() {
   const [detailSort, setDetailSort] = useState<DetailSort>("date")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
-  const [error, setError] = useState("")
 
   const dimensions = useMemo(() => getDimensions(transactions), [transactions])
   const dateRange = useMemo(() => getDateRange(transactions), [transactions])
@@ -188,55 +186,44 @@ export function FinanceDashboard() {
     })
   }, [tagSort, tagSummary])
 
-  const resetWorkbook = useCallback(() => {
-    uploadSeq.current += 1
-    setTransactions([])
-    setFileName("")
+  const resetAnalysisControls = useCallback(() => {
     setFilters(EMPTY_FILTERS)
-    setRates(DEFAULT_RATES)
-    setRateInputs(makeRateInputs(DEFAULT_RATES))
     setDrillCategory("")
     setRankLevel(RANK_LEVELS[0])
     setSummarySort("amount")
     setTagSort("amount")
     setDetailSort("date")
     setPage(1)
-    setPageSize(25)
-    setError("")
   }, [])
 
-  const handleUpload = useCallback(async (file: File) => {
-    const seq = (uploadSeq.current += 1)
-
-    try {
-      setError("")
-      const buffer = await file.arrayBuffer()
-      const parsed = await parseWorkbook(buffer)
-      if (seq !== uploadSeq.current) return
-      if (!parsed.length)
-        throw new Error("未识别到有效交易记录，请确认是 iCost 导出的 Excel。")
+  const applyParsedWorkbook = useCallback(
+    (parsed: Transaction[], file: File) => {
       setTransactions(parsed)
       setFileName(file.name)
-      setFilters(EMPTY_FILTERS)
-      setDrillCategory("")
+      resetAnalysisControls()
       const currencies = unique(parsed.map((tx) => tx.currency))
       const nextRates = { ...DEFAULT_RATES }
       for (const currency of currencies)
         if (!nextRates[currency]) nextRates[currency] = 0
       setRates(nextRates)
       setRateInputs(makeRateInputs(nextRates))
-      setRankLevel(RANK_LEVELS[0])
-      setSummarySort("amount")
-      setTagSort("amount")
-      setDetailSort("date")
-      setPage(1)
-    } catch (uploadError) {
-      if (seq !== uploadSeq.current) return
-      setError(
-        uploadError instanceof Error ? uploadError.message : "Excel 解析失败"
-      )
-    }
-  }, [])
+    },
+    [resetAnalysisControls]
+  )
+
+  const { uploadState, uploadWorkbook, resetUpload } = useWorkbookUpload({
+    onParsed: applyParsedWorkbook,
+  })
+
+  const resetWorkbook = useCallback(() => {
+    setTransactions([])
+    setFileName("")
+    setRates(DEFAULT_RATES)
+    setRateInputs(makeRateInputs(DEFAULT_RATES))
+    resetAnalysisControls()
+    setPageSize(25)
+    resetUpload()
+  }, [resetAnalysisControls, resetUpload])
 
   const applyMonth = useCallback((month: string) => {
     setFilters((current) => ({
@@ -265,7 +252,7 @@ export function FinanceDashboard() {
       <DashboardBackdrop />
 
       {!hasTransactions ? (
-        <EntryHero error={error} onUpload={handleUpload} />
+        <EntryHero uploadState={uploadState} onUpload={uploadWorkbook} />
       ) : (
         <>
           <WorkspaceHero

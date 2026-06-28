@@ -6,7 +6,7 @@ export function HeroCopy() {
       <div className="flex flex-wrap items-center gap-2">
         <Badge
           variant="outline"
-          className="shadow-ledger-tag w-fit bg-background/70 font-mono tracking-[0.18em] uppercase backdrop-blur"
+          className="w-fit bg-background/70 font-mono tracking-[0.18em] uppercase shadow-ledger-tag backdrop-blur"
         >
           iCost Excel · 多币种折算 · 交易联动分析
         </Badge>
@@ -20,7 +20,7 @@ export function HeroCopy() {
           <span className="h-px w-10 bg-foreground/40" />
           Personal finance control room
         </div>
-        <h1 className="max-w-[11ch] font-heading text-5xl leading-[0.86] font-semibold tracking-[-0.07em] text-balance md:text-7xl lg:text-[5.4rem]">
+        <h1 className="max-w-[12ch] font-heading text-4xl leading-[0.9] font-semibold tracking-[-0.06em] text-balance md:text-6xl lg:text-7xl">
           Ledger Observatory
         </h1>
         <p className="max-w-2xl border-l border-border/80 bg-background/30 py-1 pl-4 text-sm leading-7 text-muted-foreground backdrop-blur-sm md:text-base">

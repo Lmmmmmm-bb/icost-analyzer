@@ -5,7 +5,14 @@ function hasDraggedFiles(event: DragEvent<HTMLElement>) {
   return Array.from(event.dataTransfer.types).includes("Files")
 }
 
-export function useFileDrop(onFile: (file: File) => void) {
+type UseFileDropOptions = {
+  disabled?: boolean
+}
+
+export function useFileDrop(
+  onFile: (file: File) => void,
+  { disabled = false }: UseFileDropOptions = {}
+) {
   const dragDepth = useRef(0)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -14,17 +21,25 @@ export function useFileDrop(onFile: (file: File) => void) {
     setIsDragging(false)
   }, [])
 
-  const handleDragEnter = useCallback((event: DragEvent<HTMLElement>) => {
-    if (!hasDraggedFiles(event)) return
-    event.preventDefault()
-    dragDepth.current += 1
-    if (dragDepth.current === 1) setIsDragging(true)
-  }, [])
+  const handleDragEnter = useCallback(
+    (event: DragEvent<HTMLElement>) => {
+      if (disabled) return
+      if (!hasDraggedFiles(event)) return
+      event.preventDefault()
+      dragDepth.current += 1
+      if (dragDepth.current === 1) setIsDragging(true)
+    },
+    [disabled]
+  )
 
-  const handleDragOver = useCallback((event: DragEvent<HTMLElement>) => {
-    if (!hasDraggedFiles(event)) return
-    event.preventDefault()
-  }, [])
+  const handleDragOver = useCallback(
+    (event: DragEvent<HTMLElement>) => {
+      if (disabled) return
+      if (!hasDraggedFiles(event)) return
+      event.preventDefault()
+    },
+    [disabled]
+  )
 
   const handleDragLeave = useCallback((event: DragEvent<HTMLElement>) => {
     event.preventDefault()
@@ -35,11 +50,15 @@ export function useFileDrop(onFile: (file: File) => void) {
   const handleDrop = useCallback(
     (event: DragEvent<HTMLElement>) => {
       event.preventDefault()
+      if (disabled) {
+        resetDragging()
+        return
+      }
       const file = event.dataTransfer.files?.[0]
       resetDragging()
       if (file) onFile(file)
     },
-    [onFile, resetDragging]
+    [disabled, onFile, resetDragging]
   )
 
   useEffect(() => {
@@ -57,7 +76,7 @@ export function useFileDrop(onFile: (file: File) => void) {
   }, [resetDragging])
 
   return {
-    isDragging,
+    isDragging: disabled ? false : isDragging,
     dropProps: {
       onDragEnter: handleDragEnter,
       onDragOver: handleDragOver,

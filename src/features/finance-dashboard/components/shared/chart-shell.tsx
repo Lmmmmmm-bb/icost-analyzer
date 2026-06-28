@@ -27,7 +27,7 @@ export function ChartShell({
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
       <CardHeader className="relative border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
-          <span className="shadow-ledger-glow-primary-soft size-1.5 bg-primary" />
+          <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>

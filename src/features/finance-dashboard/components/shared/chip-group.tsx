@@ -23,7 +23,9 @@ export function ChipGroup({
 }: ChipGroupProps) {
   const visible = limit ? items.slice(0, limit) : items
   return (
-    <div className={titleInline ? "flex items-start gap-3" : "flex flex-col gap-2"}>
+    <div
+      className={titleInline ? "flex items-start gap-3" : "flex flex-col gap-2"}
+    >
       {showTitle ? (
         <div className="shrink-0 pt-1 text-[11px] tracking-[0.24em] text-muted-foreground uppercase">
           {title}
