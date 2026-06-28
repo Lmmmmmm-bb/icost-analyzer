@@ -1,17 +1,47 @@
 import { useEffect, useRef } from "react"
-import * as echarts from "echarts"
+import type * as ECharts from "echarts"
 import type { EChartsOption } from "echarts"
+import { BarChart, HeatmapChart, LineChart, PieChart } from "echarts/charts"
+import {
+  CalendarComponent,
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+  VisualMapComponent,
+} from "echarts/components"
+import { init, use as registerEChartsComponents } from "echarts/core"
+import type { EChartsType } from "echarts/core"
+import { CanvasRenderer } from "echarts/renderers"
+
+registerEChartsComponents([
+  BarChart,
+  HeatmapChart,
+  LineChart,
+  PieChart,
+  CalendarComponent,
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+  VisualMapComponent,
+  CanvasRenderer,
+])
 
 type EChartProps = {
   option: EChartsOption
   className?: string
-  onClick?: (params: echarts.ECElementEvent) => void
+  onClick?: (params: ECharts.ECElementEvent) => void
 }
 
 export function EChart({ option, className = "h-72", onClick }: EChartProps) {
   const ref = useRef<HTMLDivElement | null>(null)
-  const chartRef = useRef<echarts.ECharts | null>(null)
+  const chartRef = useRef<EChartsType | null>(null)
+  const optionRef = useRef(option)
   const onClickRef = useRef(onClick)
+
+  useEffect(() => {
+    optionRef.current = option
+    chartRef.current?.setOption(option, true)
+  }, [option])
 
   useEffect(() => {
     onClickRef.current = onClick
@@ -19,14 +49,17 @@ export function EChart({ option, className = "h-72", onClick }: EChartProps) {
 
   useEffect(() => {
     if (!ref.current) return
-    const chart = echarts.init(ref.current, undefined, { renderer: "canvas" })
+
+    const chart = init(ref.current, undefined, { renderer: "canvas" })
     chartRef.current = chart
-    const handleClick = (params: echarts.ECElementEvent) => {
+    chart.setOption(optionRef.current, true)
+    const handleClick = (params: ECharts.ECElementEvent) => {
       onClickRef.current?.(params)
     }
     chart.on("click", handleClick)
     const resize = () => chart.resize()
     window.addEventListener("resize", resize)
+
     return () => {
       window.removeEventListener("resize", resize)
       chart.off("click", handleClick)
@@ -34,10 +67,6 @@ export function EChart({ option, className = "h-72", onClick }: EChartProps) {
       chartRef.current = null
     }
   }, [])
-
-  useEffect(() => {
-    chartRef.current?.setOption(option, true)
-  }, [option])
 
   return <div ref={ref} className={className} />
 }

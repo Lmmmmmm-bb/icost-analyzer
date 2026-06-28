@@ -187,7 +187,7 @@ export function FinanceDashboard() {
     try {
       setError("")
       const buffer = await file.arrayBuffer()
-      const parsed = parseWorkbook(buffer)
+      const parsed = await parseWorkbook(buffer)
       if (!parsed.length)
         throw new Error("未识别到有效交易记录，请确认是 iCost 导出的 Excel。")
       setTransactions(parsed)
