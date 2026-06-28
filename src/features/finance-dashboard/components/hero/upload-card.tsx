@@ -27,7 +27,7 @@ export function UploadCard({ error, onUpload }: UploadCardProps) {
   )
 
   return (
-    <Card className="group/upload relative gap-0 overflow-hidden bg-card/90 py-0 shadow-[0_18px_60px_color-mix(in_oklch,var(--foreground),transparent_94%)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_80px_color-mix(in_oklch,var(--foreground),transparent_91%)] lg:w-[440px]">
+    <Card className="group/upload shadow-ledger-card hover:shadow-ledger-card-hover relative gap-0 overflow-hidden bg-card/90 py-0 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 lg:w-[440px]">
       <div
         aria-hidden="true"
         className="absolute -top-10 -right-10 size-28 rotate-12 border border-border/60 bg-background/35 transition-transform duration-500 group-hover/upload:rotate-6"
@@ -35,7 +35,7 @@ export function UploadCard({ error, onUpload }: UploadCardProps) {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
       <CardHeader className="relative border-b border-border/70 p-5">
         <CardTitle className="flex items-center gap-2">
-          <span className="size-2 bg-primary shadow-[0_0_0_4px_color-mix(in_oklch,var(--primary),transparent_88%)]" />
+          <span className="shadow-ledger-glow-primary size-2 bg-primary" />
           整页拖拽上传
         </CardTitle>
         <CardDescription>
@@ -66,7 +66,7 @@ export function UploadCard({ error, onUpload }: UploadCardProps) {
                 将 iCost Excel 拖进当前页面即可上传；也可以点击这里选择文件。
               </span>
             </span>
-            <span className="grid size-12 shrink-0 place-items-center border bg-primary font-mono text-xs text-primary-foreground shadow-sm transition-transform duration-300 group-hover/upload:-rotate-3">
+            <span className="shadow-ledger-tag grid size-12 shrink-0 place-items-center border bg-primary font-mono text-xs text-primary-foreground transition-transform duration-300 group-hover/upload:-rotate-3">
               XLS
             </span>
           </span>

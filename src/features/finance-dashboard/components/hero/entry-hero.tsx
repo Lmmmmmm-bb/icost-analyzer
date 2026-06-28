@@ -24,9 +24,9 @@ export function EntryHero({ error, onUpload }: EntryHeroProps) {
       {isDragging ? (
         <div
           aria-hidden="true"
-          className="ledger-drop-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-dashed border-foreground/45 bg-background/55 shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--background),transparent_26%),0_22px_90px_color-mix(in_oklch,var(--foreground),transparent_90%)] backdrop-blur-md"
+          className="ledger-drop-overlay shadow-ledger-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-dashed border-foreground/45 bg-background/55 backdrop-blur-md"
         >
-          <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-[0_18px_60px_color-mix(in_oklch,var(--foreground),transparent_90%)] backdrop-blur-xl">
+          <div className="ledger-drop-card shadow-ledger-popover max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center backdrop-blur-xl">
             <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
               松开即可上传
             </div>
@@ -41,7 +41,7 @@ export function EntryHero({ error, onUpload }: EntryHeroProps) {
       ) : null}
       <div
         aria-hidden="true"
-        className="ledger-float pointer-events-none absolute right-[8%] bottom-[10%] hidden h-72 w-72 border border-border/55 bg-card/15 shadow-[22px_22px_42px_color-mix(in_oklch,var(--foreground),transparent_96%)] backdrop-blur-sm lg:block"
+        className="ledger-float shadow-ledger-float pointer-events-none absolute right-[8%] bottom-[10%] hidden h-72 w-72 border border-border/55 bg-card/15 backdrop-blur-sm lg:block"
       />
       <div className="ledger-rise relative z-20 mx-auto grid w-full max-w-7xl gap-8 px-5 py-10 md:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-end lg:gap-12 lg:px-10">
         <div className="flex flex-col gap-9">
@@ -60,7 +60,7 @@ function EntrySteps() {
       {ENTRY_STEPS.map(([step, label], index) => (
         <div
           key={step}
-          className="group relative overflow-hidden border border-border/70 bg-card/70 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/90 hover:shadow-[0_16px_42px_color-mix(in_oklch,var(--foreground),transparent_95%)]"
+          className="group relative overflow-hidden border border-border/70 bg-card/70 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/90 hover:shadow-ledger-panel-hover"
           style={{ animationDelay: `${140 + index * 70}ms` }}
         >
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />

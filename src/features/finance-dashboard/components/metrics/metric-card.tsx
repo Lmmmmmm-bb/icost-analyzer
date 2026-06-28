@@ -14,7 +14,7 @@ type MetricCardProps = {
 
 export function MetricCard({ label, value, caption }: MetricCardProps) {
   return (
-    <Card className="group/metric relative gap-0 overflow-hidden bg-card/90 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-[0_18px_60px_color-mix(in_oklch,var(--foreground),transparent_94%)]">
+    <Card className="group/metric relative gap-0 overflow-hidden bg-card/90 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-ledger-panel-hover">
       <div
         aria-hidden="true"
         className="absolute -right-4 -bottom-4 size-16 border border-border/60 bg-background/30 transition-transform duration-300 group-hover/metric:translate-x-1 group-hover/metric:-translate-y-1"

@@ -6,7 +6,7 @@ export function HeroCopy() {
       <div className="flex flex-wrap items-center gap-2">
         <Badge
           variant="outline"
-          className="w-fit bg-background/70 font-mono tracking-[0.18em] uppercase shadow-sm backdrop-blur"
+          className="shadow-ledger-tag w-fit bg-background/70 font-mono tracking-[0.18em] uppercase backdrop-blur"
         >
           iCost Excel · 多币种折算 · 交易联动分析
         </Badge>
