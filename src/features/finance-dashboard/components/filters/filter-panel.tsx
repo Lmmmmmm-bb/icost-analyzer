@@ -173,7 +173,6 @@ export function FilterPanel({
             onChange={(tags) =>
               onFiltersChange((current) => ({ ...current, tags }))
             }
-            limit={18}
           />
         </FilterRow>
       </CardContent>
