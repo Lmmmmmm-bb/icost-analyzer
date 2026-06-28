@@ -1,4 +1,12 @@
-import type { Filters, RateMap } from "./types"
+import type { Filters, RankLevel, RateMap } from "./types"
+
+export const ALL_RANGE = "全部"
+export const ALL_YEARS_OPTION = "全部年份"
+export const BASE_CURRENCY = "CNY"
+export const RANK_LEVELS = [
+  "一级分类",
+  "二级分类",
+] as const satisfies readonly RankLevel[]
 
 export const TRANSACTION_TYPES = [
   "支出",
@@ -11,7 +19,7 @@ export const TRANSACTION_TYPES = [
 ]
 
 export const QUICK_RANGES = [
-  "全部",
+  ALL_RANGE,
   "今年",
   "近 12 月",
   "近 6 月",
@@ -20,7 +28,7 @@ export const QUICK_RANGES = [
 ]
 
 export const DEFAULT_RATES: RateMap = {
-  CNY: 1,
+  [BASE_CURRENCY]: 1,
   HKD: 0.8688,
   USD: 6.8112,
   JPY: 0.0421,
@@ -31,7 +39,7 @@ export const DEFAULT_RATES: RateMap = {
 }
 
 export const EMPTY_FILTERS: Filters = {
-  quickRange: "全部",
+  quickRange: ALL_RANGE,
   year: "",
   startDate: "",
   endDate: "",

@@ -12,9 +12,9 @@ import {
   TAG_COLOR,
   WEEK_COLOR,
   WEEKEND_COLOR,
-} from "./constants"
-import type { MonthlyItem, SummaryItem, WeekItem } from "./types"
-import { dateKey, formatMoney } from "./utils"
+} from "../../model/constants"
+import type { MonthlyItem, SummaryItem, WeekItem } from "../../model/types"
+import { dateKey, formatMoney } from "../../model/utils"
 
 function chartTextColor() {
   return document.documentElement.classList.contains("dark")

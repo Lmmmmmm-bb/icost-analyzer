@@ -1,5 +1,5 @@
-import type { MetricStats } from "../types"
-import { formatMoney } from "../utils"
+import type { MetricStats } from "../../model/types"
+import { formatMoney } from "../../model/utils"
 import { MetricCard } from "./metric-card"
 
 type MetricGridProps = {

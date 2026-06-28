@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react"
 
-import { DEFAULT_RATES, EMPTY_FILTERS } from "./constants"
+import {
+  ALL_RANGE,
+  DEFAULT_RATES,
+  EMPTY_FILTERS,
+  RANK_LEVELS,
+} from "./model/constants"
 import {
   createCurrencyOption,
   createHeatmapOption,
@@ -9,16 +14,19 @@ import {
   createRankingOption,
   createTagOption,
   createWeekOption,
-} from "./charts"
-import { AnalysisCharts } from "./components/analysis-charts"
-import { DashboardAlerts } from "./components/alerts"
-import { DashboardHero } from "./components/dashboard-hero"
-import { NoResultEmptyState, UploadEmptyState } from "./components/empty-states"
-import { FilterPanel } from "./components/filter-panel"
-import { MetricGrid } from "./components/metric-grid"
-import { RateSettings } from "./components/rate-settings"
-import { SummaryTables } from "./components/summary-tables"
-import { TransactionTable } from "./components/transaction-table"
+} from "./components/charts/chart-options"
+import { AnalysisCharts } from "./components/charts/analysis-charts"
+import { DashboardAlerts } from "./components/feedback/dashboard-alerts"
+import {
+  NoResultEmptyState,
+  UploadEmptyState,
+} from "./components/feedback/empty-states"
+import { FilterPanel } from "./components/filters/filter-panel"
+import { DashboardHero } from "./components/hero/dashboard-hero"
+import { MetricGrid } from "./components/metrics/metric-grid"
+import { RateSettings } from "./components/rates/rate-settings"
+import { SummaryTables } from "./components/summaries/summary-tables"
+import { TransactionTable } from "./components/transactions/transaction-table"
 import type {
   DetailSort,
   Filters,
@@ -27,7 +35,7 @@ import type {
   SummarySort,
   TagSort,
   Transaction,
-} from "./types"
+} from "./model/types"
 import {
   dateKey,
   filterTransactions,
@@ -42,7 +50,7 @@ import {
   summarizeBy,
   toRmb,
   unique,
-} from "./utils"
+} from "./model/utils"
 
 export function FinanceDashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -53,7 +61,7 @@ export function FinanceDashboard() {
     makeRateInputs(DEFAULT_RATES)
   )
   const [drillCategory, setDrillCategory] = useState("")
-  const [rankLevel, setRankLevel] = useState<RankLevel>("一级分类")
+  const [rankLevel, setRankLevel] = useState<RankLevel>(RANK_LEVELS[0])
   const [summarySort, setSummarySort] = useState<SummarySort>("amount")
   const [tagSort, setTagSort] = useState<TagSort>("amount")
   const [detailSort, setDetailSort] = useState<DetailSort>("date")
@@ -123,25 +131,45 @@ export function FinanceDashboard() {
     ? `${dateKey(dateRange.start)} → ${dateKey(dateRange.end)}`
     : "等待上传"
 
-  const categoryPie = drillCategory
-    ? summarizeBy(
-        filtered.filter((tx) => tx.category === drillCategory),
-        rates,
-        (tx) => tx.subcategory
-      )
-    : categorySummary
-  const ranking = (
-    rankLevel === "一级分类" ? categorySummary : subcategorySummary
-  ).slice(0, 15)
-  const chartOptions = {
-    monthlyOption: createMonthlyOption(monthly),
-    pieOption: createPieOption(categoryPie),
-    rankingOption: createRankingOption(ranking),
-    currencyOption: createCurrencyOption(currencySummary),
-    weekOption: createWeekOption(weekSummary),
-    tagOption: createTagOption(tagSummary),
-    heatmapOption: createHeatmapOption(heatmap),
-  }
+  const categoryPie = useMemo(
+    () =>
+      drillCategory
+        ? summarizeBy(
+            filtered.filter((tx) => tx.category === drillCategory),
+            rates,
+            (tx) => tx.subcategory
+          )
+        : categorySummary,
+    [categorySummary, drillCategory, filtered, rates]
+  )
+  const ranking = useMemo(
+    () =>
+      (rankLevel === RANK_LEVELS[0]
+        ? categorySummary
+        : subcategorySummary
+      ).slice(0, 15),
+    [categorySummary, rankLevel, subcategorySummary]
+  )
+  const chartOptions = useMemo(
+    () => ({
+      monthlyOption: createMonthlyOption(monthly),
+      pieOption: createPieOption(categoryPie),
+      rankingOption: createRankingOption(ranking),
+      currencyOption: createCurrencyOption(currencySummary),
+      weekOption: createWeekOption(weekSummary),
+      tagOption: createTagOption(tagSummary),
+      heatmapOption: createHeatmapOption(heatmap),
+    }),
+    [
+      categoryPie,
+      currencySummary,
+      heatmap,
+      monthly,
+      ranking,
+      tagSummary,
+      weekSummary,
+    ]
+  )
 
   const sortedCategoryRows = [...categorySummary].sort((a, b) => {
     if (summarySort === "count") return b.count - a.count
@@ -182,7 +210,7 @@ export function FinanceDashboard() {
   function applyMonth(month: string) {
     setFilters((current) => ({
       ...current,
-      quickRange: "全部",
+      quickRange: ALL_RANGE,
       year: "",
       startDate: `${month}-01`,
       endDate: dateKey(
@@ -273,7 +301,6 @@ export function FinanceDashboard() {
             <TransactionTable
               rows={detailRows}
               pagedRows={pagedRows}
-              page={page}
               safePage={safePage}
               totalPages={totalPages}
               pageSize={pageSize}

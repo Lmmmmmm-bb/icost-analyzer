@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx"
 
+import { ALL_RANGE, BASE_CURRENCY } from "./constants"
 import type {
   Filters,
   MetricStats,
@@ -46,7 +47,7 @@ export function formatMoney(value: number, compact = false) {
   if (compact && abs >= 10000) return `¥${(value / 10000).toFixed(1)} 万`
   return new Intl.NumberFormat("zh-CN", {
     style: "currency",
-    currency: "CNY",
+    currency: BASE_CURRENCY,
     maximumFractionDigits: abs >= 1000 ? 0 : 2,
   }).format(value)
 }
@@ -142,7 +143,7 @@ export function parseWorkbook(buffer: ArrayBuffer) {
           getCell(row, ["类型", "交易类型"]) || (amount < 0 ? "支出" : "收入"),
         amount,
         currency: (
-          getCell(row, ["货币", "币种", "Currency"]) || "CNY"
+          getCell(row, ["货币", "币种", "Currency"]) || BASE_CURRENCY
         ).toUpperCase(),
         category: getCell(row, ["一级分类", "分类"]) || "未分类",
         subcategory: getCell(row, ["二级分类", "子分类"]) || "未分类",
@@ -195,7 +196,7 @@ export function filterTransactions(
   if (!start && !end && filters.year) {
     start = new Date(`${filters.year}-01-01T00:00:00`)
     end = new Date(`${filters.year}-12-31T23:59:59`)
-  } else if (!start && !end && filters.quickRange !== "全部") {
+  } else if (!start && !end && filters.quickRange !== ALL_RANGE) {
     if (filters.quickRange === "今年") {
       start = new Date(`${now.getFullYear()}-01-01T00:00:00`)
     } else {
@@ -207,64 +208,78 @@ export function filterTransactions(
   }
 
   const keyword = filters.keyword.trim().toLowerCase()
+  const typeSet = filters.types.length ? new Set(filters.types) : null
+  const currencySet = filters.currencies.length
+    ? new Set(filters.currencies)
+    : null
+  const categorySet = filters.categories.length
+    ? new Set(filters.categories)
+    : null
+  const tagSet = filters.tags.length ? new Set(filters.tags) : null
   return transactions.filter((tx) => {
-    const tagNames = tx.tags
-    const haystack = [
-      tx.note,
-      tx.category,
-      tx.subcategory,
-      tagNames.join(" "),
-      tx.location,
-      tx.currency,
-    ]
-      .join(" ")
-      .toLowerCase()
+    const matchesKeyword = keyword
+      ? [
+          tx.note,
+          tx.category,
+          tx.subcategory,
+          tx.tags.join(" "),
+          tx.location,
+          tx.currency,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(keyword)
+      : true
     return (
       (!start || tx.date >= start) &&
       (!end || tx.date <= end) &&
-      (!filters.types.length || filters.types.includes(tx.type)) &&
-      (!filters.currencies.length ||
-        filters.currencies.includes(tx.currency)) &&
-      (!filters.categories.length ||
-        filters.categories.includes(tx.category)) &&
-      (!filters.tags.length ||
-        filters.tags.some((tag) => tagNames.includes(tag))) &&
-      (!keyword || haystack.includes(keyword))
+      (!typeSet || typeSet.has(tx.type)) &&
+      (!currencySet || currencySet.has(tx.currency)) &&
+      (!categorySet || categorySet.has(tx.category)) &&
+      (!tagSet || tx.tags.some((tag) => tagSet.has(tag))) &&
+      matchesKeyword
     )
   })
 }
 
 export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
-  const expenseTxs = filtered.filter(isExpense)
-  const incomeTxs = filtered.filter(isIncome)
-  const totalExpense = expenseTxs.reduce(
-    (sum, tx) => sum + expenseRmb(tx, rates),
-    0
-  )
-  const totalIncome = incomeTxs.reduce(
-    (sum, tx) => sum + Math.max(toRmb(tx, rates), 0),
-    0
-  )
-  const reimburse = filtered
-    .filter(isReimburse)
-    .reduce((sum, tx) => sum + Math.abs(toRmb(tx, rates)), 0)
-  const maxExpense = expenseTxs.reduce(
-    (max, tx) => Math.max(max, expenseRmb(tx, rates)),
-    0
-  )
-  const days = unique(filtered.map((tx) => tx.dayKey)).length || 1
+  let totalExpense = 0
+  let totalIncome = 0
+  let reimburse = 0
+  let maxExpense = 0
+  let expenseCount = 0
+  const daySet = new Set<string>()
+  const currencySet = new Set<string>()
+  const tagSet = new Set<string>()
+
+  for (const tx of filtered) {
+    const rmb = toRmb(tx, rates)
+    daySet.add(tx.dayKey)
+    currencySet.add(tx.currency)
+    tx.tags.forEach((tag) => tagSet.add(tag))
+    if (isExpense(tx)) {
+      const expense = Math.abs(rmb)
+      totalExpense += expense
+      maxExpense = Math.max(maxExpense, expense)
+      expenseCount += 1
+    }
+    if (isIncome(tx)) totalIncome += Math.max(rmb, 0)
+    if (isReimburse(tx)) reimburse += Math.abs(rmb)
+  }
+
+  const days = daySet.size || 1
   return {
     totalExpense,
     totalIncome,
     net: totalIncome - totalExpense,
     count: filtered.length,
     dailyExpense: totalExpense / days,
-    avgExpense: totalExpense / (expenseTxs.length || 1),
+    avgExpense: totalExpense / (expenseCount || 1),
     maxExpense,
     reimburse,
-    currencyCount: unique(filtered.map((tx) => tx.currency)).length,
-    tagCount: unique(filtered.flatMap((tx) => tx.tags)).length,
-    expenseCount: expenseTxs.length,
+    currencyCount: currencySet.size,
+    tagCount: tagSet.size,
+    expenseCount,
     days,
   }
 }

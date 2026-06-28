@@ -2,8 +2,9 @@ import type { ECElementEvent } from "echarts"
 
 import { Button } from "@/components/ui/button"
 
-import type { ChartOptions, RankLevel } from "../types"
-import { ChartShell } from "./chart-shell"
+import { RANK_LEVELS } from "../../model/constants"
+import type { ChartOptions, RankLevel } from "../../model/types"
+import { ChartShell } from "../shared/chart-shell"
 import { EChart } from "./e-chart"
 
 type AnalysisChartsProps = {
@@ -72,7 +73,7 @@ export function AnalysisCharts({
           description="按折算人民币金额从高到低排序。"
           action={
             <div className="flex gap-1">
-              {(["一级分类", "二级分类"] as const).map((level) => (
+              {RANK_LEVELS.map((level) => (
                 <Button
                   key={level}
                   size="xs"

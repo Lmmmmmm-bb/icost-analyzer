@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 
-import { toggleValue } from "../utils"
+import { toggleValue } from "../../model/utils"
 
 type ChipGroupProps = {
   title: string
