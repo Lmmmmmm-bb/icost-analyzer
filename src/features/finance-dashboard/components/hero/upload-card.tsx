@@ -18,7 +18,7 @@ type UploadCardProps = {
 export function UploadCard({ fileName, error, onUpload }: UploadCardProps) {
   return (
     <Card className="group/upload relative gap-0 bg-card/90 py-0 shadow-[0_18px_60px_color-mix(in_oklch,var(--foreground),transparent_94%)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_80px_color-mix(in_oklch,var(--foreground),transparent_91%)] lg:w-[420px]">
-      <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,var(--primary),color-mix(in_oklch,var(--primary),transparent_70%),var(--primary))] opacity-80" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
           <span className="size-2 bg-primary" />
