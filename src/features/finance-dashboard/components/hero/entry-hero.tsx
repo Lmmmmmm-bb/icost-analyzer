@@ -67,11 +67,11 @@ export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
 
 function EntrySteps() {
   return (
-    <div className="grid max-w-3xl gap-3 sm:grid-cols-3">
+    <div className="grid max-w-3xl gap-0 overflow-hidden border border-border/70 bg-card/70 backdrop-blur sm:grid-cols-3">
       {ENTRY_STEPS.map(([step, label], index) => (
         <div
           key={step}
-          className="group relative overflow-hidden border border-border/70 bg-card/70 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/90 hover:shadow-ledger-panel-hover"
+          className="group relative overflow-hidden border-b border-border/70 p-4 transition-all duration-300 last:border-b-0 hover:bg-card/90 hover:shadow-ledger-panel-hover sm:border-r sm:border-b-0 sm:last:border-r-0"
           style={{ animationDelay: `${140 + index * 70}ms` }}
         >
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />

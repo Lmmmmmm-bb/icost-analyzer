@@ -13,6 +13,7 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: Theme
+  resolvedTheme: ResolvedTheme
   setTheme: (theme: Theme) => void
 }
 
@@ -37,6 +38,10 @@ function getSystemTheme(): ResolvedTheme {
   }
 
   return "light"
+}
+
+function getResolvedTheme(theme: Theme): ResolvedTheme {
+  return theme === "system" ? getSystemTheme() : theme
 }
 
 function disableTransitionsTemporarily() {
@@ -92,11 +97,16 @@ export function ThemeProvider({
 
     return defaultTheme
   })
+  const [resolvedTheme, setResolvedTheme] = React.useState<ResolvedTheme>(() => {
+    const storedTheme = localStorage.getItem(storageKey)
+    return getResolvedTheme(isTheme(storedTheme) ? storedTheme : defaultTheme)
+  })
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
       localStorage.setItem(storageKey, nextTheme)
       setThemeState(nextTheme)
+      setResolvedTheme(getResolvedTheme(nextTheme))
     },
     [storageKey]
   )
@@ -129,6 +139,7 @@ export function ThemeProvider({
 
     const mediaQuery = window.matchMedia(COLOR_SCHEME_QUERY)
     const handleChange = () => {
+      setResolvedTheme(getSystemTheme())
       applyTheme("system")
     }
 
@@ -168,6 +179,7 @@ export function ThemeProvider({
                 : "dark"
 
         localStorage.setItem(storageKey, nextTheme)
+        setResolvedTheme(getResolvedTheme(nextTheme))
         return nextTheme
       })
     }
@@ -191,10 +203,12 @@ export function ThemeProvider({
 
       if (isTheme(event.newValue)) {
         setThemeState(event.newValue)
+        setResolvedTheme(getResolvedTheme(event.newValue))
         return
       }
 
       setThemeState(defaultTheme)
+      setResolvedTheme(getResolvedTheme(defaultTheme))
     }
 
     window.addEventListener("storage", handleStorageChange)
@@ -207,9 +221,10 @@ export function ThemeProvider({
   const value = React.useMemo(
     () => ({
       theme,
+      resolvedTheme,
       setTheme,
     }),
-    [theme, setTheme]
+    [theme, resolvedTheme, setTheme]
   )
 
   return (

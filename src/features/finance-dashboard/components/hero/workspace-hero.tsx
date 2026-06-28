@@ -26,18 +26,23 @@ export function WorkspaceHero({
         aria-hidden="true"
         className="absolute right-8 bottom-0 hidden h-28 w-80 border-x border-border/45 bg-card/20 lg:block"
       />
-      <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-6 px-5 py-7 md:px-8 lg:px-10">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-3 font-mono text-[10px] tracking-[0.22em] text-muted-foreground uppercase">
-              <span className="h-px w-10 bg-foreground/40" />
-              Analysis workspace
+      <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:px-10">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex max-w-2xl flex-col gap-1.5">
+            <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+              <span className="h-px w-7 bg-foreground/30" />
+              Analysis dashboard
             </div>
-            <h1 className="font-heading text-4xl leading-none font-semibold tracking-[-0.065em] md:text-6xl">
-              Ledger Observatory
-            </h1>
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-3">
+              <h1 className="font-heading text-2xl leading-none font-semibold tracking-[-0.04em] md:text-3xl">
+                账单分析
+              </h1>
+              <p className="max-w-xl text-xs leading-5 text-muted-foreground sm:border-l sm:border-border/60 sm:pl-3">
+              汇总当前文件的收支、币种、标签和消费节奏，筛选条件或汇率调整后会同步更新下方图表与明细。
+              </p>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground lg:pt-5">
             <span className="max-w-full truncate border bg-card/80 px-3 py-2 font-mono shadow-ledger-tag backdrop-blur sm:max-w-[28rem]">
               {fileName}
             </span>

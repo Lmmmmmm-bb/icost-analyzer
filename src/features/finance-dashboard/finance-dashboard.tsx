@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from "react"
 
+import { useTheme } from "@/components/theme-provider"
+
 import {
   ALL_RANGE,
   DEFAULT_RATES,
@@ -52,6 +54,7 @@ import {
 import { useWorkbookUpload } from "./components/hero/use-workbook-upload"
 
 export function FinanceDashboard() {
+  const { resolvedTheme } = useTheme()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [fileName, setFileName] = useState("")
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
@@ -158,7 +161,7 @@ export function FinanceDashboard() {
       currencyOption: createCurrencyOption(currencySummary),
       weekOption: createWeekOption(weekSummary),
       tagOption: createTagOption(tagSummary),
-      heatmapOption: createHeatmapOption(heatmap),
+      heatmapOption: createHeatmapOption(heatmap, resolvedTheme),
     }),
     [
       categoryPie,
@@ -166,6 +169,7 @@ export function FinanceDashboard() {
       heatmap,
       monthly,
       ranking,
+      resolvedTheme,
       tagSummary,
       weekSummary,
     ]

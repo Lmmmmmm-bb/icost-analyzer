@@ -5,6 +5,7 @@ import {
   CHART_COLORS,
   EXPENSE_COLOR,
   HEATMAP_COLORS,
+  HEATMAP_DARK_COLORS,
   INCOME_COLOR,
   RANKING_COLOR,
   RANKING_COLOR_END,
@@ -16,22 +17,36 @@ import {
 import type { MonthlyItem, SummaryItem, WeekItem } from "../../model/types"
 import { dateKey, formatMoney } from "../../model/utils"
 
-function chartTextColor() {
-  return document.documentElement.classList.contains("dark")
-    ? "#fafafa"
-    : "#171717"
+type ChartTheme = "dark" | "light"
+
+function isDarkChartTheme(theme?: ChartTheme) {
+  return theme
+    ? theme === "dark"
+    : document.documentElement.classList.contains("dark")
 }
 
-function chartMutedTextColor() {
-  return document.documentElement.classList.contains("dark")
-    ? "#a3a3a3"
-    : "#737373"
+function chartTextColor(theme?: ChartTheme) {
+  return isDarkChartTheme(theme) ? "#fafafa" : "#171717"
 }
 
-function chartSurfaceColor() {
-  return document.documentElement.classList.contains("dark")
-    ? "#262626"
-    : "#ffffff"
+function chartMutedTextColor(theme?: ChartTheme) {
+  return isDarkChartTheme(theme) ? "#a3a3a3" : "#737373"
+}
+
+function chartSurfaceColor(theme?: ChartTheme) {
+  return isDarkChartTheme(theme) ? "#262626" : "#ffffff"
+}
+
+function chartSoftEdgeColor(theme?: ChartTheme) {
+  return isDarkChartTheme(theme)
+    ? "rgba(250, 250, 250, 0.08)"
+    : "rgba(255, 255, 255, 0.72)"
+}
+
+function chartHairlineColor(theme?: ChartTheme) {
+  return isDarkChartTheme(theme)
+    ? "rgba(250, 250, 250, 0.05)"
+    : "rgba(255, 255, 255, 0.48)"
 }
 
 function axisStyle() {
@@ -68,12 +83,12 @@ function horizontalGradient(from: string, to: string) {
   }
 }
 
-function tooltipStyle() {
+function tooltipStyle(theme?: ChartTheme) {
   return {
-    backgroundColor: chartSurfaceColor(),
+    backgroundColor: chartSurfaceColor(theme),
     borderColor: "rgba(148, 163, 184, 0.28)",
     borderWidth: 1,
-    textStyle: { color: chartTextColor(), fontSize: 12 },
+    textStyle: { color: chartTextColor(theme), fontSize: 12 },
     extraCssText: "box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);",
   }
 }
@@ -137,7 +152,8 @@ export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
         type: "line",
         data: monthly.map((item) => item.net),
         smooth: true,
-        symbolSize: 7,
+        showSymbol: false,
+        symbol: "none",
         lineStyle: { width: 3 },
         areaStyle: { opacity: 0.08 },
       },
@@ -163,7 +179,7 @@ export function createPieOption(items: SummaryItem[]): EChartsOption {
           name: item.name,
           value: Number(item.amount.toFixed(2)),
         })),
-        itemStyle: { borderColor: chartSurfaceColor(), borderWidth: 2 },
+        itemStyle: { borderColor: chartSoftEdgeColor(), borderWidth: 1 },
         label: {
           show: true,
           position: "center",
@@ -253,7 +269,7 @@ export function createCurrencyOption(items: SummaryItem[]): EChartsOption {
           name: item.name,
           value: Number(item.amount.toFixed(2)),
         })),
-        itemStyle: { borderColor: chartSurfaceColor(), borderWidth: 2 },
+        itemStyle: { borderColor: chartSoftEdgeColor(), borderWidth: 1 },
         label: { show: false },
         labelLine: { show: false },
       },
@@ -364,8 +380,10 @@ export function createTagOption(items: SummaryItem[]): EChartsOption {
 }
 
 export function createHeatmapOption(
-  heatmap: [string, number][]
+  heatmap: [string, number][],
+  theme?: ChartTheme
 ): EChartsOption {
+  const isDark = isDarkChartTheme(theme)
   const heatmapRange = heatmap.length
     ? [heatmap[0][0], heatmap[heatmap.length - 1][0]]
     : [dateKey(new Date()), dateKey(new Date())]
@@ -376,13 +394,13 @@ export function createHeatmapOption(
         const value = item?.value as [string, number] | undefined
         return `${value?.[0] ?? ""}<br/>${formatMoney(value?.[1] ?? 0)}`
       },
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
     visualMap: {
       show: false,
       min: 0,
       max: Math.max(...heatmap.map((item) => item[1]), 1),
-      inRange: { color: HEATMAP_COLORS },
+      inRange: { color: isDark ? HEATMAP_DARK_COLORS : HEATMAP_COLORS },
     },
     calendar: {
       top: 36,
@@ -390,14 +408,14 @@ export function createHeatmapOption(
       right: 24,
       cellSize: [16, 16],
       range: heatmapRange,
-      splitLine: { lineStyle: { color: "rgba(148, 163, 184, 0.16)" } },
+      splitLine: { lineStyle: { color: chartHairlineColor(theme) } },
       itemStyle: {
-        color: chartSurfaceColor(),
-        borderColor: "rgba(148, 163, 184, 0.12)",
+        color: chartSurfaceColor(theme),
+        borderColor: chartHairlineColor(theme),
         borderWidth: 1,
       },
-      dayLabel: { color: chartMutedTextColor() },
-      monthLabel: { color: chartMutedTextColor() },
+      dayLabel: { color: chartMutedTextColor(theme) },
+      monthLabel: { color: chartMutedTextColor(theme) },
       yearLabel: { show: false },
     },
     series: [{ type: "heatmap", coordinateSystem: "calendar", data: heatmap }],

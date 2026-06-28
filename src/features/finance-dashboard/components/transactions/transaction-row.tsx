@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { TableCell, TableRow } from "@/components/ui/table"
 
 import type { RateMap, Transaction } from "../../model/types"
-import { formatMoney, isExpense, toRmb } from "../../model/utils"
+import { formatMoney, toRmb } from "../../model/utils"
 
 type TransactionRowProps = {
   transaction: Transaction
@@ -10,8 +10,7 @@ type TransactionRowProps = {
 }
 
 function transactionTypeVariant(transaction: Transaction) {
-  if (isExpense(transaction)) return "destructive"
-  return transaction.type === "转账" ? "outline" : "secondary"
+  return transaction.type === "支出" ? "destructive" : "positive"
 }
 
 export function TransactionRow({ transaction, rates }: TransactionRowProps) {
