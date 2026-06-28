@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 
 import {
   ALL_RANGE,
@@ -17,14 +17,13 @@ import {
 } from "./components/charts/chart-options"
 import { AnalysisCharts } from "./components/charts/analysis-charts"
 import { DashboardAlerts } from "./components/feedback/dashboard-alerts"
-import {
-  NoResultEmptyState,
-  UploadEmptyState,
-} from "./components/feedback/empty-states"
+import { NoResultEmptyState } from "./components/feedback/empty-states"
 import { FilterPanel } from "./components/filters/filter-panel"
-import { DashboardHero } from "./components/hero/dashboard-hero"
+import { EntryHero } from "./components/hero/entry-hero"
+import { WorkspaceHero } from "./components/hero/workspace-hero"
 import { MetricGrid } from "./components/metrics/metric-grid"
 import { RateSettings } from "./components/rates/rate-settings"
+import { DashboardBackdrop } from "./components/shared/dashboard-backdrop"
 import { SummaryTables } from "./components/summaries/summary-tables"
 import { TransactionTable } from "./components/transactions/transaction-table"
 import type {
@@ -53,6 +52,7 @@ import {
 } from "./model/utils"
 
 export function FinanceDashboard() {
+  const uploadSeq = useRef(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [fileName, setFileName] = useState("")
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
@@ -121,12 +121,14 @@ export function FinanceDashboard() {
 
   const totalPages = Math.max(1, Math.ceil(detailRows.length / pageSize))
   const safePage = Math.min(page, totalPages)
-  const pagedRows = detailRows.slice(
-    (safePage - 1) * pageSize,
-    safePage * pageSize
+  const pagedRows = useMemo(
+    () => detailRows.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [detailRows, pageSize, safePage]
   )
-  const expenseTotal =
-    categorySummary.reduce((sum, item) => sum + item.amount, 0) || 1
+  const expenseTotal = useMemo(
+    () => categorySummary.reduce((sum, item) => sum + item.amount, 0) || 1,
+    [categorySummary]
+  )
   const rangeText = dateRange
     ? `${dateKey(dateRange.start)} → ${dateKey(dateRange.end)}`
     : "等待上传"
@@ -171,23 +173,46 @@ export function FinanceDashboard() {
     ]
   )
 
-  const sortedCategoryRows = [...categorySummary].sort((a, b) => {
-    if (summarySort === "count") return b.count - a.count
-    if (summarySort === "avg") return b.amount / b.count - a.amount / a.count
-    return b.amount - a.amount
-  })
-  const sortedTagRows = [...tagSummary].sort((a, b) => {
-    if (tagSort === "count") return b.count - a.count
-    if (tagSort === "days") return b.days.size - a.days.size
-    return b.amount - a.amount
-  })
+  const sortedCategoryRows = useMemo(() => {
+    return [...categorySummary].sort((a, b) => {
+      if (summarySort === "count") return b.count - a.count
+      if (summarySort === "avg") return b.amount / b.count - a.amount / a.count
+      return b.amount - a.amount
+    })
+  }, [categorySummary, summarySort])
+  const sortedTagRows = useMemo(() => {
+    return [...tagSummary].sort((a, b) => {
+      if (tagSort === "count") return b.count - a.count
+      if (tagSort === "days") return b.days.size - a.days.size
+      return b.amount - a.amount
+    })
+  }, [tagSort, tagSummary])
 
-  async function handleUpload(file?: File) {
-    if (!file) return
+  const resetWorkbook = useCallback(() => {
+    uploadSeq.current += 1
+    setTransactions([])
+    setFileName("")
+    setFilters(EMPTY_FILTERS)
+    setRates(DEFAULT_RATES)
+    setRateInputs(makeRateInputs(DEFAULT_RATES))
+    setDrillCategory("")
+    setRankLevel(RANK_LEVELS[0])
+    setSummarySort("amount")
+    setTagSort("amount")
+    setDetailSort("date")
+    setPage(1)
+    setPageSize(25)
+    setError("")
+  }, [])
+
+  const handleUpload = useCallback(async (file: File) => {
+    const seq = (uploadSeq.current += 1)
+
     try {
       setError("")
       const buffer = await file.arrayBuffer()
       const parsed = await parseWorkbook(buffer)
+      if (seq !== uploadSeq.current) return
       if (!parsed.length)
         throw new Error("未识别到有效交易记录，请确认是 iCost 导出的 Excel。")
       setTransactions(parsed)
@@ -200,14 +225,20 @@ export function FinanceDashboard() {
         if (!nextRates[currency]) nextRates[currency] = 0
       setRates(nextRates)
       setRateInputs(makeRateInputs(nextRates))
+      setRankLevel(RANK_LEVELS[0])
+      setSummarySort("amount")
+      setTagSort("amount")
+      setDetailSort("date")
+      setPage(1)
     } catch (uploadError) {
+      if (seq !== uploadSeq.current) return
       setError(
         uploadError instanceof Error ? uploadError.message : "Excel 解析失败"
       )
     }
-  }
+  }, [])
 
-  function applyMonth(month: string) {
+  const applyMonth = useCallback((month: string) => {
     setFilters((current) => ({
       ...current,
       quickRange: ALL_RANGE,
@@ -217,49 +248,48 @@ export function FinanceDashboard() {
         new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)
       ),
     }))
-  }
+  }, [])
+
+  const resetDrill = useCallback(() => setDrillCategory(""), [])
+  const selectTag = useCallback((tag: string) => {
+    setFilters((current) => ({ ...current, tags: [tag] }))
+  }, [])
+  const selectCategory = useCallback((category: string) => {
+    setFilters((current) => ({ ...current, categories: [category] }))
+  }, [])
+
+  const hasTransactions = transactions.length > 0
 
   return (
     <main className="relative min-h-svh overflow-hidden bg-background text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_14%_8%,color-mix(in_oklch,var(--primary),transparent_86%),transparent_24rem),radial-gradient(circle_at_88%_18%,color-mix(in_oklch,var(--chart-1),transparent_84%),transparent_22rem),linear-gradient(rgba(148,163,184,0.075)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.075)_1px,transparent_1px)] bg-[size:100%_100%,100%_100%,48px_48px,48px_48px]"
-      />
-      <div
-        aria-hidden="true"
-        className="ledger-noise pointer-events-none fixed inset-0 mix-blend-multiply"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/70 to-transparent"
-      />
-      <DashboardHero
-        fileName={fileName}
-        error={error}
-        rangeText={rangeText}
-        totalCount={transactions.length}
-        filteredCount={filtered.length}
-        dimensions={dimensions}
-        onUpload={handleUpload}
-      />
+      <DashboardBackdrop />
 
-      <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-6 px-5 py-6 [animation-delay:90ms] md:px-8 lg:px-10">
-        <DashboardAlerts
-          invalidDateRange={invalidDateRange}
-          missingRates={missingRates}
-        />
+      {!hasTransactions ? (
+        <EntryHero fileName={fileName} error={error} onUpload={handleUpload} />
+      ) : (
+        <>
+          <WorkspaceHero
+            fileName={fileName}
+            rangeText={rangeText}
+            totalCount={transactions.length}
+            filteredCount={filtered.length}
+            dimensions={dimensions}
+            onReplaceFile={resetWorkbook}
+          />
 
-        <FilterPanel
-          filters={filters}
-          dimensions={dimensions}
-          onFiltersChange={setFilters}
-          onResetDrill={() => setDrillCategory("")}
-        />
+          <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-6 px-5 py-6 [animation-delay:90ms] md:px-8 lg:px-10">
+            <DashboardAlerts
+              invalidDateRange={invalidDateRange}
+              missingRates={missingRates}
+            />
 
-        {!transactions.length ? (
-          <UploadEmptyState />
-        ) : (
-          <>
+            <FilterPanel
+              filters={filters}
+              dimensions={dimensions}
+              onFiltersChange={setFilters}
+              onResetDrill={resetDrill}
+            />
+
             <MetricGrid stats={stats} />
 
             {filtered.length ? (
@@ -271,9 +301,7 @@ export function FinanceDashboard() {
                   onApplyMonth={applyMonth}
                   onDrillCategoryChange={setDrillCategory}
                   onRankLevelChange={setRankLevel}
-                  onTagSelect={(tag) =>
-                    setFilters((current) => ({ ...current, tags: [tag] }))
-                  }
+                  onTagSelect={selectTag}
                 />
 
                 <SummaryTables
@@ -284,15 +312,8 @@ export function FinanceDashboard() {
                   tagSort={tagSort}
                   onSummarySortChange={setSummarySort}
                   onTagSortChange={setTagSort}
-                  onCategorySelect={(category) =>
-                    setFilters((current) => ({
-                      ...current,
-                      categories: [category],
-                    }))
-                  }
-                  onTagSelect={(tag) =>
-                    setFilters((current) => ({ ...current, tags: [tag] }))
-                  }
+                  onCategorySelect={selectCategory}
+                  onTagSelect={selectTag}
                 />
               </>
             ) : (
@@ -318,9 +339,9 @@ export function FinanceDashboard() {
               onPageSizeChange={setPageSize}
               onDetailSortChange={setDetailSort}
             />
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </main>
   )
 }

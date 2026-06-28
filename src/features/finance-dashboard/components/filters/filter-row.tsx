@@ -14,7 +14,7 @@ export function FilterRow({
   contentClassName,
 }: FilterRowProps) {
   return (
-    <section className="group/filter-row grid border-b border-border/70 bg-background/35 transition-colors hover:bg-muted/35 last:border-b-0 md:grid-cols-[112px_1fr]">
+    <section className="group/filter-row grid border-b border-border/70 bg-background/35 transition-colors last:border-b-0 hover:bg-muted/35 md:grid-cols-[112px_1fr]">
       <div className="border-b border-border/70 px-4 py-3 font-mono text-[10px] tracking-[0.18em] text-muted-foreground uppercase transition-colors group-hover/filter-row:text-foreground md:border-r md:border-b-0 md:border-border/70">
         <span className="inline-flex items-center gap-2">
           <span className="size-1 bg-current opacity-45" />

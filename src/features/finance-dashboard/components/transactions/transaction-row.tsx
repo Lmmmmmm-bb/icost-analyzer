@@ -44,7 +44,9 @@ export function TransactionRow({ transaction, rates }: TransactionRowProps) {
           ))}
         </div>
       </TableCell>
-      <TableCell className="font-mono text-[11px]">{transaction.currency}</TableCell>
+      <TableCell className="font-mono text-[11px]">
+        {transaction.currency}
+      </TableCell>
       <TableCell className="font-mono text-[11px] tabular-nums">
         {transaction.amount.toLocaleString("zh-CN", {
           maximumFractionDigits: 3,
