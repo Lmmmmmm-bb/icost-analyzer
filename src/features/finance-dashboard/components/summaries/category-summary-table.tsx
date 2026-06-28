@@ -7,8 +7,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import type { SummaryItem } from "../../model/types"
-import { formatMoney } from "../../model/utils"
+import type { SummaryItem } from "../../model/analytics-types"
+import { formatMoney } from "../../model/money"
 
 type CategorySummaryTableProps = {
   rows: SummaryItem[]

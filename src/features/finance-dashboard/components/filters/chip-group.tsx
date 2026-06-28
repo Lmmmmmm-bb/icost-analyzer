@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button"
 
-import { toggleValue } from "../../model/utils"
-
 type ChipGroupProps = {
   title: string
   items: string[]
@@ -10,6 +8,12 @@ type ChipGroupProps = {
   limit?: number
   showTitle?: boolean
   titleInline?: boolean
+}
+
+function toggleValue(values: string[], value: string) {
+  return values.includes(value)
+    ? values.filter((item) => item !== value)
+    : [...values, value]
 }
 
 export function ChipGroup({

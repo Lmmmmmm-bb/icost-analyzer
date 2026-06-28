@@ -12,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input"
 
 import { BASE_CURRENCY, DEFAULT_RATES } from "../../model/constants"
+import { unique } from "../../model/collections"
 import type { Dimensions, RateMap } from "../../model/types"
-import { makeRateInputs, unique } from "../../model/utils"
+import { makeRateInputs } from "./rate-inputs"
 
 type RateSettingsProps = {
   dimensions: Dimensions

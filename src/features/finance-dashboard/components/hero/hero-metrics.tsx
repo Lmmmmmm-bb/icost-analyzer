@@ -1,5 +1,5 @@
 import type { Dimensions } from "../../model/types"
-import { MetricCard } from "../metrics/metric-card"
+import { MetricCard } from "../shared/metric-card"
 
 type HeroMetricsProps = {
   rangeText: string

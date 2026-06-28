@@ -1,6 +1,6 @@
-import type { MetricStats } from "../../model/types"
-import { formatMoney } from "../../model/utils"
-import { MetricCard } from "./metric-card"
+import type { MetricStats } from "../../model/analytics-types"
+import { formatMoney } from "../../model/money"
+import { MetricCard } from "../shared/metric-card"
 
 type MetricGridProps = {
   stats: MetricStats

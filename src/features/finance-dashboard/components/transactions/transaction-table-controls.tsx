@@ -1,6 +1,7 @@
-import { PAGE_SIZE_OPTIONS } from "../../model/constants"
-import type { DetailSort } from "../../model/types"
-import { selectClassName } from "../../model/utils"
+import { selectClassName } from "../shared/control-class-names"
+import type { DetailSort } from "./types"
+
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200]
 
 type TransactionTableControlsProps = {
   pageSize: number

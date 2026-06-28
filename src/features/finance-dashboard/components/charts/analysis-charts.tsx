@@ -2,10 +2,9 @@ import type { ECElementEvent } from "echarts"
 
 import { Button } from "@/components/ui/button"
 
-import { RANK_LEVELS } from "../../model/constants"
-import type { ChartOptions, RankLevel } from "../../model/types"
-import { ChartShell } from "../shared/chart-shell"
+import { DashboardPanel } from "../shared/dashboard-panel"
 import { EChart } from "./e-chart"
+import { RANK_LEVELS, type ChartOptions, type RankLevel } from "./types"
 
 type AnalysisChartsProps = {
   options: ChartOptions
@@ -33,7 +32,7 @@ export function AnalysisCharts({
   return (
     <>
       <div className="grid gap-6 xl:grid-cols-2">
-        <ChartShell
+        <DashboardPanel
           title="月度收支趋势"
           description="柱状展示支出与收入，折线展示净结余；点击月份筛选到该月。"
         >
@@ -41,8 +40,8 @@ export function AnalysisCharts({
             option={options.monthlyOption}
             onClick={(params) => onApplyMonth(getName(params))}
           />
-        </ChartShell>
-        <ChartShell
+        </DashboardPanel>
+        <DashboardPanel
           title="支出分类占比"
           description={
             drillCategory
@@ -67,8 +66,8 @@ export function AnalysisCharts({
               if (!drillCategory) onDrillCategoryChange(getName(params))
             }}
           />
-        </ChartShell>
-        <ChartShell
+        </DashboardPanel>
+        <DashboardPanel
           title="支出明细排行 Top 15"
           description="按折算人民币金额从高到低排序。"
           action={
@@ -87,20 +86,20 @@ export function AnalysisCharts({
           }
         >
           <EChart option={options.rankingOption} />
-        </ChartShell>
-        <ChartShell
+        </DashboardPanel>
+        <DashboardPanel
           title="币种分布"
           description="以支出原币种分组，金额统一折算人民币。"
         >
           <EChart option={options.currencyOption} />
-        </ChartShell>
-        <ChartShell
+        </DashboardPanel>
+        <DashboardPanel
           title="星期支出分布"
           description="观察消费集中发生在一周中的哪些日期。"
         >
           <EChart option={options.weekOption} />
-        </ChartShell>
-        <ChartShell
+        </DashboardPanel>
+        <DashboardPanel
           title="标签支出排行"
           description="多标签交易会分别计入每个标签；点击柱子筛选标签。"
         >
@@ -108,15 +107,15 @@ export function AnalysisCharts({
             option={options.tagOption}
             onClick={(params) => onTagSelect(getName(params))}
           />
-        </ChartShell>
+        </DashboardPanel>
       </div>
 
-      <ChartShell
+      <DashboardPanel
         title="每日支出热力图"
         description="每个自然日一个格子，颜色越深代表支出越集中。"
       >
         <EChart option={options.heatmapOption} className="h-40" />
-      </ChartShell>
+      </DashboardPanel>
     </>
   )
 }

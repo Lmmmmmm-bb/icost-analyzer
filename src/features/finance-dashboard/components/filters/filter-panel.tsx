@@ -9,15 +9,14 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
+import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
+import type { Dimensions, Filters } from "../../model/types"
+import { ChipGroup } from "./chip-group"
 import {
-  ALL_RANGE,
   ALL_YEARS_OPTION,
-  EMPTY_FILTERS,
   QUICK_RANGES,
   TRANSACTION_TYPES,
-} from "../../model/constants"
-import type { Dimensions, Filters } from "../../model/types"
-import { ChipGroup } from "../shared/chip-group"
+} from "./filter-options"
 import { FilterRow } from "./filter-row"
 
 type FilterPanelProps = {

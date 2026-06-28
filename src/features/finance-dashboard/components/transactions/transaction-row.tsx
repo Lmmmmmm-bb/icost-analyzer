@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { TableCell, TableRow } from "@/components/ui/table"
 
 import type { RateMap, Transaction } from "../../model/types"
-import { formatMoney, toRmb } from "../../model/utils"
+import { formatMoney, toRmb } from "../../model/money"
 
 type TransactionRowProps = {
   transaction: Transaction

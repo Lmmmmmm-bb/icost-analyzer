@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import type { Transaction } from "../../model/types"
-import { parseWorkbook } from "../../model/utils"
+import { parseWorkbook } from "./workbook-parser"
 
 const PARSING_STATUS_DELAY_MS = 650
 const PARSING_STATUS_MIN_VISIBLE_MS = 700

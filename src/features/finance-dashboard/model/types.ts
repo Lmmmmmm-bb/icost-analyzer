@@ -1,5 +1,3 @@
-import type { EChartsOption } from "echarts"
-
 export type TransactionType =
   | "支出"
   | "收入"
@@ -46,57 +44,3 @@ export type Dimensions = {
   tags: string[]
   years: string[]
 }
-
-export type DateRange = {
-  start: Date
-  end: Date
-} | null
-
-export type SummaryItem = {
-  name: string
-  count: number
-  amount: number
-  days: Set<string>
-}
-
-export type MetricStats = {
-  totalExpense: number
-  totalIncome: number
-  net: number
-  count: number
-  dailyExpense: number
-  avgExpense: number
-  maxExpense: number
-  reimburse: number
-  currencyCount: number
-  tagCount: number
-  expenseCount: number
-  days: number
-}
-
-export type MonthlyItem = {
-  month: string
-  expense: number
-  income: number
-  net: number
-}
-
-export type WeekItem = {
-  name: string
-  amount: number
-}
-
-export type ChartOptions = {
-  monthlyOption: EChartsOption
-  pieOption: EChartsOption
-  rankingOption: EChartsOption
-  currencyOption: EChartsOption
-  weekOption: EChartsOption
-  tagOption: EChartsOption
-  heatmapOption: EChartsOption
-}
-
-export type RankLevel = "一级分类" | "二级分类"
-export type SummarySort = "amount" | "count" | "avg"
-export type TagSort = "amount" | "count" | "days"
-export type DetailSort = "date" | "amount"

@@ -1,8 +1,9 @@
-import type { SummaryItem, SummarySort, TagSort } from "../../model/types"
-import { selectClassName } from "../../model/utils"
-import { ChartShell } from "../shared/chart-shell"
+import type { SummaryItem } from "../../model/analytics-types"
+import { DashboardPanel } from "../shared/dashboard-panel"
+import { selectClassName } from "../shared/control-class-names"
 import { CategorySummaryTable } from "./category-summary-table"
 import { TagSummaryTable } from "./tag-summary-table"
+import type { SummarySort, TagSort } from "./types"
 
 type SummaryTablesProps = {
   categoryRows: SummaryItem[]
@@ -29,7 +30,7 @@ export function SummaryTables({
 }: SummaryTablesProps) {
   return (
     <div className="grid gap-6 xl:grid-cols-2">
-      <ChartShell
+      <DashboardPanel
         title="分类汇总表"
         description="点击行可筛选一级分类。"
         action={
@@ -51,8 +52,8 @@ export function SummaryTables({
           expenseTotal={expenseTotal}
           onCategorySelect={onCategorySelect}
         />
-      </ChartShell>
-      <ChartShell
+      </DashboardPanel>
+      <DashboardPanel
         title="标签汇总表"
         description="覆盖天数表示该标签下有支出记录的不同自然日数量。"
         action={
@@ -68,7 +69,7 @@ export function SummaryTables({
         }
       >
         <TagSummaryTable rows={tagRows} onTagSelect={onTagSelect} />
-      </ChartShell>
+      </DashboardPanel>
     </div>
   )
 }
