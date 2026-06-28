@@ -157,7 +157,7 @@ export function createPieOption(items: SummaryItem[]): EChartsOption {
       {
         type: "pie",
         radius: ["54%", "80%"],
-        center: ["36%", "52%"],
+        center: ["50%", "52%"],
         padAngle: 1,
         data: items.map((item) => ({
           name: item.name,
@@ -248,7 +248,7 @@ export function createCurrencyOption(items: SummaryItem[]): EChartsOption {
       {
         type: "pie",
         radius: ["50%", "76%"],
-        center: ["36%", "50%"],
+        center: ["50%", "50%"],
         data: items.map((item) => ({
           name: item.name,
           value: Number(item.amount.toFixed(2)),
@@ -379,16 +379,13 @@ export function createHeatmapOption(
       ...tooltipStyle(),
     },
     visualMap: {
+      show: false,
       min: 0,
       max: Math.max(...heatmap.map((item) => item[1]), 1),
-      orient: "horizontal",
-      left: "center",
-      bottom: 0,
       inRange: { color: HEATMAP_COLORS },
-      textStyle: { color: chartMutedTextColor() },
     },
     calendar: {
-      top: 24,
+      top: 36,
       left: 36,
       right: 24,
       cellSize: [16, 16],

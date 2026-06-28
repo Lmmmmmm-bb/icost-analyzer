@@ -9,6 +9,7 @@ type ChipGroupProps = {
   onChange: (next: string[]) => void
   limit?: number
   showTitle?: boolean
+  titleInline?: boolean
 }
 
 export function ChipGroup({
@@ -18,12 +19,13 @@ export function ChipGroup({
   onChange,
   limit,
   showTitle = true,
+  titleInline = false,
 }: ChipGroupProps) {
   const visible = limit ? items.slice(0, limit) : items
   return (
-    <div className="flex flex-col gap-2">
+    <div className={titleInline ? "flex items-start gap-3" : "flex flex-col gap-2"}>
       {showTitle ? (
-        <div className="text-[11px] tracking-[0.24em] text-muted-foreground uppercase">
+        <div className="shrink-0 pt-1 text-[11px] tracking-[0.24em] text-muted-foreground uppercase">
           {title}
         </div>
       ) : null}

@@ -60,7 +60,7 @@ export function FilterPanel({
         </CardAction>
       </CardHeader>
       <CardContent className="px-0">
-        <FilterRow label="时间" contentClassName="flex flex-col gap-3">
+        <FilterRow label="时间" contentClassName="flex flex-col gap-3" inline>
           <ChipGroup
             title="快捷时间"
             items={QUICK_RANGES}
@@ -80,6 +80,7 @@ export function FilterPanel({
             title="年份"
             items={[ALL_YEARS_OPTION, ...dimensions.years]}
             value={[filters.year || ALL_YEARS_OPTION]}
+            titleInline
             onChange={(next) => {
               const selected = next.at(-1)
               onFiltersChange((current) => ({

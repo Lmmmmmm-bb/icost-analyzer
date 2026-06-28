@@ -115,7 +115,7 @@ export function AnalysisCharts({
         title="每日支出热力图"
         description="每个自然日一个格子，颜色越深代表支出越集中。"
       >
-        <EChart option={options.heatmapOption} className="h-56" />
+        <EChart option={options.heatmapOption} className="h-40" />
       </ChartShell>
     </>
   )

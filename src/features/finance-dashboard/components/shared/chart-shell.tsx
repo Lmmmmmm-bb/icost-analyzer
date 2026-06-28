@@ -24,10 +24,6 @@ export function ChartShell({
 }: ChartShellProps) {
   return (
     <Card className="group/chart relative gap-0 overflow-hidden bg-card/92 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-ledger-chart-hover">
-      <div
-        aria-hidden="true"
-        className="absolute top-4 right-4 size-10 border border-border/60 bg-background/25 opacity-70 transition-transform duration-500 group-hover/chart:rotate-6"
-      />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
       <CardHeader className="relative border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
