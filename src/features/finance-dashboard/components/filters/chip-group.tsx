@@ -2,6 +2,11 @@ import { Fragment } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 type ChipGroupProps = {
   title: string
@@ -12,6 +17,7 @@ type ChipGroupProps = {
   showTitle?: boolean
   titleInline?: boolean
   separatorBefore?: string
+  describe?: (item: string) => string | null
 }
 
 function toggleValue(values: string[], value: string) {
@@ -29,6 +35,7 @@ export function ChipGroup({
   showTitle = true,
   titleInline = false,
   separatorBefore,
+  describe,
 }: ChipGroupProps) {
   const visible = limit ? items.slice(0, limit) : items
   return (
@@ -41,14 +48,9 @@ export function ChipGroup({
         </div>
       ) : null}
       <div className="flex flex-wrap gap-1.5">
-        {visible.map((item) => (
-          <Fragment key={item}>
-            {separatorBefore === item ? (
-              <Separator
-                orientation="vertical"
-                className="mx-1 h-6 self-center"
-              />
-            ) : null}
+        {visible.map((item) => {
+          const hint = describe?.(item) ?? null
+          const chip = (
             <Button
               type="button"
               size="xs"
@@ -58,8 +60,29 @@ export function ChipGroup({
             >
               {item}
             </Button>
-          </Fragment>
-        ))}
+          )
+
+          return (
+            <Fragment key={item}>
+              {separatorBefore === item ? (
+                <Separator
+                  orientation="vertical"
+                  className="mx-1 h-6 self-center"
+                />
+              ) : null}
+              {hint ? (
+                <Tooltip>
+                  <TooltipTrigger render={chip} />
+                  <TooltipContent className="font-mono tracking-[0.04em]">
+                    {hint}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                chip
+              )}
+            </Fragment>
+          )
+        })}
       </div>
     </div>
   )

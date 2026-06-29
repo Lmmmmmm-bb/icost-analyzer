@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover"
 
 import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
+import { describeTimeRange } from "../../model/date"
 import type { Dimensions, Filters } from "../../model/types"
 import { ChipGroup } from "./chip-group"
 import { QUICK_RANGES, TRANSACTION_TYPES } from "./filter-options"
@@ -68,6 +69,7 @@ export function FilterPanel({
             value={[filters.year || filters.quickRange]}
             showTitle={false}
             separatorBefore={dimensions.years[0]}
+            describe={(item) => describeTimeRange(item)}
             onChange={(next) => {
               const selected = next.at(-1) ?? ALL_RANGE
               const isYear = dimensions.years.includes(selected)
