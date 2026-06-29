@@ -33,6 +33,7 @@ export type Filters = {
   currencies: string[]
   categories: string[]
   tags: string[]
+  excludedTags: string[]
   keyword: string
 }
 

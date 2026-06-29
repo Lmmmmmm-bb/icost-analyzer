@@ -38,7 +38,13 @@ export function filterTransactions(
     ? new Set(filters.categories)
     : null
   const tagSet = filters.tags.length ? new Set(filters.tags) : null
+  const excludedTagSet = filters.excludedTags.length
+    ? new Set(filters.excludedTags)
+    : null
   return transactions.filter((tx) => {
+    const hasExcludedTag = excludedTagSet
+      ? tx.tags.some((tag) => excludedTagSet.has(tag))
+      : false
     const matchesKeyword = keyword
       ? [
           tx.note,
@@ -59,6 +65,7 @@ export function filterTransactions(
       (!currencySet || currencySet.has(tx.currency)) &&
       (!categorySet || categorySet.has(tx.category)) &&
       (!tagSet || tx.tags.some((tag) => tagSet.has(tag))) &&
+      !hasExcludedTag &&
       matchesKeyword
     )
   })

@@ -122,7 +122,7 @@ export function FinanceDashboard() {
 
   const resetDrill = useCallback(() => setDrillCategory(""), [])
   const selectTag = useCallback((tag: string) => {
-    setFilters((current) => ({ ...current, tags: [tag] }))
+    setFilters((current) => ({ ...current, tags: [tag], excludedTags: [] }))
   }, [])
   const selectCategory = useCallback((category: string) => {
     setFilters((current) => ({ ...current, categories: [category] }))

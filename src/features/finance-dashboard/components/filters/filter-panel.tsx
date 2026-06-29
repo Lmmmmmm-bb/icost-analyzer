@@ -162,10 +162,24 @@ export function FilterPanel({
             title="标签"
             items={dimensions.tags}
             value={filters.tags}
+            excludedValue={filters.excludedTags}
             showTitle={false}
-            onChange={(tags) =>
-              onFiltersChange((current) => ({ ...current, tags }))
-            }
+            onChange={(tags) => {
+              onFiltersChange((current) => ({
+                ...current,
+                tags,
+                excludedTags: current.excludedTags.filter(
+                  (tag) => !tags.includes(tag)
+                ),
+              }))
+            }}
+            onExcludedChange={(excludedTags) => {
+              onFiltersChange((current) => ({
+                ...current,
+                tags: current.tags.filter((tag) => !excludedTags.includes(tag)),
+                excludedTags,
+              }))
+            }}
           />
         </FilterRow>
       </CardContent>

@@ -7,12 +7,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 type ChipGroupProps = {
   title: string
   items: string[]
   value: string[]
   onChange: (next: string[]) => void
+  excludedValue?: string[]
+  onExcludedChange?: (next: string[]) => void
   limit?: number
   showTitle?: boolean
   titleInline?: boolean
@@ -26,11 +29,17 @@ function toggleValue(values: string[], value: string) {
     : [...values, value]
 }
 
+function removeValue(values: string[], value: string) {
+  return values.filter((item) => item !== value)
+}
+
 export function ChipGroup({
   title,
   items,
   value,
   onChange,
+  excludedValue = [],
+  onExcludedChange,
   limit,
   showTitle = true,
   titleInline = false,
@@ -50,13 +59,44 @@ export function ChipGroup({
       <div className="flex flex-wrap gap-1.5">
         {visible.map((item) => {
           const hint = describe?.(item) ?? null
+          const selected = value.includes(item)
+          const excluded = excludedValue.includes(item)
+          const nextLabel = selected
+            ? `排除${item}`
+            : excluded
+              ? `取消排除${item}`
+              : `筛选${item}`
           const chip = (
             <Button
               type="button"
               size="xs"
-              variant={value.includes(item) ? "default" : "outline"}
-              className="font-mono tracking-[0.04em] shadow-none transition-transform hover:-translate-y-px"
-              onClick={() => onChange(toggleValue(value, item))}
+              variant={selected ? "default" : "outline"}
+              className={cn(
+                "font-mono tracking-[0.04em] shadow-none transition-transform hover:-translate-y-px",
+                excluded &&
+                  "text-muted-foreground line-through decoration-primary/80 decoration-2 underline-offset-4 hover:text-muted-foreground"
+              )}
+              aria-label={nextLabel}
+              aria-pressed={selected || excluded}
+              onClick={() => {
+                if (!onExcludedChange) {
+                  onChange(toggleValue(value, item))
+                  return
+                }
+
+                if (selected) {
+                  onChange(removeValue(value, item))
+                  onExcludedChange(toggleValue(excludedValue, item))
+                  return
+                }
+
+                if (excluded) {
+                  onExcludedChange(removeValue(excludedValue, item))
+                  return
+                }
+
+                onChange(toggleValue(value, item))
+              }}
             >
               {item}
             </Button>
