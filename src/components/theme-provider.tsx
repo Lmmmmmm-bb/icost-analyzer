@@ -4,6 +4,16 @@ import * as React from "react"
 type Theme = "dark" | "light" | "system"
 type ResolvedTheme = "dark" | "light"
 
+type RootViewTransition = {
+  ready: Promise<void>
+}
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (
+    updateCallback: () => void | Promise<void>
+  ) => RootViewTransition
+}
+
 type ThemeProviderProps = {
   children: React.ReactNode
   defaultTheme?: Theme
@@ -18,6 +28,7 @@ type ThemeProviderState = {
 }
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 const THEME_VALUES: Theme[] = ["dark", "light", "system"]
 
 const ThemeProviderContext = React.createContext<
@@ -63,6 +74,29 @@ function disableTransitionsTemporarily() {
   }
 }
 
+function prefersReducedMotion() {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches
+}
+
+function getToggledTheme(currentTheme: Theme): ResolvedTheme {
+  if (currentTheme === "dark") {
+    return "light"
+  }
+
+  if (currentTheme === "light") {
+    return "dark"
+  }
+
+  return getSystemTheme() === "dark" ? "light" : "dark"
+}
+
+function getViewTransitionRadius(x: number, y: number) {
+  return Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y)
+  )
+}
+
 function isEditableTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) {
     return false
@@ -103,6 +137,7 @@ export function ThemeProvider({
       return getResolvedTheme(isTheme(storedTheme) ? storedTheme : defaultTheme)
     }
   )
+  const isThemeTransitioningRef = React.useRef(false)
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
@@ -130,6 +165,66 @@ export function ThemeProvider({
       }
     },
     [disableTransitionOnChange]
+  )
+
+  const commitTheme = React.useCallback(
+    (nextTheme: Theme) => {
+      localStorage.setItem(storageKey, nextTheme)
+      setThemeState(nextTheme)
+      setResolvedTheme(getResolvedTheme(nextTheme))
+    },
+    [storageKey]
+  )
+
+  const toggleThemeWithViewTransition = React.useCallback(
+    (currentTheme: Theme) => {
+      const nextTheme = getToggledTheme(currentTheme)
+      const transitionDocument = document as ViewTransitionDocument
+
+      if (isThemeTransitioningRef.current) {
+        return
+      }
+
+      if (!transitionDocument.startViewTransition || prefersReducedMotion()) {
+        commitTheme(nextTheme)
+        return
+      }
+
+      const x = 0
+      const y = 0
+      const endRadius = getViewTransitionRadius(x, y)
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`,
+      ]
+
+      isThemeTransitioningRef.current = true
+
+      const transition = transitionDocument.startViewTransition(() => {
+        applyTheme(nextTheme)
+        commitTheme(nextTheme)
+      })
+
+      transition.ready
+        .then(() => {
+          const animation = document.documentElement.animate(
+            {
+              clipPath,
+            },
+            {
+              duration: 650,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            }
+          )
+
+          return animation.finished
+        })
+        .finally(() => {
+          isThemeTransitioningRef.current = false
+        })
+    },
+    [applyTheme, commitTheme]
   )
 
   React.useEffect(() => {
@@ -170,20 +265,7 @@ export function ThemeProvider({
         return
       }
 
-      setThemeState((currentTheme) => {
-        const nextTheme =
-          currentTheme === "dark"
-            ? "light"
-            : currentTheme === "light"
-              ? "dark"
-              : getSystemTheme() === "dark"
-                ? "light"
-                : "dark"
-
-        localStorage.setItem(storageKey, nextTheme)
-        setResolvedTheme(getResolvedTheme(nextTheme))
-        return nextTheme
-      })
+      toggleThemeWithViewTransition(theme)
     }
 
     window.addEventListener("keydown", handleKeyDown)
@@ -191,7 +273,7 @@ export function ThemeProvider({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [storageKey])
+  }, [theme, toggleThemeWithViewTransition])
 
   React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {

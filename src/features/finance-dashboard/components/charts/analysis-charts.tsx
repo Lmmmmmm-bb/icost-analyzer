@@ -163,7 +163,7 @@ export function AnalysisCharts({
         contentClassName="p-0 min-h-unset"
       >
         <div className="grid xl:relative xl:block">
-          <div className="m-0 overflow-x-auto border-b border-border/80 p-0 xl:w-[30rem] xl:border-r xl:border-b-0">
+          <div className="m-0 overflow-x-auto border-b border-border/80 bg-card/90 p-0 xl:w-[30rem] xl:border-r xl:border-b-0">
             <Calendar
               mode="single"
               selected={selectedCashflowDate}
@@ -196,7 +196,7 @@ export function AnalysisCharts({
                       modifiers={modifiers}
                       locale={zhCN}
                       className={cn(
-                        "items-start justify-start overflow-hidden border border-transparent bg-background/70 p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/70 group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 data-[selected-single=true]:[&>span]:opacity-100 dark:data-[selected-single=true]:bg-primary/15",
+                        "items-start justify-start overflow-hidden border border-transparent bg-background/70 p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/70 group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 data-[selected-single=true]:[&>span]:opacity-100 dark:bg-transparent dark:data-[selected-single=true]:bg-primary/15",
                         item && "text-foreground",
                         !item && "opacity-45",
                         className
@@ -227,8 +227,8 @@ export function AnalysisCharts({
             />
           </div>
 
-          <div className="flex min-h-0 flex-col bg-background/70 xl:absolute xl:inset-y-0 xl:right-0 xl:left-[30rem]">
-            <div className="flex shrink-0 items-center justify-between gap-3 p-4">
+          <div className="flex min-h-0 flex-col xl:absolute xl:inset-y-0 xl:right-0 xl:left-[30rem]">
+            <div className="flex shrink-0 items-center justify-between gap-3 bg-card/90 p-4">
               <div className="grid gap-1">
                 <h3 className="font-heading text-lg font-semibold tracking-tight">
                   {selectedCashflow?.day ?? "选择日期账单"}
