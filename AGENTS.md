@@ -7,6 +7,10 @@
 - The product is a local-first iCost Excel analyzer. Users upload `.xlsx` or
   `.xls` exports in the browser, then inspect spending metrics, linked charts,
   summaries, filters, exchange rates, and paginated transaction details.
+- This is an open-source, third-party companion project for iCost exports. Do
+  not imply official iCost affiliation in product copy, documentation, package
+  metadata, or repository materials unless the user explicitly provides that
+  relationship.
 - There is no backend service in this repo. Workbook parsing happens in the
   browser through a lazy `xlsx` import, and the app should not upload personal
   finance data to any remote service.
@@ -18,6 +22,25 @@
   `theme` key, supports `dark`, `light`, and `system`, applies the resolved
   class to `<html>`, syncs across tabs, and toggles with the `d` key when focus
   is not in an editable element.
+
+## Open Source & Documentation
+
+- `README.md` is the public entry point for the project. Keep it friendly to
+  non-internal users and update it whenever product behavior, supported iCost
+  export fields, commands, privacy boundaries, or contribution expectations
+  change.
+- Public-facing documentation should default to Simplified Chinese unless the
+  user asks for another language. Technical agent guidance in `AGENTS.md` may
+  remain in English for tool compatibility and precision.
+- Treat this project as local-first by default. Do not introduce remote upload,
+  telemetry, cloud parsing, live exchange-rate fetching, or account features
+  without an explicit product decision and matching README/UI disclosure.
+- Use fictional, anonymized, or generated examples only. Never add real finance
+  exports, private screenshots, personal categories, or sensitive sample data to
+  docs, fixtures, or commits.
+- If a license file is added later, update the README license section in the
+  same change. Do not change `package.json` publication settings only because
+  the repository is open source.
 
 ## Product Behavior
 
