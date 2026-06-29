@@ -1,0 +1,72 @@
+import type { EChartsOption } from "echarts"
+
+import { TAG_COLOR, TAG_COLOR_ACTIVE } from "../chart-theme"
+import type { SummaryItem } from "../../../model/analytics-types"
+import { formatMoney } from "../../../model/money"
+import type { ChartTheme } from "./types"
+import {
+  axisStyle,
+  chartMutedTextColor,
+  compactMoney,
+  horizontalGradient,
+  tooltipStyle,
+} from "./shared"
+
+export function createTagOption(
+  items: SummaryItem[],
+  theme?: ChartTheme
+): EChartsOption {
+  const axis = axisStyle(theme)
+  const top = items.slice(0, 15)
+  return {
+    color: [TAG_COLOR],
+    tooltip: {
+      trigger: "axis",
+      valueFormatter: (value) => formatMoney(Number(value)),
+      ...tooltipStyle(theme),
+    },
+    grid: { left: 6, right: 58, top: 6, bottom: 6, containLabel: true },
+    xAxis: {
+      type: "value",
+      ...axis,
+      axisLabel: {
+        color: chartMutedTextColor(theme),
+        fontSize: 10,
+        formatter: compactMoney,
+      },
+    },
+    yAxis: {
+      type: "category",
+      data: top.map((item) => item.name).reverse(),
+      ...axis,
+      splitLine: { show: false },
+      axisLabel: {
+        color: chartMutedTextColor(theme),
+        fontSize: 10,
+        formatter: (value: string) =>
+          value.length > 10 ? `${value.slice(0, 10)}…` : value,
+      },
+    },
+    series: [
+      {
+        type: "bar",
+        data: top
+          .map((item) => ({
+            value: item.amount,
+            itemStyle: {
+              color: horizontalGradient(TAG_COLOR, TAG_COLOR_ACTIVE),
+            },
+          }))
+          .reverse(),
+        barMaxWidth: 12,
+        label: {
+          show: true,
+          position: "right",
+          color: chartMutedTextColor(theme),
+          fontSize: 10,
+          formatter: (params) => formatMoney(Number(params.value)),
+        },
+      },
+    ],
+  }
+}
