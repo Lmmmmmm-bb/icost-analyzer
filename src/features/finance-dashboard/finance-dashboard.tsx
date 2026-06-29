@@ -5,7 +5,7 @@ import { useTheme } from "@/components/theme-provider"
 import { ALL_RANGE, DEFAULT_RATES, EMPTY_FILTERS } from "./model/constants"
 import {
   createCurrencyOption,
-  createHeatmapOption,
+  createHeatmapOptionsByYear,
   createMonthlyOption,
   createPieOption,
   createRankingOption,
@@ -149,7 +149,7 @@ export function FinanceDashboard() {
       currencyOption: createCurrencyOption(currencySummary, resolvedTheme),
       weekOption: createWeekOption(weekSummary, resolvedTheme),
       tagOption: createTagOption(tagSummary, resolvedTheme),
-      heatmapOption: createHeatmapOption(heatmap, resolvedTheme),
+      heatmapOptions: createHeatmapOptionsByYear(heatmap, resolvedTheme),
     }),
     [
       categoryPie,
