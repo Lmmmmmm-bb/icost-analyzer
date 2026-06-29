@@ -53,6 +53,7 @@ export function SummaryTables({
       <DashboardPanel
         title="分类汇总表"
         description="点击行可筛选一级分类。"
+        contentClassName="p-0"
         action={
           <Select
             items={SUMMARY_SORT_OPTIONS}
@@ -83,6 +84,7 @@ export function SummaryTables({
       <DashboardPanel
         title="标签汇总表"
         description="覆盖天数表示该标签下有支出记录的不同自然日数量。"
+        contentClassName="p-0"
         action={
           <Select
             items={TAG_SORT_OPTIONS}

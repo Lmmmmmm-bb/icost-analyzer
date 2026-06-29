@@ -4,8 +4,6 @@ import {
   BALANCE_COLOR,
   CHART_COLORS,
   EXPENSE_COLOR,
-  HEATMAP_COLORS,
-  HEATMAP_DARK_COLORS,
   INCOME_COLOR,
   RANKING_COLOR,
   RANKING_COLOR_END,
@@ -54,9 +52,17 @@ function chartHairlineColor(theme?: ChartTheme) {
     : "rgba(255, 255, 255, 0.48)"
 }
 
-function axisStyle() {
+function shadcnHeatmapColors(theme?: ChartTheme) {
+  const isDark = isDarkChartTheme(theme)
+
+  return isDark
+    ? ["#262626", "#404040", "#737373", "#d4d4d4", "#e5e5e5"]
+    : ["#fafafa", "#e5e5e5", "#a3a3a3", "#525252", "#262626"]
+}
+
+function axisStyle(theme?: ChartTheme) {
   return {
-    axisLabel: { color: chartMutedTextColor(), fontSize: 11 },
+    axisLabel: { color: chartMutedTextColor(theme), fontSize: 11 },
     axisLine: { show: false },
     axisTick: { show: false },
     splitLine: {
@@ -98,7 +104,7 @@ function tooltipStyle(theme?: ChartTheme) {
   }
 }
 
-function pieLegend(items: SummaryItem[]) {
+function pieLegend(items: SummaryItem[], theme?: ChartTheme) {
   return {
     type: "scroll" as const,
     bottom: 0,
@@ -108,9 +114,9 @@ function pieLegend(items: SummaryItem[]) {
     itemHeight: 8,
     itemGap: 10,
     pageIconSize: 9,
-    pageTextStyle: { color: chartMutedTextColor(), fontSize: 10 },
+    pageTextStyle: { color: chartMutedTextColor(theme), fontSize: 10 },
     textStyle: {
-      color: chartMutedTextColor(),
+      color: chartMutedTextColor(theme),
       fontSize: 10,
       width: 72,
       overflow: "truncate" as const,
@@ -119,14 +125,17 @@ function pieLegend(items: SummaryItem[]) {
   }
 }
 
-export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
-  const axis = axisStyle()
+export function createMonthlyOption(
+  monthly: MonthlyItem[],
+  theme?: ChartTheme
+): EChartsOption {
+  const axis = axisStyle(theme)
   return {
     color: [EXPENSE_COLOR, INCOME_COLOR, BALANCE_COLOR],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
     legend: {
       top: 2,
@@ -135,7 +144,7 @@ export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
       itemWidth: 10,
       itemHeight: 10,
       itemGap: 13,
-      textStyle: { color: chartMutedTextColor(), fontSize: 11 },
+      textStyle: { color: chartMutedTextColor(theme), fontSize: 11 },
     },
     grid: { left: 8, right: 14, top: 34, bottom: 8, containLabel: true },
     xAxis: {
@@ -143,7 +152,7 @@ export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
       data: monthly.map((item) => item.month),
       ...axis,
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 10,
         rotate: monthly.length > 16 ? 45 : 0,
         formatter: (value: string) => value.slice(2),
@@ -153,7 +162,7 @@ export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
       type: "value",
       ...axis,
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 10,
         formatter: compactMoney,
       },
@@ -164,14 +173,12 @@ export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
         type: "bar",
         data: monthly.map((item) => item.expense),
         barMaxWidth: 28,
-        itemStyle: { borderRadius: [4, 4, 0, 0] },
       },
       {
         name: "收入",
         type: "bar",
         data: monthly.map((item) => item.income),
         barMaxWidth: 28,
-        itemStyle: { borderRadius: [4, 4, 0, 0] },
       },
       {
         name: "净结余",
@@ -187,15 +194,18 @@ export function createMonthlyOption(monthly: MonthlyItem[]): EChartsOption {
   }
 }
 
-export function createPieOption(items: SummaryItem[]): EChartsOption {
+export function createPieOption(
+  items: SummaryItem[],
+  theme?: ChartTheme
+): EChartsOption {
   return {
     color: CHART_COLORS,
     tooltip: {
       trigger: "item",
       formatter: "{b}<br/>¥{c} · {d}%",
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
-    legend: pieLegend(items),
+    legend: pieLegend(items, theme),
     series: [
       {
         type: "pie",
@@ -206,7 +216,7 @@ export function createPieOption(items: SummaryItem[]): EChartsOption {
           name: item.name,
           value: Number(item.amount.toFixed(2)),
         })),
-        itemStyle: { borderColor: chartSoftEdgeColor(), borderWidth: 1 },
+        itemStyle: { borderColor: chartSoftEdgeColor(theme), borderWidth: 1 },
         label: {
           show: true,
           position: "center",
@@ -214,11 +224,11 @@ export function createPieOption(items: SummaryItem[]): EChartsOption {
             `{a|支出合计}\n{b|${compactMoney(items.reduce((sum, item) => sum + item.amount, 0))}}`,
           rich: {
             a: {
-              color: chartMutedTextColor(),
+              color: chartMutedTextColor(theme),
               fontSize: 11,
               padding: [0, 0, 5, 0],
             },
-            b: { color: chartTextColor(), fontSize: 18, fontWeight: 600 },
+            b: { color: chartTextColor(theme), fontSize: 18, fontWeight: 600 },
           },
         },
         labelLine: { show: false },
@@ -227,21 +237,24 @@ export function createPieOption(items: SummaryItem[]): EChartsOption {
   }
 }
 
-export function createRankingOption(items: SummaryItem[]): EChartsOption {
-  const axis = axisStyle()
+export function createRankingOption(
+  items: SummaryItem[],
+  theme?: ChartTheme
+): EChartsOption {
+  const axis = axisStyle(theme)
   return {
     color: [RANKING_COLOR],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
     grid: { left: 8, right: 62, top: 8, bottom: 6, containLabel: true },
     xAxis: {
       type: "value",
       ...axis,
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 10,
         formatter: compactMoney,
       },
@@ -252,7 +265,7 @@ export function createRankingOption(items: SummaryItem[]): EChartsOption {
       ...axis,
       splitLine: { show: false },
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 11,
         formatter: (value: string) =>
           value.length > 10 ? `${value.slice(0, 10)}…` : value,
@@ -265,29 +278,31 @@ export function createRankingOption(items: SummaryItem[]): EChartsOption {
         barMaxWidth: 13,
         itemStyle: {
           color: horizontalGradient(RANKING_COLOR, RANKING_COLOR_END),
-          borderRadius: [0, 3, 3, 0],
         },
         label: {
           show: true,
           position: "right",
-          color: chartMutedTextColor(),
+          color: chartMutedTextColor(theme),
           fontSize: 10,
-          formatter: (params) => compactMoney(Number(params.value)),
+          formatter: (params) => formatMoney(Number(params.value)),
         },
       },
     ],
   }
 }
 
-export function createCurrencyOption(items: SummaryItem[]): EChartsOption {
+export function createCurrencyOption(
+  items: SummaryItem[],
+  theme?: ChartTheme
+): EChartsOption {
   return {
     color: CHART_COLORS,
     tooltip: {
       trigger: "item",
       formatter: "{b}<br/>¥{c} · {d}%",
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
-    legend: pieLegend(items),
+    legend: pieLegend(items, theme),
     series: [
       {
         type: "pie",
@@ -297,7 +312,7 @@ export function createCurrencyOption(items: SummaryItem[]): EChartsOption {
           name: item.name,
           value: Number(item.amount.toFixed(2)),
         })),
-        itemStyle: { borderColor: chartSoftEdgeColor(), borderWidth: 1 },
+        itemStyle: { borderColor: chartSoftEdgeColor(theme), borderWidth: 1 },
         label: { show: false },
         labelLine: { show: false },
       },
@@ -305,27 +320,30 @@ export function createCurrencyOption(items: SummaryItem[]): EChartsOption {
   }
 }
 
-export function createWeekOption(items: WeekItem[]): EChartsOption {
-  const axis = axisStyle()
+export function createWeekOption(
+  items: WeekItem[],
+  theme?: ChartTheme
+): EChartsOption {
+  const axis = axisStyle(theme)
   return {
     color: [WEEK_COLOR],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
     grid: { left: 6, right: 10, top: 12, bottom: 6, containLabel: true },
     xAxis: {
       type: "category",
       data: items.map((item) => item.name),
       ...axis,
-      axisLabel: { color: chartMutedTextColor(), fontSize: 11 },
+      axisLabel: { color: chartMutedTextColor(theme), fontSize: 11 },
     },
     yAxis: {
       type: "value",
       ...axis,
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 10,
         formatter: compactMoney,
       },
@@ -342,30 +360,30 @@ export function createWeekOption(items: WeekItem[]): EChartsOption {
           },
         })),
         barMaxWidth: 34,
-        itemStyle: {
-          borderRadius: [3, 3, 0, 0],
-        },
       },
     ],
   }
 }
 
-export function createTagOption(items: SummaryItem[]): EChartsOption {
-  const axis = axisStyle()
+export function createTagOption(
+  items: SummaryItem[],
+  theme?: ChartTheme
+): EChartsOption {
+  const axis = axisStyle(theme)
   const top = items.slice(0, 15)
   return {
     color: [TAG_COLOR],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
-      ...tooltipStyle(),
+      ...tooltipStyle(theme),
     },
     grid: { left: 6, right: 58, top: 6, bottom: 6, containLabel: true },
     xAxis: {
       type: "value",
       ...axis,
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 10,
         formatter: compactMoney,
       },
@@ -376,10 +394,10 @@ export function createTagOption(items: SummaryItem[]): EChartsOption {
       ...axis,
       splitLine: { show: false },
       axisLabel: {
-        color: chartMutedTextColor(),
+        color: chartMutedTextColor(theme),
         fontSize: 10,
         formatter: (value: string) =>
-          value.length > 8 ? `${value.slice(0, 8)}…` : value,
+          value.length > 10 ? `${value.slice(0, 10)}…` : value,
       },
     },
     series: [
@@ -394,13 +412,12 @@ export function createTagOption(items: SummaryItem[]): EChartsOption {
           }))
           .reverse(),
         barMaxWidth: 12,
-        itemStyle: { borderRadius: [0, 3, 3, 0] },
         label: {
           show: true,
           position: "right",
-          color: chartMutedTextColor(),
+          color: chartMutedTextColor(theme),
           fontSize: 10,
-          formatter: (params) => compactMoney(Number(params.value)),
+          formatter: (params) => formatMoney(Number(params.value)),
         },
       },
     ],
@@ -411,7 +428,6 @@ export function createHeatmapOption(
   heatmap: [string, number][],
   theme?: ChartTheme
 ): EChartsOption {
-  const isDark = isDarkChartTheme(theme)
   const heatmapRange = heatmap.length
     ? [heatmap[0][0], heatmap[heatmap.length - 1][0]]
     : [dateKey(new Date()), dateKey(new Date())]
@@ -428,7 +444,7 @@ export function createHeatmapOption(
       show: false,
       min: 0,
       max: Math.max(...heatmap.map((item) => item[1]), 1),
-      inRange: { color: isDark ? HEATMAP_DARK_COLORS : HEATMAP_COLORS },
+      inRange: { color: shadcnHeatmapColors(theme) },
     },
     calendar: {
       top: 36,

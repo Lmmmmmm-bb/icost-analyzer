@@ -143,12 +143,12 @@ export function FinanceDashboard() {
   )
   const chartOptions = useMemo(
     () => ({
-      monthlyOption: createMonthlyOption(monthly),
-      pieOption: createPieOption(categoryPie),
-      rankingOption: createRankingOption(ranking),
-      currencyOption: createCurrencyOption(currencySummary),
-      weekOption: createWeekOption(weekSummary),
-      tagOption: createTagOption(tagSummary),
+      monthlyOption: createMonthlyOption(monthly, resolvedTheme),
+      pieOption: createPieOption(categoryPie, resolvedTheme),
+      rankingOption: createRankingOption(ranking, resolvedTheme),
+      currencyOption: createCurrencyOption(currencySummary, resolvedTheme),
+      weekOption: createWeekOption(weekSummary, resolvedTheme),
+      tagOption: createTagOption(tagSummary, resolvedTheme),
       heatmapOption: createHeatmapOption(heatmap, resolvedTheme),
     }),
     [

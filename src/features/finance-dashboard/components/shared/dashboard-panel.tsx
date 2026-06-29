@@ -8,11 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 type DashboardPanelProps = {
   title: string
   description: string
   action?: ReactNode
+  contentClassName?: string
   children: ReactNode
 }
 
@@ -20,6 +22,7 @@ export function DashboardPanel({
   title,
   description,
   action,
+  contentClassName,
   children,
 }: DashboardPanelProps) {
   return (
@@ -33,7 +36,12 @@ export function DashboardPanel({
         <CardDescription>{description}</CardDescription>
         {action ? <CardAction>{action}</CardAction> : null}
       </CardHeader>
-      <CardContent className="relative bg-[linear-gradient(180deg,color-mix(in_oklch,var(--muted),transparent_74%),transparent_36%)] p-4">
+      <CardContent
+        className={cn(
+          "relative bg-[linear-gradient(180deg,color-mix(in_oklch,var(--muted),transparent_74%),transparent_36%)] p-4",
+          contentClassName
+        )}
+      >
         {children}
       </CardContent>
     </Card>
