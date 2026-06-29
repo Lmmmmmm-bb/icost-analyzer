@@ -47,7 +47,7 @@ export function TransactionTable({
   onDetailSortChange,
 }: TransactionTableProps) {
   return (
-    <Card className="gap-0 py-0">
+    <Card className="gap-0 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-ledger-chart-hover motion-reduce:hover:translate-y-0">
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
           <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
