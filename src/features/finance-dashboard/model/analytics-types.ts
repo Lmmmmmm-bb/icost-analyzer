@@ -28,6 +28,29 @@ export type MonthlyItem = {
   net: number
 }
 
+export type DailyCashflowItem = {
+  day: string
+  date: Date
+  expense: number
+  income: number
+  net: number
+  count: number
+  bills: DailyBillItem[]
+}
+
+export type DailyBillItem = {
+  id: string
+  type: string
+  category: string
+  subcategory: string
+  note: string
+  location: string
+  amount: number
+  currency: string
+  rmb: number
+  direction: "expense" | "income" | "other"
+}
+
 export type WeekItem = {
   name: string
   amount: number

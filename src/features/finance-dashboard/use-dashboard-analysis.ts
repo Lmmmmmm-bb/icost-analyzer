@@ -13,6 +13,7 @@ import { RANK_LEVELS, type RankLevel } from "./components/charts/types"
 import type { SummarySort, TagSort } from "./components/summaries/types"
 import type { DetailSort } from "./components/transactions/types"
 import {
+  getDailyCashflow,
   getDateRange,
   getDimensions,
   getHeatmap,
@@ -94,6 +95,10 @@ export function useDashboardAnalysis({
     () => getWeekSummary(filtered, rates),
     [filtered, rates]
   )
+  const dailyCashflow = useMemo(
+    () => getDailyCashflow(filtered, rates),
+    [filtered, rates]
+  )
   const heatmap = useMemo(() => getHeatmap(filtered, rates), [filtered, rates])
 
   const detailRows = useMemo(() => {
@@ -145,10 +150,12 @@ export function useDashboardAnalysis({
       weekOption: createWeekOption(weekSummary, resolvedTheme),
       tagOption: createTagOption(tagSummary, resolvedTheme),
       heatmapOptions: createHeatmapOptionsByYear(heatmap, resolvedTheme),
+      dailyCashflow,
     }),
     [
       categoryPie,
       currencySummary,
+      dailyCashflow,
       heatmap,
       monthly,
       ranking,

@@ -1,5 +1,7 @@
 import type { EChartsOption } from "echarts"
 
+import type { DailyCashflowItem } from "../../model/analytics-types"
+
 export type RankLevel = "一级分类" | "二级分类"
 
 export const RANK_LEVELS = [
@@ -20,4 +22,5 @@ export type ChartOptions = {
   weekOption: EChartsOption
   tagOption: EChartsOption
   heatmapOptions: HeatmapChartOption[]
+  dailyCashflow: DailyCashflowItem[]
 }

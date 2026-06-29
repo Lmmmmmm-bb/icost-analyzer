@@ -1,4 +1,5 @@
 import type {
+  DailyCashflowItem,
   MetricStats,
   MonthlyItem,
   SummaryItem,
@@ -128,6 +129,47 @@ export function getMonthly(filtered: Transaction[], rates: RateMap) {
     map.set(tx.monthKey, item)
   }
   return Array.from(map.values()).sort((a, b) => a.month.localeCompare(b.month))
+}
+
+export function getDailyCashflow(
+  filtered: Transaction[],
+  rates: RateMap
+): DailyCashflowItem[] {
+  const map = new Map<string, DailyCashflowItem>()
+  for (const tx of filtered) {
+    const item = map.get(tx.dayKey) ?? {
+      day: tx.dayKey,
+      date: new Date(
+        tx.date.getFullYear(),
+        tx.date.getMonth(),
+        tx.date.getDate()
+      ),
+      expense: 0,
+      income: 0,
+      net: 0,
+      count: 0,
+      bills: [],
+    }
+    const rmb = toRmb(tx, rates)
+    if (isExpense(tx)) item.expense += Math.abs(rmb)
+    if (isIncome(tx)) item.income += Math.max(rmb, 0)
+    item.net = item.income - item.expense
+    item.count += 1
+    item.bills.push({
+      id: tx.id,
+      type: tx.type,
+      category: tx.category,
+      subcategory: tx.subcategory,
+      note: tx.note,
+      location: tx.location,
+      amount: tx.amount,
+      currency: tx.currency,
+      rmb,
+      direction: isExpense(tx) ? "expense" : isIncome(tx) ? "income" : "other",
+    })
+    map.set(tx.dayKey, item)
+  }
+  return Array.from(map.values()).sort((a, b) => a.day.localeCompare(b.day))
 }
 
 export function getWeekSummary(filtered: Transaction[], rates: RateMap) {
