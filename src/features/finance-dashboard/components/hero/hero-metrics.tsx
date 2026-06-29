@@ -52,14 +52,19 @@ export function HeroMetrics({ stats }: HeroMetricsProps) {
       <CardContent className="p-0">
         <div className="grid divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {primaryMetrics.map((metric) => (
-            <div key={metric.label} className="relative flex flex-col gap-2 p-4">
-              <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+            <div
+              key={metric.label}
+              className="group/metric relative flex flex-col gap-2 bg-background/35 p-4 transition-colors hover:bg-muted/35"
+            >
+              <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
                 {metric.label}
               </div>
               <div className="font-heading text-2xl leading-tight font-semibold tracking-tight tabular-nums">
                 {metric.value}
               </div>
-              <div className="text-sm text-muted-foreground">{metric.caption}</div>
+              <div className="text-sm text-muted-foreground">
+                {metric.caption}
+              </div>
             </div>
           ))}
         </div>
@@ -67,9 +72,9 @@ export function HeroMetrics({ stats }: HeroMetricsProps) {
           {secondaryMetrics.map((metric) => (
             <div
               key={metric.label}
-              className="flex min-h-14 flex-col justify-between gap-1.5 border-r border-b border-border/70 px-3 py-2.5 xl:border-b-0 xl:last:border-r-0"
+              className="group/metric flex min-h-14 flex-col justify-between gap-1.5 border-r border-b border-border/70 px-3 py-2.5 transition-colors hover:bg-muted/35 xl:border-b-0 xl:last:border-r-0"
             >
-              <div className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+              <div className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
                 {metric.label}
               </div>
               <div className="font-heading text-base leading-none font-semibold tracking-tight tabular-nums">
