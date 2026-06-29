@@ -161,6 +161,7 @@ export function getDailyCashflow(
       category: tx.category,
       subcategory: tx.subcategory,
       note: tx.note,
+      tags: tx.tags,
       location: tx.location,
       amount: tx.amount,
       currency: tx.currency,

@@ -163,7 +163,7 @@ export function AnalysisCharts({
         contentClassName="p-0 min-h-unset"
       >
         <div className="grid xl:relative xl:block">
-          <div className="overflow-x-auto border-b border-border/80 p-4 xl:w-[30rem] xl:border-r xl:border-b-0">
+          <div className="m-0 overflow-x-auto border-b border-border/80 p-0 xl:w-[30rem] xl:border-r xl:border-b-0">
             <Calendar
               mode="single"
               selected={selectedCashflowDate}
@@ -175,13 +175,16 @@ export function AnalysisCharts({
               numberOfMonths={1}
               showOutsideDays={false}
               disabled={(date) => !dailyCashflowByDay.has(dateKey(date))}
-              className="mx-auto w-max max-w-none overflow-visible bg-transparent [--cell-size:3.25rem]"
+              className="m-0 w-full max-w-none overflow-visible bg-transparent p-0 [--cell-size:3.25rem]"
               classNames={{
-                root: "relative w-max max-w-none overflow-visible",
-                months: "relative w-max max-w-none overflow-visible",
-                month: "w-max max-w-none",
-                month_grid: "w-max max-w-none",
+                root: "relative m-0 w-full max-w-none overflow-visible p-0",
+                months: "relative m-0 w-full max-w-none overflow-visible p-0",
+                month: "m-0 w-full max-w-none gap-2 p-0",
+                month_grid: "m-0 w-full max-w-none p-0",
                 nav: "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1 px-0",
+                weekdays: "m-0 flex p-0",
+                weekday: "m-0 flex-1 p-0",
+                week: "m-0 flex w-full p-0",
               }}
               components={{
                 DayButton: ({ day, modifiers, className, ...props }) => {
@@ -193,7 +196,7 @@ export function AnalysisCharts({
                       modifiers={modifiers}
                       locale={zhCN}
                       className={cn(
-                        "items-start justify-start overflow-hidden border border-transparent bg-background/70 p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/70",
+                        "items-start justify-start overflow-hidden border border-transparent bg-background/70 p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/70 group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 data-[selected-single=true]:[&>span]:opacity-100 dark:data-[selected-single=true]:bg-primary/15",
                         item && "text-foreground",
                         !item && "opacity-45",
                         className
@@ -225,9 +228,9 @@ export function AnalysisCharts({
           </div>
 
           <div className="flex min-h-0 flex-col bg-background/70 xl:absolute xl:inset-y-0 xl:right-0 xl:left-[30rem]">
-            <div className="flex shrink-0 items-start justify-between gap-3 p-4">
+            <div className="flex shrink-0 items-center justify-between gap-3 p-4">
               <div className="grid gap-1">
-                <h3 className="font-heading text-2xl font-semibold tracking-tight">
+                <h3 className="font-heading text-lg font-semibold tracking-tight">
                   {selectedCashflow?.day ?? "选择日期账单"}
                 </h3>
                 {!selectedCashflow ? (
@@ -315,7 +318,7 @@ export function AnalysisCharts({
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex min-w-0 flex-wrap items-center gap-2">
                               <p className="truncate text-sm font-medium">
                                 {bill.category}
                                 {bill.subcategory
@@ -323,6 +326,18 @@ export function AnalysisCharts({
                                   : ""}
                               </p>
                               <Badge variant={badgeVariant}>{bill.type}</Badge>
+                              {bill.tags.length ? (
+                                <>
+                                  <span className="h-3 w-px bg-border" />
+                                  <span className="flex min-w-0 flex-wrap items-center gap-1">
+                                    {bill.tags.map((tag) => (
+                                      <Badge key={tag} variant="outline">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                  </span>
+                                </>
+                              ) : null}
                             </div>
                             <p
                               className="mt-1 truncate text-xs text-muted-foreground"

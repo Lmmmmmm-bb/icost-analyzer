@@ -44,6 +44,7 @@ export type DailyBillItem = {
   category: string
   subcategory: string
   note: string
+  tags: string[]
   location: string
   amount: number
   currency: string
