@@ -119,19 +119,84 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
 
 export function getMonthly(filtered: Transaction[], rates: RateMap) {
   const map = new Map<string, MonthlyItem>()
+  const categoryMaps = new Map<string, Map<string, number>>()
   for (const tx of filtered) {
     const item = map.get(tx.monthKey) ?? {
       month: tx.monthKey,
       expense: 0,
       income: 0,
       net: 0,
+      savingsRate: null,
+      topExpenseCategory: {
+        name: "暂无支出",
+        amount: 0,
+      },
+      largestExpense: null,
+      bills: [],
     }
-    if (isExpense(tx)) item.expense += expenseRmb(tx, rates)
-    if (isIncome(tx)) item.income += Math.max(toRmb(tx, rates), 0)
+    const rmb = toRmb(tx, rates)
+    const direction = isIncome(tx)
+      ? "income"
+      : isExpense(tx)
+        ? "expense"
+        : "other"
+    item.bills.push({
+      id: tx.id,
+      date: tx.date,
+      dateText: tx.dateText,
+      type: tx.type,
+      category: tx.category,
+      subcategory: tx.subcategory,
+      note: tx.note,
+      tags: tx.tags,
+      location: tx.location,
+      amount: tx.amount,
+      currency: tx.currency,
+      rmb,
+      direction,
+    })
+    if (isExpense(tx)) {
+      const expense = expenseRmb(tx, rates)
+      const categoryName = tx.category || "未分类"
+      const categoryMap =
+        categoryMaps.get(tx.monthKey) ?? new Map<string, number>()
+      const categoryAmount = (categoryMap.get(categoryName) ?? 0) + expense
+      categoryMap.set(categoryName, categoryAmount)
+      categoryMaps.set(tx.monthKey, categoryMap)
+
+      item.expense += expense
+      if (categoryAmount > item.topExpenseCategory.amount) {
+        item.topExpenseCategory = {
+          name: categoryName,
+          amount: categoryAmount,
+        }
+      }
+      if (!item.largestExpense || expense > item.largestExpense.rmb) {
+        item.largestExpense = {
+          id: tx.id,
+          day: tx.dayKey,
+          category: tx.category,
+          subcategory: tx.subcategory,
+          note: tx.note,
+          amount: Math.abs(tx.amount),
+          currency: tx.currency,
+          rmb: expense,
+        }
+      }
+    }
+    if (isIncome(tx)) item.income += Math.max(rmb, 0)
     item.net = item.income - item.expense
+    item.savingsRate = item.income > 0 ? item.net / item.income : null
     map.set(tx.monthKey, item)
   }
-  return Array.from(map.values()).sort((a, b) => a.month.localeCompare(b.month))
+  return Array.from(map.values())
+    .map((item) => ({
+      ...item,
+      bills: [...item.bills].sort(
+        (a, b) => b.date.getTime() - a.date.getTime()
+      ),
+    }))
+    .sort((a, b) => a.month.localeCompare(b.month))
 }
 
 function createTrend(current: number, previous: number): PeriodTrend {

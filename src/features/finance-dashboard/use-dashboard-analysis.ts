@@ -313,6 +313,7 @@ export function useDashboardAnalysis({
       tagOption: createTagOption(tagSummary, resolvedTheme),
       heatmapOptions: createHeatmapOptionsByYear(heatmap, resolvedTheme),
       dailyCashflow,
+      monthlyReview: monthly,
     }),
     [
       categoryPie,

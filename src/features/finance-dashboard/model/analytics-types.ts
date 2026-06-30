@@ -48,6 +48,40 @@ export type MonthlyItem = {
   expense: number
   income: number
   net: number
+  savingsRate: number | null
+  topExpenseCategory: {
+    name: string
+    amount: number
+  }
+  largestExpense: MonthlyLargestExpense | null
+  bills: MonthlyBillItem[]
+}
+
+export type MonthlyLargestExpense = {
+  id: string
+  day: string
+  category: string
+  subcategory: string
+  note: string
+  amount: number
+  currency: string
+  rmb: number
+}
+
+export type MonthlyBillItem = {
+  id: string
+  date: Date
+  dateText: string
+  type: string
+  category: string
+  subcategory: string
+  note: string
+  tags: string[]
+  location: string
+  amount: number
+  currency: string
+  rmb: number
+  direction: "expense" | "income" | "other"
 }
 
 export type DailyCashflowItem = {
