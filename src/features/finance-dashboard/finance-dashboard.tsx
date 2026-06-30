@@ -46,6 +46,8 @@ export function FinanceDashboard() {
     filtered,
     missingRates,
     stats,
+    periodComparison,
+    yearComparison,
     detailRows,
     safePage,
     totalPages,
@@ -142,6 +144,8 @@ export function FinanceDashboard() {
             fileName={fileName}
             rangeText={rangeText}
             stats={stats}
+            periodComparison={periodComparison}
+            yearComparison={yearComparison}
             onReplaceFile={resetWorkbook}
           />
 

@@ -5,6 +5,28 @@ export type SummaryItem = {
   days: Set<string>
 }
 
+export type PeriodTrend = {
+  current: number
+  previous: number
+  change: number
+  changeRate: number | null
+}
+
+export type PeriodTopMover = PeriodTrend & {
+  name: string
+}
+
+export type PeriodComparison = {
+  canCompare: boolean
+  currentLabel: string
+  previousLabel: string
+  expense: PeriodTrend
+  income: PeriodTrend
+  net: PeriodTrend
+  categoryExpenseTop: PeriodTopMover[]
+  tagExpenseTop: PeriodTopMover[]
+}
+
 export type MetricStats = {
   totalExpense: number
   totalIncome: number

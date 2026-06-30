@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button"
 
-import type { MetricStats } from "../../model/analytics-types"
+import type { MetricStats, PeriodComparison } from "../../model/analytics-types"
 import { HeroMetrics } from "./hero-metrics"
 
 type WorkspaceHeroProps = {
   fileName: string
   rangeText: string
   stats: MetricStats
+  periodComparison: PeriodComparison
+  yearComparison: PeriodComparison
   onReplaceFile: () => void
 }
 
@@ -14,6 +16,8 @@ export function WorkspaceHero({
   fileName,
   rangeText,
   stats,
+  periodComparison,
+  yearComparison,
   onReplaceFile,
 }: WorkspaceHeroProps) {
   return (
@@ -63,7 +67,11 @@ export function WorkspaceHero({
           </div>
         </div>
       </div>
-      <HeroMetrics stats={stats} />
+      <HeroMetrics
+        stats={stats}
+        periodComparison={periodComparison}
+        yearComparison={yearComparison}
+      />
     </section>
   )
 }

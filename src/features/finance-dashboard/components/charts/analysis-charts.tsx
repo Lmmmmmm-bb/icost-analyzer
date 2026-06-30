@@ -196,7 +196,7 @@ export function AnalysisCharts({
                       modifiers={modifiers}
                       locale={zhCN}
                       className={cn(
-                        "items-start justify-start overflow-hidden border border-transparent bg-transparent p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/55 group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 data-[selected-single=true]:[&>span]:opacity-100",
+                        "items-start justify-start overflow-hidden border border-transparent bg-transparent p-1.5 text-left transition-all group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 hover:border-foreground/20 hover:bg-muted/55 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:[&>span]:opacity-100",
                         item && "text-foreground",
                         !item && "opacity-45",
                         className
