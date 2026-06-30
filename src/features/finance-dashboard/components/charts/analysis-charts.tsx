@@ -94,8 +94,8 @@ export function AnalysisCharts({
             />
           </DashboardPanel>
           <DashboardPanel
-            title="支出明细排行 Top 15"
-            description="按折算人民币金额从高到低排序。"
+            title="支出分类排行 Top 15"
+            description="按人民币折算金额从高到低排序，可切换一级/二级分类。"
             action={
               <div className="flex gap-1">
                 {RANK_LEVELS.map((level) => (
@@ -117,14 +117,14 @@ export function AnalysisCharts({
 
         <div className="grid gap-6 lg:grid-cols-3">
           <DashboardPanel
-            title="币种分布"
-            description="以支出原币种分组，金额统一折算人民币。"
+            title="支出币种分布"
+            description="按支出的原币种分组，并统一折算为人民币。"
           >
             <EChart option={options.currencyOption} />
           </DashboardPanel>
           <DashboardPanel
             title="星期支出分布"
-            description="观察消费集中发生在一周中的哪些日期。"
+            description="观察支出集中发生在一周中的哪些日期。"
           >
             <EChart option={options.weekOption} />
           </DashboardPanel>
@@ -159,8 +159,8 @@ export function AnalysisCharts({
       </DashboardPanel>
 
       <DashboardPanel
-        title="收支日历"
-        description="每个日期同时标注收入与支出，点击日期查看当天流水截面。"
+        title="每日收支日历"
+        description="在日历中标注每日收入与支出，点击日期查看当天交易。"
         contentClassName="p-0 min-h-unset"
       >
         <div className="grid xl:relative xl:block">
@@ -232,11 +232,11 @@ export function AnalysisCharts({
             <div className="flex shrink-0 items-center justify-between gap-3 bg-transparent p-4">
               <div className="grid gap-1">
                 <h3 className="font-heading text-lg font-semibold tracking-tight">
-                  {selectedCashflow?.day ?? "选择日期账单"}
+                  {selectedCashflow?.day ?? "选择日期查看交易"}
                 </h3>
                 {!selectedCashflow ? (
                   <p className="text-sm text-muted-foreground">
-                    点击有色日期查看当天账单明细。
+                    点击有记录的日期查看当天交易。
                   </p>
                 ) : null}
               </div>
@@ -344,7 +344,7 @@ export function AnalysisCharts({
                               className="mt-1 truncate text-xs text-muted-foreground"
                               title={`${bill.note} ${bill.location}`}
                             >
-                              {bill.note || "未填写备注"}
+                              {bill.note || "无备注"}
                               {bill.location ? ` · ${bill.location}` : ""}
                             </p>
                           </div>
@@ -374,7 +374,7 @@ export function AnalysisCharts({
               </>
             ) : (
               <p className="text-sm leading-relaxed text-muted-foreground">
-                无流水日期会保持不可选状态。
+                没有交易记录的日期不可选择。
               </p>
             )}
           </div>

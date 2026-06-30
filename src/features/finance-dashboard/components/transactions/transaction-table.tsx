@@ -55,7 +55,7 @@ export function TransactionTable({
           交易明细
         </CardTitle>
         <CardDescription>
-          共 {rows.length} 条筛选结果，外币保留原金额并展示人民币折算。
+          共 {rows.length} 条匹配记录，外币保留原币金额，并展示人民币折算金额。
         </CardDescription>
         <CardAction>
           <TransactionTableControls
@@ -77,8 +77,8 @@ export function TransactionTable({
               <TableHead>备注 / 地点</TableHead>
               <TableHead>标签</TableHead>
               <TableHead>币种</TableHead>
-              <TableHead>原始金额</TableHead>
-              <TableHead>折算人民币</TableHead>
+              <TableHead>原币金额</TableHead>
+              <TableHead>人民币折算</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

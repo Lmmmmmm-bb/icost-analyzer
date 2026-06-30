@@ -40,11 +40,11 @@ export function WorkspaceHero({
                   ∑
                 </span>
                 <h1 className="font-heading text-3xl leading-none font-semibold tracking-[-0.055em] md:text-4xl">
-                  账单分析
+                  财务分析
                 </h1>
               </div>
               <p className="max-w-2xl border-l border-border/70 pl-3 text-xs leading-5 text-muted-foreground md:mb-0.5">
-                当前文件已完成本地解析。按时间、分类、标签与币种汇总账单；调整筛选或汇率后，图表与明细会同步刷新。
+                当前文件已在本地解析完成，数据仅保留在当前页面会话中。可按时间、分类、标签与币种查看交易；调整筛选或汇率后，图表与明细会同步刷新。
               </p>
             </div>
           </div>

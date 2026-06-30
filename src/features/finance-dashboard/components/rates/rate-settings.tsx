@@ -86,11 +86,11 @@ export function RateSettings({
   return (
     <DashboardPanel
       title="汇率设置"
-      description={`${BASE_CURRENCY} 固定为 1；非法或空汇率不会写入计算。`}
+      description={`${BASE_CURRENCY} 固定为 1；默认汇率为内置参考值，非实时行情。留空或无效输入不会更新计算。`}
       interactive={false}
       action={
         <Button variant="outline" size="xs" onClick={resetRates}>
-          恢复默认汇率
+          恢复内置汇率
         </Button>
       }
       contentClassName="p-0"

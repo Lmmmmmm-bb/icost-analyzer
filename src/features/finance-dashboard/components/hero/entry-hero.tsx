@@ -40,10 +40,10 @@ export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
         >
           <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-ledger-popover backdrop-blur-xl">
             <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
-              松开即可上传
+              松开开始本地解析
             </div>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              已识别到文件拖入页面，松开后会在本地解析 iCost Excel。
+              已识别到文件拖入页面，松开后仅在当前浏览器解析 iCost Excel。
             </p>
             <div className="mt-2 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
               Drop anywhere · .xlsx / .xls

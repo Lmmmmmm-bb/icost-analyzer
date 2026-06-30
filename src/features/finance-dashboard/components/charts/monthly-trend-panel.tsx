@@ -27,7 +27,7 @@ export function MonthlyTrendPanel({
     <Dialog open={reviewOpen} onOpenChange={onReviewOpenChange}>
       <DashboardPanel
         title="月度收支趋势"
-        description="柱状展示支出与收入，折线展示净结余；点击月份筛选到该月。"
+        description="柱状图展示收入与支出，折线图展示净结余；点击月份可筛选该月数据。"
         action={
           <DialogTrigger
             render={<Button type="button" variant="outline" size="xs" />}

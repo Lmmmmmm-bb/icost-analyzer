@@ -62,10 +62,10 @@ export function ChipGroup({
           const selected = value.includes(item)
           const excluded = excludedValue.includes(item)
           const nextLabel = selected
-            ? `排除${item}`
+            ? `排除 ${item}`
             : excluded
-              ? `取消排除${item}`
-              : `筛选${item}`
+              ? `取消排除 ${item}`
+              : `筛选 ${item}`
           const chip = (
             <Button
               type="button"

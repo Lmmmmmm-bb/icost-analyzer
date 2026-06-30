@@ -62,12 +62,12 @@ export function MonthlyReviewDialog({
               ) : null}
             </div>
             <DialogTitle className="font-heading text-2xl leading-tight font-semibold tracking-[-0.04em]">
-              {selectedReview ? "当月账单详情" : "月度财务复盘卡片"}
+              {selectedReview ? "当月交易明细" : "月度复盘"}
             </DialogTitle>
             <DialogDescription>
               {selectedReview
-                ? "按交易明细字段查看本月全部流水，确认日期、类型、分类、备注、标签、币种与金额。"
-                : "像翻阅一叠月末账单一样，逐月检查收入、支出、结余、储蓄率与本月最大消费线索。"}
+                ? "查看本月全部交易，核对日期、类型、分类、备注、标签、币种与金额。"
+                : "按月回顾收入、支出、结余、储蓄率和最大支出。"}
             </DialogDescription>
           </div>
           <div
@@ -195,7 +195,7 @@ function MonthlyReviewCard({
           className="mt-1 w-full"
           onClick={onSelect}
         >
-          查看当月账单
+          查看当月明细
         </Button>
       </div>
     </article>
@@ -214,7 +214,7 @@ function MonthlyBillsDetail({
       <div className="flex flex-col gap-3 border border-border/80 bg-card/70 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="grid gap-1">
           <h3 className="font-heading text-lg font-semibold tracking-tight">
-            共 {month.bills.length} 笔账单
+            共 {month.bills.length} 笔交易
           </h3>
           <p className="text-xs text-muted-foreground">
             收入 {formatMoney(month.income)} · 支出 {formatMoney(month.expense)}{" "}
@@ -222,7 +222,7 @@ function MonthlyBillsDetail({
           </p>
         </div>
         <Button type="button" variant="outline" size="sm" onClick={onBack}>
-          返回复盘卡片
+          返回月度复盘
         </Button>
       </div>
 
@@ -236,8 +236,8 @@ function MonthlyBillsDetail({
               <TableHead>备注 / 地点</TableHead>
               <TableHead>标签</TableHead>
               <TableHead>币种</TableHead>
-              <TableHead>原始金额</TableHead>
-              <TableHead>折算人民币</TableHead>
+              <TableHead>原币金额</TableHead>
+              <TableHead>人民币折算</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

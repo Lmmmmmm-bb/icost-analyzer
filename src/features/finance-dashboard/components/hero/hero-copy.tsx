@@ -21,11 +21,11 @@ export function HeroCopy() {
           Personal finance dashboard
         </div>
         <h1 className="max-w-[13ch] font-heading text-4xl leading-[0.94] font-semibold tracking-[-0.06em] text-balance md:text-6xl lg:text-7xl">
-          看清你的每一笔消费
+          看清你的每一笔支出
         </h1>
         <p className="max-w-2xl border-l border-border/80 bg-background/30 py-1 pl-4 text-sm leading-7 text-muted-foreground backdrop-blur-sm md:text-base">
-          上传 iCost 导出的
-          Excel，系统会在本地整理收入、支出、标签、币种和每日消费强度。筛选条件或汇率变更后，指标、图表和交易明细会同步更新。
+          选择或拖入 iCost 导出的
+          Excel。本项目是开源的第三方非官方工具，文件仅在浏览器本地解析，不会上传；筛选条件或汇率变更后，指标、图表和交易明细会同步更新。
         </p>
       </div>
       <div className="grid max-w-xl grid-cols-3 border border-border/70 bg-card/45 text-center font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase backdrop-blur">

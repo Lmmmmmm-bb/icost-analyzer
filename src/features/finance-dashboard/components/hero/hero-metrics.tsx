@@ -49,7 +49,7 @@ export function HeroMetrics({
     { label: "笔均支出", value: formatMoney(stats.avgExpense) },
     { label: "最大单笔", value: formatMoney(stats.maxExpense) },
     { label: "退款/报销", value: formatMoney(stats.reimburse) },
-    { label: "涉及货币", value: `${stats.currencyCount} 种` },
+    { label: "涉及币种", value: `${stats.currencyCount} 种` },
     { label: "涉及标签", value: `${stats.tagCount} 个` },
   ]
 

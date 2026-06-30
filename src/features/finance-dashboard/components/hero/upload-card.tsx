@@ -41,12 +41,12 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
       <CardHeader className="relative border-b border-border/70 p-5">
         <CardTitle className="flex items-center gap-2">
           <span className="size-2 bg-primary shadow-ledger-glow-primary" />
-          {showParsingStatus ? "正在解析账本" : "整页拖拽上传"}
+          {showParsingStatus ? "正在解析账本" : "整页拖拽导入"}
         </CardTitle>
         <CardDescription>
           {showParsingStatus
             ? "Excel 文件越大，本地解析越需要一点时间，请保持当前页面打开。"
-            : "右侧面板仅作提示与手动选择；把文件拖到首页任意位置都可以上传。"}
+            : "右侧面板仅作提示与手动选择；把文件拖到页面任意位置即可本地解析。"}
         </CardDescription>
       </CardHeader>
       <CardContent className="relative flex flex-col gap-3 p-5">
@@ -56,7 +56,7 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
           aria-label={
             isParsing
               ? "正在解析 iCost Excel 文件"
-              : "拖拽到页面任意位置，或点击选择 iCost Excel 文件"
+              : "拖拽到页面任意位置，或点击选择 iCost Excel 文件进行本地解析"
           }
           aria-busy={isParsing}
           disabled={isParsing}
@@ -80,7 +80,7 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
               <span className="text-sm leading-6 text-muted-foreground">
                 {showParsingStatus
                   ? "我们正在读取工作簿、识别交易行，并重建分类、标签与币种维度。"
-                  : "将 iCost Excel 拖进当前页面即可上传；也可以点击这里选择文件。"}
+                  : "将 iCost Excel 拖进当前页面即可本地解析；也可以点击这里选择文件。"}
               </span>
             </span>
             <span className="relative grid size-12 shrink-0 place-items-center overflow-hidden border bg-primary font-mono text-xs text-primary-foreground shadow-ledger-tag transition-transform duration-300 group-hover/upload:-rotate-3">

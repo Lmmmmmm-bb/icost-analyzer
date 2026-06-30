@@ -200,7 +200,7 @@ export function useDashboardAnalysis({
   )
   const rangeText = dateRange
     ? `${dateKey(dateRange.start)} → ${dateKey(dateRange.end)}`
-    : "等待上传"
+    : "等待导入"
   const categoryPie = useMemo(
     () =>
       drillCategory

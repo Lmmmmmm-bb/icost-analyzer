@@ -11,9 +11,9 @@ export function NoResultEmptyState() {
     <Empty className="min-h-72 border">
       <EmptyHeader>
         <EmptyMedia variant="icon">∅</EmptyMedia>
-        <EmptyTitle>当前筛选条件下没有数据</EmptyTitle>
+        <EmptyTitle>暂无匹配的交易记录</EmptyTitle>
         <EmptyDescription>
-          请放宽时间、分类、标签或关键词条件。
+          可放宽时间、分类、标签或关键词后再试。
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

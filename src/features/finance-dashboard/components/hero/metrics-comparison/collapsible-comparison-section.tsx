@@ -44,7 +44,7 @@ export function CollapsibleComparisonSection({
     <Collapsible className="border-t border-border/70 bg-background/35">
       <CollapsibleTrigger
         disabled={!canExpandComparison}
-        className="group/comparison-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-muted/35 focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:opacity-60"
+        className="group/comparison-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-muted/35 focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent"
       >
         <div className="grid gap-1">
           <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">

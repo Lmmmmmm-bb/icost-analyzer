@@ -15,7 +15,7 @@ export function describeTimeRange(
   label: string,
   now: Date = new Date()
 ): string | null {
-  const months = label.match(/^近\s*(\d+)\s*月$/)
+  const months = label.match(/^近\s*(\d+)\s*(?:个)?月$/)
   if (!months) return null
 
   const start = new Date(now)

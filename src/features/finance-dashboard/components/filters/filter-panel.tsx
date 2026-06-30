@@ -36,10 +36,10 @@ export function FilterPanel({
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
           <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
-          筛选器
+          筛选
         </CardTitle>
         <CardDescription>
-          时间、类型、币种、分类、标签与关键词会联动刷新全部分析模块。
+          调整时间、类型、币种、分类、标签或关键词后，指标、图表和明细会同步刷新。
         </CardDescription>
         <CardAction>
           <Button
