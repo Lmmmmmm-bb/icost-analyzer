@@ -163,7 +163,7 @@ export function AnalysisCharts({
         contentClassName="p-0 min-h-unset"
       >
         <div className="grid xl:relative xl:block">
-          <div className="m-0 overflow-x-auto border-b border-border/80 bg-card/90 p-0 xl:w-[30rem] xl:border-r xl:border-b-0">
+          <div className="m-0 overflow-x-auto border-b border-border/80 bg-transparent p-0 xl:w-[30rem] xl:border-r xl:border-b-0">
             <Calendar
               mode="single"
               selected={selectedCashflowDate}
@@ -196,7 +196,7 @@ export function AnalysisCharts({
                       modifiers={modifiers}
                       locale={zhCN}
                       className={cn(
-                        "items-start justify-start overflow-hidden border border-transparent bg-background/70 p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/70 group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 data-[selected-single=true]:[&>span]:opacity-100 dark:bg-transparent dark:data-[selected-single=true]:bg-primary/15",
+                        "items-start justify-start overflow-hidden border border-transparent bg-transparent p-1.5 text-left transition-all hover:border-foreground/20 hover:bg-muted/55 group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-0 group-data-[focused=true]/day:data-[selected-single=true]:border-primary/60 data-[selected-single=true]:border-primary/60 data-[selected-single=true]:bg-primary/10 data-[selected-single=true]:text-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:ring-0 data-[selected-single=true]:[&>span]:opacity-100",
                         item && "text-foreground",
                         !item && "opacity-45",
                         className
@@ -228,7 +228,7 @@ export function AnalysisCharts({
           </div>
 
           <div className="flex min-h-0 flex-col xl:absolute xl:inset-y-0 xl:right-0 xl:left-[30rem]">
-            <div className="flex shrink-0 items-center justify-between gap-3 bg-card/90 p-4">
+            <div className="flex shrink-0 items-center justify-between gap-3 bg-transparent p-4">
               <div className="grid gap-1">
                 <h3 className="font-heading text-lg font-semibold tracking-tight">
                   {selectedCashflow?.day ?? "选择日期账单"}
@@ -249,7 +249,7 @@ export function AnalysisCharts({
             {selectedCashflow ? (
               <>
                 <div className="grid shrink-0 border-y border-border/70 sm:grid-cols-3">
-                  <div className="group/day-metric relative overflow-hidden border-b border-border/70 bg-card/90 p-4 transition-colors duration-300 hover:bg-card/95 sm:border-r sm:border-b-0">
+                  <div className="group/day-metric relative overflow-hidden border-b border-border/70 bg-transparent p-4 transition-colors duration-300 hover:bg-muted/50 sm:border-r sm:border-b-0">
                     <div
                       aria-hidden="true"
                       className="absolute -right-2.5 -bottom-2.5 size-8 border border-border/35 bg-background/15 opacity-55 transition-[opacity,transform] duration-300 group-hover/day-metric:translate-x-0.5 group-hover/day-metric:-translate-y-0.5 group-hover/day-metric:opacity-70"
@@ -261,7 +261,7 @@ export function AnalysisCharts({
                       {formatMoney(selectedCashflow.income)}
                     </p>
                   </div>
-                  <div className="group/day-metric relative overflow-hidden border-b border-border/70 bg-card/90 p-4 transition-colors duration-300 hover:bg-card/95 sm:border-r sm:border-b-0">
+                  <div className="group/day-metric relative overflow-hidden border-b border-border/70 bg-transparent p-4 transition-colors duration-300 hover:bg-muted/50 sm:border-r sm:border-b-0">
                     <div
                       aria-hidden="true"
                       className="absolute -right-2.5 -bottom-2.5 size-8 border border-border/35 bg-background/15 opacity-55 transition-[opacity,transform] duration-300 group-hover/day-metric:translate-x-0.5 group-hover/day-metric:-translate-y-0.5 group-hover/day-metric:opacity-70"
@@ -273,7 +273,7 @@ export function AnalysisCharts({
                       {formatMoney(selectedCashflow.expense)}
                     </p>
                   </div>
-                  <div className="group/day-metric relative overflow-hidden bg-card/90 p-4 transition-colors duration-300 hover:bg-card/95">
+                  <div className="group/day-metric relative overflow-hidden bg-transparent p-4 transition-colors duration-300 hover:bg-muted/50">
                     <div
                       aria-hidden="true"
                       className="absolute -right-2.5 -bottom-2.5 size-8 border border-border/35 bg-background/15 opacity-55 transition-[opacity,transform] duration-300 group-hover/day-metric:translate-x-0.5 group-hover/day-metric:-translate-y-0.5 group-hover/day-metric:opacity-70"
@@ -314,7 +314,7 @@ export function AnalysisCharts({
                     return (
                       <div
                         key={bill.id}
-                        className="grid gap-2 border-b border-border/70 bg-card/70 p-4 last:border-b-0"
+                        className="grid gap-2 border-b border-border/70 bg-transparent p-4 last:border-b-0"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
