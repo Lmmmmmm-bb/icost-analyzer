@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import type { ECElementEvent } from "echarts"
 import { zhCN } from "react-day-picker/locale"
@@ -71,6 +71,7 @@ export function AnalysisCharts({
     : undefined
   const [reviewOpen, setReviewOpen] = useState(false)
   const [selectedReviewMonth, setSelectedReviewMonth] = useState("")
+  const reviewContentRef = useRef<HTMLDivElement>(null)
   function getName(params: ECElementEvent) {
     return String(params.name)
   }
@@ -82,6 +83,12 @@ export function AnalysisCharts({
   const selectedReview = selectedReviewMonth
     ? monthlyReviewCards.find((month) => month.month === selectedReviewMonth)
     : undefined
+
+  useEffect(() => {
+    if (!reviewOpen) return
+
+    reviewContentRef.current?.scrollTo({ top: 0 })
+  }, [reviewOpen, selectedReviewMonth])
 
   return (
     <>
@@ -110,7 +117,7 @@ export function AnalysisCharts({
             />
           </DashboardPanel>
 
-          <DialogContent className="flex max-h-[min(48rem,calc(100svh-1rem))] flex-col overflow-hidden p-0 sm:max-w-5xl">
+          <DialogContent className="flex max-h-[min(48rem,calc(100svh-1rem))] flex-col gap-0 overflow-hidden p-0 sm:max-w-5xl">
             <DialogHeader className="shrink-0 border-b border-border/70 bg-[radial-gradient(circle_at_18%_16%,color-mix(in_oklch,var(--primary),transparent_94%),transparent_38%),linear-gradient(135deg,color-mix(in_oklch,var(--muted),transparent_76%),transparent_64%)] p-5 pr-12">
               <div className="flex items-start justify-between gap-4">
                 <div className="grid gap-2">
@@ -142,7 +149,10 @@ export function AnalysisCharts({
               </div>
             </DialogHeader>
 
-            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
+            <div
+              ref={reviewContentRef}
+              className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5"
+            >
               {selectedReview ? (
                 <MonthlyBillsDetail
                   month={selectedReview}
@@ -157,18 +167,18 @@ export function AnalysisCharts({
                     >
                       <div
                         aria-hidden="true"
-                        className="absolute top-2 right-2 rotate-[-6deg] border border-border/45 bg-background/40 px-2 py-1 font-mono text-xl leading-none font-semibold tracking-[-0.06em] text-muted-foreground/20 select-none"
+                        className="absolute top-0 right-0 border-b border-l border-border/45 bg-background/45 px-2 py-1 font-mono text-base leading-none font-semibold tracking-[-0.06em] text-muted-foreground/20 select-none"
                       >
                         {month.month}
                       </div>
-                      <div className="relative border-b border-border/70 p-4">
+                      <div className="relative border-b border-border/70 p-3">
                         <div className="relative z-10 grid gap-1">
                           <div className="grid gap-1">
                             <p className="font-mono text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
                               复盘月份
                             </p>
                             <div className="flex items-end justify-between gap-3">
-                              <h3 className="font-heading text-xl leading-tight font-semibold tracking-tight">
+                              <h3 className="font-heading text-lg leading-tight font-semibold tracking-tight">
                                 {month.month}
                               </h3>
                               <Badge
@@ -211,7 +221,7 @@ export function AnalysisCharts({
                         />
                       </div>
 
-                      <div className="relative grid gap-3 p-4">
+                      <div className="relative grid gap-3 p-3">
                         <ReviewFact
                           label="最大支出分类"
                           value={month.topExpenseCategory.name}
@@ -688,7 +698,7 @@ function ReviewMetric({
       </p>
       <p
         className={cn(
-          "mt-1 font-heading text-base leading-tight font-semibold tabular-nums",
+          "mt-0.5 font-heading text-sm leading-tight font-semibold tabular-nums",
           tone === "positive" ? "text-positive" : "text-destructive"
         )}
       >
@@ -708,7 +718,7 @@ function ReviewFact({
   detail: string
 }) {
   return (
-    <div className="grid gap-1 border-l border-primary/40 pl-3">
+    <div className="grid gap-0.5 border-l border-primary/40 pl-2.5">
       <p className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
         {label}
       </p>
