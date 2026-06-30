@@ -297,6 +297,60 @@
     animation: ledger-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
+  .ledger-stagger-stack > * {
+    --ledger-stagger-index: 0;
+    animation: ledger-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(90ms + var(--ledger-stagger-index) * 110ms);
+  }
+
+  .ledger-stagger-stack > :nth-child(1) {
+    --ledger-stagger-index: 0;
+  }
+
+  .ledger-stagger-stack > :nth-child(2) {
+    --ledger-stagger-index: 1;
+  }
+
+  .ledger-stagger-stack > :nth-child(3) {
+    --ledger-stagger-index: 2;
+  }
+
+  .ledger-stagger-stack > :nth-child(4) {
+    --ledger-stagger-index: 3;
+  }
+
+  .ledger-stagger-stack > :nth-child(5) {
+    --ledger-stagger-index: 4;
+  }
+
+  .ledger-stagger-stack > :nth-child(6) {
+    --ledger-stagger-index: 5;
+  }
+
+  .ledger-stagger-stack > :nth-child(7) {
+    --ledger-stagger-index: 6;
+  }
+
+  .ledger-stagger-stack > :nth-child(8) {
+    --ledger-stagger-index: 7;
+  }
+
+  .ledger-stagger-stack > :nth-child(9) {
+    --ledger-stagger-index: 8;
+  }
+
+  .ledger-stagger-stack > :nth-child(10) {
+    --ledger-stagger-index: 9;
+  }
+
+  .ledger-stagger-stack > :nth-child(11) {
+    --ledger-stagger-index: 10;
+  }
+
+  .ledger-stagger-stack > :nth-child(12) {
+    --ledger-stagger-index: 11;
+  }
+
   .ledger-scan {
     animation: ledger-scan 8s ease-in-out infinite alternate;
   }
@@ -336,6 +390,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .ledger-rise,
+    .ledger-stagger-stack > *,
     .ledger-scan,
     .ledger-float,
     .ledger-drop-overlay,

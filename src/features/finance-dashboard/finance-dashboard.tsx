@@ -165,7 +165,7 @@ export function FinanceDashboard() {
         <EntryHero uploadState={uploadState} onUpload={uploadWorkbook} />
       ) : (
         <Suspense fallback={null}>
-          <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 [animation-delay:90ms] md:px-8 lg:gap-6 lg:px-10 lg:py-6">
+          <div className="ledger-stagger-stack relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:gap-6 lg:px-10 lg:py-6">
             <WorkspaceHero
               fileName={fileName}
               rangeText={rangeText}
