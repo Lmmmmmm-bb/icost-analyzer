@@ -29,12 +29,22 @@
   non-internal users and update it whenever product behavior, supported iCost
   export fields, commands, privacy boundaries, or contribution expectations
   change.
+- Treat the README as user documentation first, not an implementation tour.
+  Lead with what the project does, how to use it, privacy expectations, and
+  supported iCost export fields before local development details.
 - Public-facing documentation should default to Simplified Chinese unless the
   user asks for another language. Technical agent guidance in `AGENTS.md` may
   remain in English for tool compatibility and precision.
+- Public copy should consistently describe the project as open source,
+  third-party, unofficial, and local-first. Avoid internal company context,
+  private deployment assumptions, or wording that implies an official iCost
+  partnership.
 - Treat this project as local-first by default. Do not introduce remote upload,
   telemetry, cloud parsing, live exchange-rate fetching, or account features
   without an explicit product decision and matching README/UI disclosure.
+- If a product change affects parsing rules, analytics semantics, exchange-rate
+  behavior, persistence, browser storage, supported commands, or expected user
+  workflow, update README.md in the same change.
 - Use fictional, anonymized, or generated examples only. Never add real finance
   exports, private screenshots, personal categories, or sensitive sample data to
   docs, fixtures, or commits.
@@ -46,6 +56,10 @@
 
 - The upload flow accepts `.xlsx` and `.xls` files via full-page drag-and-drop
   or a hidden file input.
+- Uploaded workbook data lives only in React state during the current page
+  session. Do not persist transaction data to localStorage, sessionStorage,
+  IndexedDB, cookies, or remote services without an explicit product decision
+  and matching README/UI disclosure.
 - `workbook-parser.ts` reads the first worksheet and maps supported column
   aliases into `Transaction` records.
 - Required data is date plus amount. Rows with invalid dates or non-numeric
