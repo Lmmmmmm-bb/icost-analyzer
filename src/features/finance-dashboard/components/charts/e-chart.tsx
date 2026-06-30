@@ -11,7 +11,7 @@ import {
 } from "echarts/components"
 import { init, use as registerEChartsComponents } from "echarts/core"
 import type { EChartsType } from "echarts/core"
-import { CanvasRenderer } from "echarts/renderers"
+import { SVGRenderer } from "echarts/renderers"
 
 registerEChartsComponents([
   BarChart,
@@ -23,7 +23,7 @@ registerEChartsComponents([
   LegendComponent,
   TooltipComponent,
   VisualMapComponent,
-  CanvasRenderer,
+  SVGRenderer,
 ])
 
 type EChartProps = {
@@ -50,7 +50,7 @@ export function EChart({ option, className = "h-72", onClick }: EChartProps) {
   useEffect(() => {
     if (!ref.current) return
 
-    const chart = init(ref.current, undefined, { renderer: "canvas" })
+    const chart = init(ref.current, undefined, { renderer: "svg" })
     chartRef.current = chart
     chart.setOption(optionRef.current, true)
     const handleClick = (params: ECharts.ECElementEvent) => {
