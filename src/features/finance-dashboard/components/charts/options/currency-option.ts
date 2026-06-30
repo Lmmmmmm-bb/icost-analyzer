@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts"
 
-import { CHART_COLORS } from "../chart-theme"
+import { pieChartTokenColors } from "../chart-theme"
 import type { SummaryItem } from "../../../model/analytics-types"
 import type { ChartTheme } from "./types"
 import {
@@ -8,6 +8,7 @@ import {
   chartSoftEdgeColor,
   chartTextColor,
   pieLegend,
+  pieSeriesData,
   tooltipStyle,
 } from "./shared"
 
@@ -15,8 +16,11 @@ export function createCurrencyOption(
   items: SummaryItem[],
   theme?: ChartTheme
 ): EChartsOption {
+  const colors = pieChartTokenColors()
+  const edgeColor = chartSoftEdgeColor(theme)
+
   return {
-    color: CHART_COLORS,
+    color: colors,
     tooltip: {
       trigger: "item",
       formatter: "{b}<br/>¥{c} · {d}%",
@@ -28,11 +32,8 @@ export function createCurrencyOption(
         type: "pie",
         radius: ["42%", "66%"],
         center: ["50%", "43%"],
-        data: items.map((item) => ({
-          name: item.name,
-          value: Number(item.amount.toFixed(2)),
-        })),
-        itemStyle: { borderColor: chartSoftEdgeColor(theme), borderWidth: 1 },
+        data: pieSeriesData(items, colors, edgeColor),
+        itemStyle: { borderColor: edgeColor, borderWidth: 1 },
         label: {
           show: true,
           position: "center",

@@ -60,18 +60,54 @@ export function compactMoney(value: number) {
   return `¥${Math.round(value)}`
 }
 
-export function horizontalGradient(from: string, to: string) {
+type FixedItemVisualStyle = {
+  color: string
+  opacity?: number
+  borderColor?: string
+  borderWidth?: number
+}
+
+export function fixedItemVisualStyle(style: FixedItemVisualStyle) {
   return {
-    type: "linear" as const,
-    x: 0,
-    y: 0,
-    x2: 1,
-    y2: 0,
-    colorStops: [
-      { offset: 0, color: from },
-      { offset: 1, color: to },
-    ],
+    itemStyle: style,
+    emphasis: {
+      itemStyle: {
+        ...style,
+        opacity: style.opacity ?? 1,
+      },
+    },
   }
+}
+
+export function fixedLineVisualStyle(color: string, width: number) {
+  return {
+    itemStyle: { color },
+    lineStyle: { color, width },
+    emphasis: {
+      itemStyle: { color, opacity: 1 },
+      lineStyle: { color, width },
+    },
+  }
+}
+
+export function pieSeriesData(
+  items: SummaryItem[],
+  colors: string[],
+  edgeColor: string
+) {
+  return items.map((item, index) => {
+    const color = colors[index % colors.length]
+
+    return {
+      name: item.name,
+      value: Number(item.amount.toFixed(2)),
+      ...fixedItemVisualStyle({
+        color,
+        borderColor: edgeColor,
+        borderWidth: 1,
+      }),
+    }
+  })
 }
 
 export function tooltipStyle(theme?: ChartTheme) {

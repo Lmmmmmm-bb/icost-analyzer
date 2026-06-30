@@ -1,26 +1,3 @@
-export const CHART_COLORS = [
-  "#E0A23B",
-  "#34CE8A",
-  "#5B9BD5",
-  "#F26157",
-  "#9B8AFB",
-  "#3FC4C4",
-  "#E0844F",
-  "#C9CC4D",
-  "#D46FA8",
-  "#7D8794",
-]
-
-export const EXPENSE_COLOR = "#F26157"
-export const INCOME_COLOR = "#34CE8A"
-export const BALANCE_COLOR = "#E0A23B"
-export const RANKING_COLOR = "#E0A23B"
-export const RANKING_COLOR_END = "#F2BE62"
-export const TAG_COLOR = "#E0A23B"
-export const TAG_COLOR_ACTIVE = "#F2BE62"
-export const WEEK_COLOR = "rgba(224, 162, 59, 0.22)"
-export const WEEKEND_COLOR = "#E0A23B"
-
 const CHART_TOKEN_FALLBACKS = {
   1: "oklch(0.87 0 0)",
   2: "oklch(0.556 0 0)",
@@ -31,14 +8,38 @@ const CHART_TOKEN_FALLBACKS = {
 
 type ChartTokenIndex = keyof typeof CHART_TOKEN_FALLBACKS
 
+const CHART_TOKEN_INDICES = [1, 2, 3, 4, 5] as const
+const PIE_CHART_TOKEN_INDICES = [4, 3, 2, 1] as const
+
+function readChartTokenColor(
+  index: ChartTokenIndex,
+  styles?: CSSStyleDeclaration
+) {
+  return (
+    styles?.getPropertyValue(`--chart-${index}`).trim() ||
+    CHART_TOKEN_FALLBACKS[index]
+  )
+}
+
 export function chartTokenColor(index: ChartTokenIndex) {
   if (typeof document === "undefined") {
     return CHART_TOKEN_FALLBACKS[index]
   }
 
-  return (
-    getComputedStyle(document.documentElement)
-      .getPropertyValue(`--chart-${index}`)
-      .trim() || CHART_TOKEN_FALLBACKS[index]
-  )
+  return readChartTokenColor(index, getComputedStyle(document.documentElement))
+}
+
+export function chartTokenColors(
+  indices: readonly ChartTokenIndex[] = CHART_TOKEN_INDICES
+) {
+  const styles =
+    typeof document === "undefined"
+      ? undefined
+      : getComputedStyle(document.documentElement)
+
+  return indices.map((index) => readChartTokenColor(index, styles))
+}
+
+export function pieChartTokenColors() {
+  return chartTokenColors(PIE_CHART_TOKEN_INDICES)
 }

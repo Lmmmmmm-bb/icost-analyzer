@@ -8,6 +8,7 @@ import {
   axisStyle,
   chartMutedTextColor,
   compactMoney,
+  fixedItemVisualStyle,
   tooltipStyle,
 } from "./shared"
 
@@ -53,20 +54,12 @@ export function createWeekOption(
 
           return {
             value: item.amount,
-            itemStyle: {
+            ...fixedItemVisualStyle({
               color,
               opacity,
               borderColor: weekendColor,
               borderWidth,
-            },
-            emphasis: {
-              itemStyle: {
-                color,
-                opacity,
-                borderColor: weekendColor,
-                borderWidth,
-              },
-            },
+            }),
           }
         }),
         barMaxWidth: 34,

@@ -8,6 +8,7 @@ import {
   axisStyle,
   chartMutedTextColor,
   compactMoney,
+  fixedItemVisualStyle,
   tooltipStyle,
 } from "./shared"
 
@@ -54,15 +55,7 @@ export function createTagOption(
         data: top
           .map((item) => ({
             value: item.amount,
-            itemStyle: {
-              color: tagColor,
-            },
-            emphasis: {
-              itemStyle: {
-                color: tagColor,
-                opacity: 1,
-              },
-            },
+            ...fixedItemVisualStyle({ color: tagColor }),
           }))
           .reverse(),
         barMaxWidth: 12,

@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts"
 
-import { BALANCE_COLOR, EXPENSE_COLOR, INCOME_COLOR } from "../chart-theme"
+import { chartTokenColor } from "../chart-theme"
 import type { MonthlyItem } from "../../../model/analytics-types"
 import { formatMoney } from "../../../model/money"
 import type { ChartTheme } from "./types"
@@ -8,6 +8,8 @@ import {
   axisStyle,
   chartMutedTextColor,
   compactMoney,
+  fixedItemVisualStyle,
+  fixedLineVisualStyle,
   tooltipStyle,
 } from "./shared"
 
@@ -16,8 +18,12 @@ export function createMonthlyOption(
   theme?: ChartTheme
 ): EChartsOption {
   const axis = axisStyle(theme)
+  const expenseColor = chartTokenColor(4)
+  const incomeColor = chartTokenColor(2)
+  const balanceColor = chartTokenColor(3)
+
   return {
-    color: [EXPENSE_COLOR, INCOME_COLOR, BALANCE_COLOR],
+    color: [expenseColor, incomeColor, balanceColor],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
@@ -59,12 +65,14 @@ export function createMonthlyOption(
         type: "bar",
         data: monthly.map((item) => item.expense),
         barMaxWidth: 28,
+        ...fixedItemVisualStyle({ color: expenseColor }),
       },
       {
         name: "收入",
         type: "bar",
         data: monthly.map((item) => item.income),
         barMaxWidth: 28,
+        ...fixedItemVisualStyle({ color: incomeColor }),
       },
       {
         name: "净结余",
@@ -73,8 +81,8 @@ export function createMonthlyOption(
         smooth: true,
         showSymbol: false,
         symbol: "none",
-        lineStyle: { width: 3 },
-        areaStyle: { opacity: 0.08 },
+        ...fixedLineVisualStyle(balanceColor, 3),
+        areaStyle: { color: balanceColor, opacity: 0.08 },
       },
     ],
   }

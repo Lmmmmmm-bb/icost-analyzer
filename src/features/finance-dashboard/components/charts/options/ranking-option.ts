@@ -8,6 +8,7 @@ import {
   axisStyle,
   chartMutedTextColor,
   compactMoney,
+  fixedItemVisualStyle,
   tooltipStyle,
 } from "./shared"
 
@@ -52,15 +53,7 @@ export function createRankingOption(
         type: "bar",
         data: items.map((item) => item.amount).reverse(),
         barMaxWidth: 13,
-        itemStyle: {
-          color: rankingColor,
-        },
-        emphasis: {
-          itemStyle: {
-            color: rankingColor,
-            opacity: 1,
-          },
-        },
+        ...fixedItemVisualStyle({ color: rankingColor }),
         label: {
           show: true,
           position: "right",
