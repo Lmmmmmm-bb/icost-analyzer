@@ -1,16 +1,11 @@
-import { useCallback, useState } from "react"
+import { lazy, Suspense, useCallback, useState } from "react"
 
 import { ALL_RANGE, DEFAULT_RATES, EMPTY_FILTERS } from "./model/constants"
-import { AnalysisCharts } from "./components/charts/analysis-charts"
 import { DashboardBackdrop } from "./components/layout/dashboard-backdrop"
 import { DashboardAlerts } from "./components/feedback/dashboard-alerts"
 import { NoResultEmptyState } from "./components/feedback/empty-states"
-import { FilterPanel } from "./components/filters/filter-panel"
 import { EntryHero } from "./components/hero/entry-hero"
 import { WorkspaceHero } from "./components/hero/workspace-hero"
-import { RateSettings } from "./components/rates/rate-settings"
-import { SummaryTables } from "./components/summaries/summary-tables"
-import { TransactionTable } from "./components/transactions/transaction-table"
 import {
   RANK_LEVELS,
   type DetailSort,
@@ -24,6 +19,36 @@ import { unique } from "./model/collections"
 import { dateKey } from "./model/date"
 import { useWorkbookUpload } from "./components/hero/use-workbook-upload"
 import { useDashboardAnalysis } from "./hooks/use-dashboard-analysis"
+
+const AnalysisCharts = lazy(() =>
+  import("./components/charts/analysis-charts").then((module) => ({
+    default: module.AnalysisCharts,
+  }))
+)
+
+const FilterPanel = lazy(() =>
+  import("./components/filters/filter-panel").then((module) => ({
+    default: module.FilterPanel,
+  }))
+)
+
+const RateSettings = lazy(() =>
+  import("./components/rates/rate-settings").then((module) => ({
+    default: module.RateSettings,
+  }))
+)
+
+const SummaryTables = lazy(() =>
+  import("./components/summaries/summary-tables").then((module) => ({
+    default: module.SummaryTables,
+  }))
+)
+
+const TransactionTable = lazy(() =>
+  import("./components/transactions/transaction-table").then((module) => ({
+    default: module.TransactionTable,
+  }))
+)
 
 export function FinanceDashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -139,76 +164,78 @@ export function FinanceDashboard() {
       {!hasTransactions ? (
         <EntryHero uploadState={uploadState} onUpload={uploadWorkbook} />
       ) : (
-        <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 [animation-delay:90ms] md:px-8 lg:gap-6 lg:px-10 lg:py-6">
-          <WorkspaceHero
-            fileName={fileName}
-            rangeText={rangeText}
-            stats={stats}
-            periodComparison={periodComparison}
-            yearComparison={yearComparison}
-            onReplaceFile={resetWorkbook}
-          />
+        <Suspense fallback={null}>
+          <div className="ledger-rise relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 [animation-delay:90ms] md:px-8 lg:gap-6 lg:px-10 lg:py-6">
+            <WorkspaceHero
+              fileName={fileName}
+              rangeText={rangeText}
+              stats={stats}
+              periodComparison={periodComparison}
+              yearComparison={yearComparison}
+              onReplaceFile={resetWorkbook}
+            />
 
-          <DashboardAlerts
-            invalidDateRange={invalidDateRange}
-            missingRates={missingRates}
-          />
+            <DashboardAlerts
+              invalidDateRange={invalidDateRange}
+              missingRates={missingRates}
+            />
 
-          <FilterPanel
-            filters={filters}
-            dimensions={dimensions}
-            onFiltersChange={setFilters}
-            onResetDrill={resetDrill}
-          />
+            <FilterPanel
+              filters={filters}
+              dimensions={dimensions}
+              onFiltersChange={setFilters}
+              onResetDrill={resetDrill}
+            />
 
-          <RateSettings
-            dimensions={dimensions}
-            rateInputs={rateInputs}
-            onRateInputsChange={setRateInputs}
-            onRatesChange={setRates}
-          />
+            <RateSettings
+              dimensions={dimensions}
+              rateInputs={rateInputs}
+              onRateInputsChange={setRateInputs}
+              onRatesChange={setRates}
+            />
 
-          {filtered.length ? (
-            <>
-              <AnalysisCharts
-                data={chartData}
-                drillCategory={drillCategory}
-                rankLevel={rankLevel}
-                onApplyMonth={applyMonth}
-                onDrillCategoryChange={setDrillCategory}
-                onRankLevelChange={setRankLevel}
-                onTagSelect={selectTag}
-              />
+            {filtered.length ? (
+              <>
+                <AnalysisCharts
+                  data={chartData}
+                  drillCategory={drillCategory}
+                  rankLevel={rankLevel}
+                  onApplyMonth={applyMonth}
+                  onDrillCategoryChange={setDrillCategory}
+                  onRankLevelChange={setRankLevel}
+                  onTagSelect={selectTag}
+                />
 
-              <SummaryTables
-                categoryRows={sortedCategoryRows}
-                tagRows={sortedTagRows}
-                expenseTotal={expenseTotal}
-                summarySort={summarySort}
-                tagSort={tagSort}
-                onSummarySortChange={setSummarySort}
-                onTagSortChange={setTagSort}
-                onCategorySelect={selectCategory}
-                onTagSelect={selectTag}
-              />
-            </>
-          ) : (
-            <NoResultEmptyState />
-          )}
+                <SummaryTables
+                  categoryRows={sortedCategoryRows}
+                  tagRows={sortedTagRows}
+                  expenseTotal={expenseTotal}
+                  summarySort={summarySort}
+                  tagSort={tagSort}
+                  onSummarySortChange={setSummarySort}
+                  onTagSortChange={setTagSort}
+                  onCategorySelect={selectCategory}
+                  onTagSelect={selectTag}
+                />
+              </>
+            ) : (
+              <NoResultEmptyState />
+            )}
 
-          <TransactionTable
-            rows={detailRows}
-            pagedRows={pagedRows}
-            safePage={safePage}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            detailSort={detailSort}
-            rates={rates}
-            onPageChange={setPage}
-            onPageSizeChange={setPageSize}
-            onDetailSortChange={setDetailSort}
-          />
-        </div>
+            <TransactionTable
+              rows={detailRows}
+              pagedRows={pagedRows}
+              safePage={safePage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              detailSort={detailSort}
+              rates={rates}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+              onDetailSortChange={setDetailSort}
+            />
+          </div>
+        </Suspense>
       )}
     </main>
   )
