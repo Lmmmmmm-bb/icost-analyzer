@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react"
 
 const FinanceDashboard = lazy(() =>
-  import("@/features/finance-dashboard/finance-dashboard").then((module) => ({
+  import("@/features/finance-dashboard").then((module) => ({
     default: module.FinanceDashboard,
   }))
 )
