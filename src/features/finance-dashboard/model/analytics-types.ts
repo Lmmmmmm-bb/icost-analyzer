@@ -113,7 +113,7 @@ export type WeekItem = {
   amount: number
 }
 
-export type HeatmapEntry = [day: string, amount: number]
+type HeatmapEntry = [day: string, amount: number]
 
 export type DashboardChartData = {
   monthly: MonthlyItem[]

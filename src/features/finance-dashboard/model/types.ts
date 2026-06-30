@@ -1,4 +1,4 @@
-export type TransactionType =
+type TransactionType =
   | "支出"
   | "收入"
   | "退款入账"

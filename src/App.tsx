@@ -6,7 +6,7 @@ const FinanceDashboard = lazy(() =>
   }))
 )
 
-export function App() {
+function App() {
   return (
     <Suspense fallback={null}>
       <FinanceDashboard />

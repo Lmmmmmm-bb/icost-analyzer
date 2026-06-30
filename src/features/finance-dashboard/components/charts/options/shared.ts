@@ -2,7 +2,7 @@ import type { SummaryItem } from "../../../model/analytics-types"
 
 import type { ChartTheme } from "./types"
 
-export function isDarkChartTheme(theme?: ChartTheme) {
+function isDarkChartTheme(theme?: ChartTheme) {
   return theme
     ? theme === "dark"
     : document.documentElement.classList.contains("dark")

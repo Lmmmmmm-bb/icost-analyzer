@@ -2,7 +2,7 @@ import { ALL_RANGE } from "./constants"
 import { dateKey } from "./date"
 import type { Filters, Transaction } from "./types"
 
-export type DatePeriod = {
+type DatePeriod = {
   start: Date
   end: Date
   label: string
