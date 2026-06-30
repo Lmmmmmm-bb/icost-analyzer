@@ -32,6 +32,7 @@ export function FilterPanel({
 }: FilterPanelProps) {
   return (
     <Card className="relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
           <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
