@@ -8,10 +8,19 @@ import {
   createRankingOption,
   createTagOption,
   createWeekOption,
-} from "./components/charts/chart-options"
-import { RANK_LEVELS, type RankLevel } from "./components/charts/types"
-import type { SummarySort, TagSort } from "./components/summaries/types"
-import type { DetailSort } from "./components/transactions/types"
+} from "../components/charts/chart-options"
+import {
+  RANK_LEVELS,
+  type DetailSort,
+  type RankLevel,
+  type SummarySort,
+  type TagSort,
+} from "../model/dashboard-controls"
+import {
+  getCurrentDatePeriod,
+  getPreviousDatePeriod,
+  getYearOverYearDatePeriod,
+} from "../model/date-periods"
 import {
   getDailyCashflow,
   getDateRange,
@@ -22,13 +31,13 @@ import {
   getStats,
   getWeekSummary,
   summarizeBy,
-} from "./model/analytics"
-import { unique } from "./model/collections"
-import { ALL_RANGE } from "./model/constants"
-import { dateKey } from "./model/date"
-import { filterTransactions } from "./model/filtering"
-import { toRmb } from "./model/money"
-import type { Filters, RateMap, Transaction } from "./model/types"
+} from "../model/analytics"
+import { unique } from "../model/collections"
+import { ALL_RANGE } from "../model/constants"
+import { dateKey } from "../model/date"
+import { filterTransactions } from "../model/filtering"
+import { toRmb } from "../model/money"
+import type { Filters, RateMap, Transaction } from "../model/types"
 
 type DashboardAnalysisParams = {
   transactions: Transaction[]
@@ -42,102 +51,6 @@ type DashboardAnalysisParams = {
   detailSort: DetailSort
   page: number
   pageSize: number
-}
-
-type DatePeriod = {
-  start: Date
-  end: Date
-  label: string
-}
-
-const RANGE_ARROW = "→"
-
-function normalizeStart(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
-}
-
-function normalizeEnd(date: Date) {
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    23,
-    59,
-    59,
-    999
-  )
-}
-
-function formatPeriodLabel(start: Date, end: Date) {
-  const startKey = dateKey(start)
-  const endKey = dateKey(end)
-  return startKey === endKey ? startKey : `${startKey} ${RANGE_ARROW} ${endKey}`
-}
-
-function createDatePeriod(start: Date, end: Date): DatePeriod {
-  const normalizedStart = normalizeStart(start)
-  const normalizedEnd = normalizeEnd(end)
-  return {
-    start: normalizedStart,
-    end: normalizedEnd,
-    label: formatPeriodLabel(normalizedStart, normalizedEnd),
-  }
-}
-
-function getCurrentDatePeriod(
-  filters: Filters,
-  filtered: Transaction[]
-): DatePeriod | null {
-  const dataRange = getDateRange(filtered)
-
-  if (filters.startDate || filters.endDate) {
-    const start = filters.startDate
-      ? new Date(`${filters.startDate}T00:00:00`)
-      : dataRange?.start
-    const end = filters.endDate
-      ? new Date(`${filters.endDate}T23:59:59`)
-      : dataRange?.end
-    return start && end ? createDatePeriod(start, end) : null
-  }
-
-  if (filters.year) {
-    return createDatePeriod(
-      new Date(`${filters.year}-01-01T00:00:00`),
-      new Date(`${filters.year}-12-31T23:59:59`)
-    )
-  }
-
-  if (filters.quickRange !== ALL_RANGE) {
-    const now = new Date()
-    if (filters.quickRange === "今年") {
-      return createDatePeriod(
-        new Date(`${now.getFullYear()}-01-01T00:00:00`),
-        now
-      )
-    }
-
-    const months = Number(filters.quickRange.match(/\d+/)?.[0] ?? 0)
-    const start = new Date(now)
-    start.setMonth(start.getMonth() - months)
-    return createDatePeriod(start, now)
-  }
-
-  return dataRange ? createDatePeriod(dataRange.start, dataRange.end) : null
-}
-
-function getPreviousDatePeriod(period: DatePeriod): DatePeriod {
-  const periodLength = period.end.getTime() - period.start.getTime()
-  const previousEnd = new Date(period.start.getTime() - 1)
-  const previousStart = new Date(previousEnd.getTime() - periodLength)
-  return createDatePeriod(previousStart, previousEnd)
-}
-
-function getYearOverYearDatePeriod(period: DatePeriod): DatePeriod {
-  const previousYearStart = new Date(period.start)
-  const previousYearEnd = new Date(period.end)
-  previousYearStart.setFullYear(previousYearStart.getFullYear() - 1)
-  previousYearEnd.setFullYear(previousYearEnd.getFullYear() - 1)
-  return createDatePeriod(previousYearStart, previousYearEnd)
 }
 
 export function useDashboardAnalysis({
@@ -164,9 +77,13 @@ export function useDashboardAnalysis({
     () => filterTransactions(transactions, filters, invalidDateRange),
     [filters, invalidDateRange, transactions]
   )
+  const filteredDateRange = useMemo(() => getDateRange(filtered), [filtered])
   const currentPeriod = useMemo(
-    () => (invalidDateRange ? null : getCurrentDatePeriod(filters, filtered)),
-    [filtered, filters, invalidDateRange]
+    () =>
+      invalidDateRange
+        ? null
+        : getCurrentDatePeriod(filters, filtered, filteredDateRange),
+    [filtered, filteredDateRange, filters, invalidDateRange]
   )
   const previousPeriod = useMemo(
     () => (currentPeriod ? getPreviousDatePeriod(currentPeriod) : null),

@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/select"
 
 import type { SummaryItem } from "../../model/analytics-types"
+import type { SummarySort, TagSort } from "../../model/dashboard-controls"
 import { DashboardPanel } from "../shared/dashboard-panel"
 import { CategorySummaryTable } from "./category-summary-table"
 import { TagSummaryTable } from "./tag-summary-table"
-import type { SummarySort, TagSort } from "./types"
 
 const SUMMARY_SORT_OPTIONS = [
   { value: "amount", label: "按总支出" },

@@ -5,13 +5,6 @@ import type {
   MonthlyItem,
 } from "../../model/analytics-types"
 
-export type RankLevel = "一级分类" | "二级分类"
-
-export const RANK_LEVELS = [
-  "一级分类",
-  "二级分类",
-] as const satisfies readonly RankLevel[]
-
 export type HeatmapChartOption = {
   year: string
   option: EChartsOption

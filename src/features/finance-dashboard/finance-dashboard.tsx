@@ -4,24 +4,28 @@ import { useTheme } from "@/components/theme-provider"
 
 import { ALL_RANGE, DEFAULT_RATES, EMPTY_FILTERS } from "./model/constants"
 import { AnalysisCharts } from "./components/charts/analysis-charts"
-import { RANK_LEVELS, type RankLevel } from "./components/charts/types"
-import { DashboardBackdrop } from "./components/dashboard-backdrop"
+import { DashboardBackdrop } from "./components/layout/dashboard-backdrop"
 import { DashboardAlerts } from "./components/feedback/dashboard-alerts"
 import { NoResultEmptyState } from "./components/feedback/empty-states"
 import { FilterPanel } from "./components/filters/filter-panel"
 import { EntryHero } from "./components/hero/entry-hero"
 import { WorkspaceHero } from "./components/hero/workspace-hero"
 import { RateSettings } from "./components/rates/rate-settings"
-import { makeRateInputs } from "./components/rates/rate-inputs"
 import { SummaryTables } from "./components/summaries/summary-tables"
-import type { SummarySort, TagSort } from "./components/summaries/types"
 import { TransactionTable } from "./components/transactions/transaction-table"
-import type { DetailSort } from "./components/transactions/types"
+import {
+  RANK_LEVELS,
+  type DetailSort,
+  type RankLevel,
+  type SummarySort,
+  type TagSort,
+} from "./model/dashboard-controls"
+import { makeRateInputs } from "./model/rate-inputs"
 import type { Filters, RateMap, Transaction } from "./model/types"
 import { unique } from "./model/collections"
 import { dateKey } from "./model/date"
 import { useWorkbookUpload } from "./components/hero/use-workbook-upload"
-import { useDashboardAnalysis } from "./use-dashboard-analysis"
+import { useDashboardAnalysis } from "./hooks/use-dashboard-analysis"
 
 export function FinanceDashboard() {
   const { resolvedTheme } = useTheme()

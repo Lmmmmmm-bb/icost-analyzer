@@ -15,11 +15,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+import type { DetailSort } from "../../model/dashboard-controls"
 import type { RateMap, Transaction } from "../../model/types"
 import { TransactionPagination } from "./transaction-pagination"
 import { TransactionRow } from "./transaction-row"
 import { TransactionTableControls } from "./transaction-table-controls"
-import type { DetailSort } from "./types"
 
 type TransactionTableProps = {
   rows: Transaction[]

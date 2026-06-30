@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import type { DetailSort } from "./types"
+import type { DetailSort } from "../../model/dashboard-controls"
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200]
 
