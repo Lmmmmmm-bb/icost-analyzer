@@ -112,3 +112,16 @@ export type WeekItem = {
   name: string
   amount: number
 }
+
+export type HeatmapEntry = [day: string, amount: number]
+
+export type DashboardChartData = {
+  monthly: MonthlyItem[]
+  categoryPie: SummaryItem[]
+  ranking: SummaryItem[]
+  currencySummary: SummaryItem[]
+  weekSummary: WeekItem[]
+  tagSummary: SummaryItem[]
+  heatmap: HeatmapEntry[]
+  dailyCashflow: DailyCashflowItem[]
+}

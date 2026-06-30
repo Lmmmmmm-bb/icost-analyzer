@@ -1,7 +1,5 @@
 import { useCallback, useState } from "react"
 
-import { useTheme } from "@/components/theme-provider"
-
 import { ALL_RANGE, DEFAULT_RATES, EMPTY_FILTERS } from "./model/constants"
 import { AnalysisCharts } from "./components/charts/analysis-charts"
 import { DashboardBackdrop } from "./components/layout/dashboard-backdrop"
@@ -28,7 +26,6 @@ import { useWorkbookUpload } from "./components/hero/use-workbook-upload"
 import { useDashboardAnalysis } from "./hooks/use-dashboard-analysis"
 
 export function FinanceDashboard() {
-  const { resolvedTheme } = useTheme()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [fileName, setFileName] = useState("")
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
@@ -58,14 +55,13 @@ export function FinanceDashboard() {
     pagedRows,
     expenseTotal,
     rangeText,
-    chartOptions,
+    chartData,
     sortedCategoryRows,
     sortedTagRows,
   } = useDashboardAnalysis({
     transactions,
     filters,
     rates,
-    resolvedTheme,
     drillCategory,
     rankLevel,
     summarySort,
@@ -175,7 +171,7 @@ export function FinanceDashboard() {
           {filtered.length ? (
             <>
               <AnalysisCharts
-                options={chartOptions}
+                data={chartData}
                 drillCategory={drillCategory}
                 rankLevel={rankLevel}
                 onApplyMonth={applyMonth}

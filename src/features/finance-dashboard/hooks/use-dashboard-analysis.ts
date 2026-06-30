@@ -1,15 +1,6 @@
 import { useMemo } from "react"
 
 import {
-  createCurrencyOption,
-  createHeatmapOptionsByYear,
-  createMonthlyOption,
-  createPieOption,
-  createRankingOption,
-  createTagOption,
-  createWeekOption,
-} from "../components/charts/chart-options"
-import {
   RANK_LEVELS,
   type DetailSort,
   type RankLevel,
@@ -21,6 +12,7 @@ import {
   getPreviousDatePeriod,
   getYearOverYearDatePeriod,
 } from "../model/date-periods"
+import type { DashboardChartData } from "../model/analytics-types"
 import {
   getDailyCashflow,
   getDateRange,
@@ -43,7 +35,6 @@ type DashboardAnalysisParams = {
   transactions: Transaction[]
   filters: Filters
   rates: RateMap
-  resolvedTheme: "dark" | "light"
   drillCategory: string
   rankLevel: RankLevel
   summarySort: SummarySort
@@ -57,7 +48,6 @@ export function useDashboardAnalysis({
   transactions,
   filters,
   rates,
-  resolvedTheme,
   drillCategory,
   rankLevel,
   summarySort,
@@ -220,17 +210,16 @@ export function useDashboardAnalysis({
       ).slice(0, 15),
     [categorySummary, rankLevel, subcategorySummary]
   )
-  const chartOptions = useMemo(
+  const chartData = useMemo<DashboardChartData>(
     () => ({
-      monthlyOption: createMonthlyOption(monthly, resolvedTheme),
-      pieOption: createPieOption(categoryPie, resolvedTheme),
-      rankingOption: createRankingOption(ranking, resolvedTheme),
-      currencyOption: createCurrencyOption(currencySummary, resolvedTheme),
-      weekOption: createWeekOption(weekSummary, resolvedTheme),
-      tagOption: createTagOption(tagSummary, resolvedTheme),
-      heatmapOptions: createHeatmapOptionsByYear(heatmap, resolvedTheme),
+      monthly,
+      categoryPie,
+      ranking,
+      currencySummary,
+      weekSummary,
+      tagSummary,
+      heatmap,
       dailyCashflow,
-      monthlyReview: monthly,
     }),
     [
       categoryPie,
@@ -239,7 +228,6 @@ export function useDashboardAnalysis({
       heatmap,
       monthly,
       ranking,
-      resolvedTheme,
       tagSummary,
       weekSummary,
     ]
@@ -274,7 +262,7 @@ export function useDashboardAnalysis({
     pagedRows,
     expenseTotal,
     rangeText,
-    chartOptions,
+    chartData,
     sortedCategoryRows,
     sortedTagRows,
   }

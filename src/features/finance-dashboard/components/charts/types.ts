@@ -1,16 +1,11 @@
 import type { EChartsOption } from "echarts"
 
-import type {
-  DailyCashflowItem,
-  MonthlyItem,
-} from "../../model/analytics-types"
-
 export type HeatmapChartOption = {
   year: string
   option: EChartsOption
 }
 
-export type ChartOptions = {
+export type ChartPanelOptions = {
   monthlyOption: EChartsOption
   pieOption: EChartsOption
   rankingOption: EChartsOption
@@ -18,6 +13,4 @@ export type ChartOptions = {
   weekOption: EChartsOption
   tagOption: EChartsOption
   heatmapOptions: HeatmapChartOption[]
-  dailyCashflow: DailyCashflowItem[]
-  monthlyReview: MonthlyItem[]
 }
