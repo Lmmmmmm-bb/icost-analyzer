@@ -29,6 +29,8 @@ type ThemeProviderState = {
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
+const SKIP_THEME_VIEW_TRANSITION_SELECTOR =
+  "[data-skip-theme-view-transition='true']"
 const THEME_VALUES: Theme[] = ["dark", "light", "system"]
 
 const ThemeProviderContext = React.createContext<
@@ -76,6 +78,10 @@ function disableTransitionsTemporarily() {
 
 function prefersReducedMotion() {
   return window.matchMedia(REDUCED_MOTION_QUERY).matches
+}
+
+function shouldSkipThemeViewTransition() {
+  return Boolean(document.querySelector(SKIP_THEME_VIEW_TRANSITION_SELECTOR))
 }
 
 function getToggledTheme(currentTheme: Theme): ResolvedTheme {
@@ -185,7 +191,11 @@ export function ThemeProvider({
         return
       }
 
-      if (!transitionDocument.startViewTransition || prefersReducedMotion()) {
+      if (
+        !transitionDocument.startViewTransition ||
+        prefersReducedMotion() ||
+        shouldSkipThemeViewTransition()
+      ) {
         commitTheme(nextTheme)
         return
       }

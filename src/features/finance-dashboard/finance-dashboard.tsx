@@ -156,9 +156,13 @@ export function FinanceDashboard() {
   }, [])
 
   const hasTransactions = transactions.length > 0
+  const hasAnalysisCharts = filtered.length > 0
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-background text-foreground">
+    <main
+      className="relative min-h-svh overflow-hidden bg-background text-foreground"
+      data-skip-theme-view-transition={hasAnalysisCharts ? "true" : undefined}
+    >
       <DashboardBackdrop />
 
       {!hasTransactions ? (
@@ -194,7 +198,7 @@ export function FinanceDashboard() {
               onRatesChange={setRates}
             />
 
-            {filtered.length ? (
+            {hasAnalysisCharts ? (
               <>
                 <AnalysisCharts
                   data={chartData}
