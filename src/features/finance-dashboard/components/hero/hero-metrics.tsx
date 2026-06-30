@@ -1,5 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { RiArrowDownSLine } from "@remixicon/react"
 
 import type {
   MetricStats,
@@ -104,12 +115,68 @@ export function HeroMetrics({
             </div>
           ))}
         </div>
+        <CollapsibleComparisonSection
+          periodComparison={periodComparison}
+          periodTrendMetrics={periodTrendMetrics}
+          yearComparison={yearComparison}
+          yearTrendMetrics={yearTrendMetrics}
+        />
+      </CardContent>
+    </Card>
+  )
+}
+
+function CollapsibleComparisonSection({
+  periodComparison,
+  periodTrendMetrics,
+  yearComparison,
+  yearTrendMetrics,
+}: {
+  periodComparison: PeriodComparison
+  periodTrendMetrics: TrendMetricConfig[]
+  yearComparison: PeriodComparison
+  yearTrendMetrics: TrendMetricConfig[]
+}) {
+  const visibleComparisonCount = [
+    periodComparison.canCompare,
+    yearComparison.canCompare,
+  ].filter(Boolean).length
+
+  if (!visibleComparisonCount) return null
+
+  return (
+    <Collapsible className="border-t border-border/70 bg-background/35">
+      <CollapsibleTrigger className="group/comparison-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-muted/35 focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:outline-none">
+        <div className="grid gap-1">
+          <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+            环比 / 同比
+          </div>
+          <div className="text-sm font-medium text-foreground">
+            展开查看 {visibleComparisonCount} 组趋势对比
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+          <span className="hidden group-data-[panel-open]/comparison-trigger:inline">
+            收起
+          </span>
+          <span className="group-data-[panel-open]/comparison-trigger:hidden">
+            展开
+          </span>
+          <RiArrowDownSLine
+            data-icon="inline-end"
+            className="transition-transform group-data-[panel-open]/comparison-trigger:rotate-180"
+          />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="overflow-hidden border-t border-border/70 data-open:ledger-collapsible-down data-closed:ledger-collapsible-up">
         <ComparisonSection
           comparison={periodComparison}
           marker="Δ"
           metrics={periodTrendMetrics}
           categoryTitle="分类支出环比 Top"
           tagTitle="标签支出环比 Top"
+          currentPeriodText="本周期"
+          previousPeriodText="上周期"
           emptyCategoryText="还没有可对比的分类支出"
           emptyTagText="还没有可对比的标签支出"
         />
@@ -119,11 +186,13 @@ export function HeroMetrics({
           metrics={yearTrendMetrics}
           categoryTitle="分类支出同比 Top"
           tagTitle="标签支出同比 Top"
+          currentPeriodText="本周期"
+          previousPeriodText="去年同期"
           emptyCategoryText="还没有可同比的分类支出"
           emptyTagText="还没有可同比的标签支出"
         />
-      </CardContent>
-    </Card>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 
@@ -144,6 +213,8 @@ function ComparisonSection({
   metrics,
   categoryTitle,
   tagTitle,
+  currentPeriodText,
+  previousPeriodText,
   emptyCategoryText,
   emptyTagText,
 }: {
@@ -152,13 +223,15 @@ function ComparisonSection({
   metrics: TrendMetricConfig[]
   categoryTitle: string
   tagTitle: string
+  currentPeriodText: string
+  previousPeriodText: string
   emptyCategoryText: string
   emptyTagText: string
 }) {
   if (!comparison.canCompare) return null
 
   return (
-    <div className="grid border-t border-border/70 bg-background/35 lg:grid-cols-[1.05fr_1.4fr]">
+    <div className="grid bg-background/35 lg:grid-cols-[1.05fr_1.4fr] [&+&]:border-t [&+&]:border-border/70">
       <div className="grid border-b border-border/70 sm:grid-cols-3 lg:border-r lg:border-b-0">
         {metrics.map((metric) => (
           <TrendMetric
@@ -167,6 +240,8 @@ function ComparisonSection({
             trend={metric.trend}
             tone={metric.tone}
             marker={marker}
+            currentPeriodText={currentPeriodText}
+            previousPeriodText={previousPeriodText}
             currentLabel={comparison.currentLabel}
             previousLabel={comparison.previousLabel}
           />
@@ -194,6 +269,8 @@ function TrendMetric({
   trend,
   tone,
   marker,
+  currentPeriodText,
+  previousPeriodText,
   currentLabel,
   previousLabel,
 }: {
@@ -201,6 +278,8 @@ function TrendMetric({
   trend: PeriodTrend
   tone: TrendTone
   marker: string
+  currentPeriodText: string
+  previousPeriodText: string
   currentLabel: string
   previousLabel: string
 }) {
@@ -233,15 +312,48 @@ function TrendMetric({
           {formatSignedMoney(trend.change)}
         </div>
         <div className="mt-2 grid gap-1 text-[11px] text-muted-foreground tabular-nums">
-          <span>
-            {currentLabel || "本期"} {formatMoney(trend.current)}
-          </span>
-          <span>
-            {previousLabel || "上期"} {formatMoney(trend.previous)}
-          </span>
+          <PeriodValue
+            label={currentPeriodText}
+            value={trend.current}
+            detail={currentLabel}
+          />
+          <PeriodValue
+            label={previousPeriodText}
+            value={trend.previous}
+            detail={previousLabel}
+          />
         </div>
       </div>
     </div>
+  )
+}
+
+function PeriodValue({
+  label,
+  value,
+  detail,
+}: {
+  label: string
+  value: number
+  detail: string
+}) {
+  const trigger = (
+    <span
+      tabIndex={0}
+      className="inline-flex w-fit cursor-help items-baseline gap-1 border-b border-dotted border-muted-foreground/40 outline-none transition-colors hover:border-foreground/60 hover:text-foreground focus-visible:border-ring focus-visible:text-foreground"
+    >
+      <span>{label}</span>
+      <span>{formatMoney(value)}</span>
+    </span>
+  )
+
+  return (
+    <Tooltip>
+      <TooltipTrigger render={trigger} />
+      <TooltipContent className="font-mono tracking-[0.04em]">
+        {detail || label}
+      </TooltipContent>
+    </Tooltip>
   )
 }
 

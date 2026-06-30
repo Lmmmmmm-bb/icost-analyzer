@@ -261,6 +261,28 @@
     }
   }
 
+  @keyframes ledger-collapsible-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--collapsible-panel-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ledger-collapsible-up {
+    from {
+      height: var(--collapsible-panel-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+
   .ledger-noise {
     background-image: radial-gradient(
       circle at 1px 1px,
@@ -304,6 +326,14 @@
       infinite;
   }
 
+  .ledger-collapsible-down {
+    animation: ledger-collapsible-down 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ledger-collapsible-up {
+    animation: ledger-collapsible-up 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .ledger-rise,
     .ledger-scan,
@@ -312,7 +342,9 @@
     .ledger-drop-card,
     .ledger-parse-bar,
     .ledger-parse-mark,
-    .ledger-parse-sweep {
+    .ledger-parse-sweep,
+    .ledger-collapsible-down,
+    .ledger-collapsible-up {
       animation: none;
     }
   }
