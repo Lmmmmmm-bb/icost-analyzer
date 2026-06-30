@@ -21,6 +21,9 @@ type ChipGroupProps = {
   titleInline?: boolean
   separatorBefore?: string
   describe?: (item: string) => string | null
+  className?: string
+  listClassName?: string
+  chipClassName?: string
 }
 
 function toggleValue(values: string[], value: string) {
@@ -45,18 +48,24 @@ export function ChipGroup({
   titleInline = false,
   separatorBefore,
   describe,
+  className,
+  listClassName,
+  chipClassName,
 }: ChipGroupProps) {
   const visible = limit ? items.slice(0, limit) : items
   return (
     <div
-      className={titleInline ? "flex items-start gap-3" : "flex flex-col gap-2"}
+      className={cn(
+        titleInline ? "flex items-start gap-3" : "flex flex-col gap-2",
+        className
+      )}
     >
       {showTitle ? (
         <div className="shrink-0 pt-1 text-[11px] tracking-[0.24em] text-muted-foreground uppercase">
           {title}
         </div>
       ) : null}
-      <div className="flex flex-wrap gap-1.5">
+      <div className={cn("flex flex-wrap gap-1.5", listClassName)}>
         {visible.map((item) => {
           const hint = describe?.(item) ?? null
           const selected = value.includes(item)
@@ -74,7 +83,8 @@ export function ChipGroup({
               className={cn(
                 "font-mono tracking-[0.04em] shadow-none transition-transform hover:-translate-y-px",
                 excluded &&
-                  "text-muted-foreground line-through decoration-primary/80 decoration-2 underline-offset-4 hover:text-muted-foreground"
+                  "text-muted-foreground line-through decoration-primary/80 decoration-2 underline-offset-4 hover:text-muted-foreground",
+                chipClassName
               )}
               aria-label={nextLabel}
               aria-pressed={selected || excluded}

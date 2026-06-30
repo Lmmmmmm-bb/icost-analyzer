@@ -56,27 +56,58 @@ export function FilterPanel({
       </CardHeader>
       <CardContent className="px-0">
         <FilterRow label="时间" contentClassName="flex flex-col gap-3" inline>
-          <ChipGroup
-            title="时间"
-            items={[...QUICK_RANGES, ...dimensions.years]}
-            value={[filters.year || filters.quickRange]}
-            showTitle={false}
-            separatorBefore={dimensions.years[0]}
-            describe={(item) => describeTimeRange(item)}
-            onChange={(next) => {
-              const selected = next.at(-1) ?? ALL_RANGE
-              const isYear = dimensions.years.includes(selected)
+          <div className="grid gap-2.5">
+            <ChipGroup
+              title="快捷时间"
+              items={QUICK_RANGES}
+              value={filters.year ? [] : [filters.quickRange]}
+              showTitle={false}
+              describe={(item) => describeTimeRange(item)}
+              listClassName="grid grid-cols-2 gap-1.5 min-[420px]:flex min-[420px]:flex-wrap"
+              chipClassName="w-full justify-center min-[420px]:w-auto"
+              onChange={(next) => {
+                const selected = next.at(-1) ?? ALL_RANGE
 
-              onFiltersChange((current) => ({
-                ...current,
-                quickRange: isYear ? ALL_RANGE : selected,
-                year: isYear ? selected : "",
-                startDate: "",
-                endDate: "",
-              }))
-            }}
-          />
-          <div className="flex flex-wrap items-center gap-2">
+                onFiltersChange((current) => ({
+                  ...current,
+                  quickRange: selected,
+                  year: "",
+                  startDate: "",
+                  endDate: "",
+                }))
+              }}
+            />
+            {dimensions.years.length ? (
+              <div className="flex w-full items-center gap-1.5">
+                <div className="shrink-0">
+                  <span className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+                    年份
+                  </span>
+                </div>
+                <ChipGroup
+                  title="年份"
+                  items={dimensions.years}
+                  value={filters.year ? [filters.year] : []}
+                  showTitle={false}
+                  className="min-w-0 flex-1"
+                  listClassName="grid grid-cols-[repeat(auto-fit,minmax(4.75rem,1fr))] gap-1.5 sm:flex sm:flex-wrap"
+                  chipClassName="justify-center sm:w-auto"
+                  onChange={(next) => {
+                    const selected = next.at(-1) ?? ""
+
+                    onFiltersChange((current) => ({
+                      ...current,
+                      quickRange: selected ? ALL_RANGE : current.quickRange,
+                      year: selected,
+                      startDate: "",
+                      endDate: "",
+                    }))
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
             <DateRangePickerField
               startDate={filters.startDate}
               endDate={filters.endDate}

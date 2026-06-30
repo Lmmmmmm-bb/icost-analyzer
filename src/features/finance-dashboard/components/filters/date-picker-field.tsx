@@ -35,7 +35,7 @@ export function DateRangePickerField({
   const displayValue = formatRangeDisplay(startDate, endDate)
 
   return (
-    <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <label className="flex w-full flex-col gap-1.5 text-xs text-muted-foreground sm:w-auto sm:flex-row sm:items-center">
       <span className="font-mono text-[10px] tracking-[0.14em] uppercase">
         自定义
       </span>
@@ -52,7 +52,7 @@ export function DateRangePickerField({
               type="button"
               variant="outline"
               size="sm"
-              className="w-[17rem] justify-start font-mono text-[11px] font-normal"
+              className="w-full justify-start font-mono text-[11px] font-normal sm:w-[17rem]"
             />
           }
         >
