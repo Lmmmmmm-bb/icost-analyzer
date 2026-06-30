@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts"
 
-import { RANKING_COLOR, RANKING_COLOR_END } from "../chart-theme"
+import { chartTokenColor } from "../chart-theme"
 import type { SummaryItem } from "../../../model/analytics-types"
 import { formatMoney } from "../../../model/money"
 import type { ChartTheme } from "./types"
@@ -8,7 +8,6 @@ import {
   axisStyle,
   chartMutedTextColor,
   compactMoney,
-  horizontalGradient,
   tooltipStyle,
 } from "./shared"
 
@@ -17,8 +16,10 @@ export function createRankingOption(
   theme?: ChartTheme
 ): EChartsOption {
   const axis = axisStyle(theme)
+  const rankingColor = chartTokenColor(3)
+
   return {
-    color: [RANKING_COLOR],
+    color: [rankingColor],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
@@ -52,7 +53,13 @@ export function createRankingOption(
         data: items.map((item) => item.amount).reverse(),
         barMaxWidth: 13,
         itemStyle: {
-          color: horizontalGradient(RANKING_COLOR, RANKING_COLOR_END),
+          color: rankingColor,
+        },
+        emphasis: {
+          itemStyle: {
+            color: rankingColor,
+            opacity: 1,
+          },
         },
         label: {
           show: true,

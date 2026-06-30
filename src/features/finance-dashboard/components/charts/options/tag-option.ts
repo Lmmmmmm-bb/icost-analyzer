@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts"
 
-import { TAG_COLOR, TAG_COLOR_ACTIVE } from "../chart-theme"
+import { chartTokenColor } from "../chart-theme"
 import type { SummaryItem } from "../../../model/analytics-types"
 import { formatMoney } from "../../../model/money"
 import type { ChartTheme } from "./types"
@@ -8,7 +8,6 @@ import {
   axisStyle,
   chartMutedTextColor,
   compactMoney,
-  horizontalGradient,
   tooltipStyle,
 } from "./shared"
 
@@ -18,8 +17,10 @@ export function createTagOption(
 ): EChartsOption {
   const axis = axisStyle(theme)
   const top = items.slice(0, 15)
+  const tagColor = chartTokenColor(4)
+
   return {
-    color: [TAG_COLOR],
+    color: [tagColor],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
@@ -54,7 +55,13 @@ export function createTagOption(
           .map((item) => ({
             value: item.amount,
             itemStyle: {
-              color: horizontalGradient(TAG_COLOR, TAG_COLOR_ACTIVE),
+              color: tagColor,
+            },
+            emphasis: {
+              itemStyle: {
+                color: tagColor,
+                opacity: 1,
+              },
             },
           }))
           .reverse(),

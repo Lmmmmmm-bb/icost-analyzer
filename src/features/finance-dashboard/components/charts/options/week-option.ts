@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts"
 
-import { WEEK_COLOR, WEEKEND_COLOR } from "../chart-theme"
+import { chartTokenColor } from "../chart-theme"
 import type { WeekItem } from "../../../model/analytics-types"
 import { formatMoney } from "../../../model/money"
 import type { ChartTheme } from "./types"
@@ -16,8 +16,11 @@ export function createWeekOption(
   theme?: ChartTheme
 ): EChartsOption {
   const axis = axisStyle(theme)
+  const weekColor = chartTokenColor(1)
+  const weekendColor = chartTokenColor(3)
+
   return {
-    color: [WEEK_COLOR],
+    color: [weekColor],
     tooltip: {
       trigger: "axis",
       valueFormatter: (value) => formatMoney(Number(value)),
@@ -42,14 +45,30 @@ export function createWeekOption(
     series: [
       {
         type: "bar",
-        data: items.map((item, index) => ({
-          value: item.amount,
-          itemStyle: {
-            color: [5, 6].includes(index) ? WEEKEND_COLOR : WEEK_COLOR,
-            borderColor: WEEKEND_COLOR,
-            borderWidth: [5, 6].includes(index) ? 0 : 1,
-          },
-        })),
+        data: items.map((item, index) => {
+          const isWeekend = [5, 6].includes(index)
+          const color = isWeekend ? weekendColor : weekColor
+          const opacity = isWeekend ? 1 : 0.68
+          const borderWidth = isWeekend ? 0 : 1
+
+          return {
+            value: item.amount,
+            itemStyle: {
+              color,
+              opacity,
+              borderColor: weekendColor,
+              borderWidth,
+            },
+            emphasis: {
+              itemStyle: {
+                color,
+                opacity,
+                borderColor: weekendColor,
+                borderWidth,
+              },
+            },
+          }
+        }),
         barMaxWidth: 34,
       },
     ],
