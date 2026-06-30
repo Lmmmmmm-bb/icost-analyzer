@@ -1,7 +1,11 @@
+import { useCallback, useRef } from "react"
+
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 import type { MetricStats, PeriodComparison } from "../../model/analytics-types"
 import { HeroMetrics } from "./hero-metrics"
+import type { WorkbookUploadState } from "./use-workbook-upload"
 
 type WorkspaceHeroProps = {
   fileName: string
@@ -9,7 +13,8 @@ type WorkspaceHeroProps = {
   stats: MetricStats
   periodComparison: PeriodComparison
   yearComparison: PeriodComparison
-  onReplaceFile: () => void
+  uploadState: WorkbookUploadState
+  onUpload: (file: File) => void
 }
 
 export function WorkspaceHero({
@@ -18,8 +23,18 @@ export function WorkspaceHero({
   stats,
   periodComparison,
   yearComparison,
-  onReplaceFile,
+  uploadState,
+  onUpload,
 }: WorkspaceHeroProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const uploadFile = useCallback(
+    (file?: File) => {
+      if (!file || uploadState.isParsing) return
+      onUpload(file)
+    },
+    [onUpload, uploadState.isParsing]
+  )
+
   return (
     <section className="flex flex-col gap-5">
       <div className="relative overflow-hidden border border-border/80 bg-card/88 shadow-ledger-panel backdrop-blur-xl">
@@ -59,10 +74,24 @@ export function WorkspaceHero({
               <Button
                 type="button"
                 className="shrink-0 font-mono hover:-translate-y-0.5"
-                onClick={onReplaceFile}
+                disabled={uploadState.isParsing}
+                onClick={() => inputRef.current?.click()}
               >
-                更换文件
+                {uploadState.isParsing ? "解析中" : "更换文件"}
               </Button>
+              <Input
+                ref={inputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                className="sr-only"
+                tabIndex={-1}
+                aria-label="选择新的 iCost Excel 文件"
+                disabled={uploadState.isParsing}
+                onChange={(event) => {
+                  uploadFile(event.target.files?.[0])
+                  event.currentTarget.value = ""
+                }}
+              />
             </div>
           </div>
         </div>

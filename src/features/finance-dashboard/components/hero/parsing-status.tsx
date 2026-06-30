@@ -41,9 +41,20 @@ export function ParsingFileName({ className, fileName }: ParsingFileNameProps) {
   )
 }
 
-export function ParsingStatusOverlay({ fileName }: { fileName: string }) {
+export function ParsingStatusOverlay({
+  className,
+  fileName,
+}: {
+  className?: string
+  fileName: string
+}) {
   return (
-    <div className="ledger-drop-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-foreground/25 bg-background/62 shadow-ledger-overlay backdrop-blur-md">
+    <div
+      className={cn(
+        "ledger-drop-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-foreground/25 bg-background/62 shadow-ledger-overlay backdrop-blur-md",
+        className
+      )}
+    >
       <div
         role="status"
         aria-live="polite"

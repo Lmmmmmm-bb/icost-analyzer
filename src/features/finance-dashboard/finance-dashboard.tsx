@@ -5,6 +5,8 @@ import { DashboardBackdrop } from "./components/layout/dashboard-backdrop"
 import { DashboardAlerts } from "./components/feedback/dashboard-alerts"
 import { NoResultEmptyState } from "./components/feedback/empty-states"
 import { EntryHero } from "./components/hero/entry-hero"
+import { ParsingStatusOverlay } from "./components/hero/parsing-status"
+import { useFileDrop } from "./components/hero/use-file-drop"
 import { WorkspaceHero } from "./components/hero/workspace-hero"
 import {
   RANK_LEVELS,
@@ -121,19 +123,24 @@ export function FinanceDashboard() {
     [resetAnalysisControls]
   )
 
-  const { uploadState, uploadWorkbook, resetUpload } = useWorkbookUpload({
+  const { uploadState, uploadWorkbook } = useWorkbookUpload({
     onParsed: applyParsedWorkbook,
   })
 
-  const resetWorkbook = useCallback(() => {
-    setTransactions([])
-    setFileName("")
-    setRates(DEFAULT_RATES)
-    setRateInputs(makeRateInputs(DEFAULT_RATES))
-    resetAnalysisControls()
-    setPageSize(25)
-    resetUpload()
-  }, [resetAnalysisControls, resetUpload])
+  const hasTransactions = transactions.length > 0
+  const hasAnalysisCharts = filtered.length > 0
+
+  const handleWorkspaceFileDrop = useCallback(
+    (file: File) => {
+      if (!uploadState.isParsing) uploadWorkbook(file)
+    },
+    [uploadState.isParsing, uploadWorkbook]
+  )
+
+  const { isDragging: isWorkspaceDragging, dropProps: workspaceDropProps } =
+    useFileDrop(handleWorkspaceFileDrop, {
+      disabled: uploadState.isParsing || !hasTransactions,
+    })
 
   const applyMonth = useCallback((month: string) => {
     setFilters((current) => ({
@@ -155,13 +162,11 @@ export function FinanceDashboard() {
     setFilters((current) => ({ ...current, categories: [category] }))
   }, [])
 
-  const hasTransactions = transactions.length > 0
-  const hasAnalysisCharts = filtered.length > 0
-
   return (
     <main
       className="relative min-h-svh overflow-hidden bg-background text-foreground"
       data-skip-theme-view-transition={hasAnalysisCharts ? "true" : undefined}
+      {...workspaceDropProps}
     >
       <DashboardBackdrop />
 
@@ -169,17 +174,46 @@ export function FinanceDashboard() {
         <EntryHero uploadState={uploadState} onUpload={uploadWorkbook} />
       ) : (
         <Suspense fallback={null}>
-          <div className="ledger-stagger-stack relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:gap-6 lg:px-10 lg:py-6">
+          <div
+            className="ledger-stagger-stack relative mx-auto flex min-h-svh max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:gap-6 lg:px-10 lg:py-6"
+          >
+            {isWorkspaceDragging ? (
+              <div
+                aria-hidden="true"
+                className="ledger-drop-overlay pointer-events-none fixed inset-0 z-40 grid place-items-center bg-background/55 shadow-ledger-overlay backdrop-blur-md"
+              >
+                <div className="absolute inset-4 border-2 border-dashed border-foreground/45" />
+                <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-ledger-popover backdrop-blur-xl">
+                  <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
+                    松开替换当前分析数据
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    新的 iCost Excel 会在当前浏览器本地解析，并替换现有看板数据。
+                  </p>
+                  <div className="mt-2 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+                    Drop anywhere · .xlsx / .xls
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            {uploadState.showParsingStatus ? (
+              <ParsingStatusOverlay
+                fileName={uploadState.parsingFileName}
+                className="fixed inset-0"
+              />
+            ) : null}
             <WorkspaceHero
               fileName={fileName}
               rangeText={rangeText}
               stats={stats}
               periodComparison={periodComparison}
               yearComparison={yearComparison}
-              onReplaceFile={resetWorkbook}
+              uploadState={uploadState}
+              onUpload={uploadWorkbook}
             />
 
             <DashboardAlerts
+              uploadError={uploadState.error}
               invalidDateRange={invalidDateRange}
               missingRates={missingRates}
             />

@@ -1,16 +1,24 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 type DashboardAlertsProps = {
+  uploadError: string
   invalidDateRange: boolean
   missingRates: string[]
 }
 
 export function DashboardAlerts({
+  uploadError,
   invalidDateRange,
   missingRates,
 }: DashboardAlertsProps) {
   return (
     <>
+      {uploadError ? (
+        <Alert variant="destructive">
+          <AlertTitle>解析失败</AlertTitle>
+          <AlertDescription>{uploadError}</AlertDescription>
+        </Alert>
+      ) : null}
       {invalidDateRange ? (
         <Alert variant="destructive">
           <AlertTitle>日期范围无效</AlertTitle>
