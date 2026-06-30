@@ -2,15 +2,15 @@ import { Badge } from "@/components/ui/badge"
 import { TableCell, TableRow } from "@/components/ui/table"
 
 import type { RateMap, Transaction } from "../../model/types"
-import { formatMoney, toRmb } from "../../model/money"
+import { formatMoney, formatOriginalAmount, toRmb } from "../../model/money"
+import {
+  getDirectionBadgeVariant,
+  getTransactionDirection,
+} from "../../model/transaction-rules"
 
 type TransactionRowProps = {
   transaction: Transaction
   rates: RateMap
-}
-
-function transactionTypeVariant(transaction: Transaction) {
-  return transaction.type === "支出" ? "destructive" : "positive"
 }
 
 export function TransactionRow({ transaction, rates }: TransactionRowProps) {
@@ -20,7 +20,11 @@ export function TransactionRow({ transaction, rates }: TransactionRowProps) {
         {transaction.dateText}
       </TableCell>
       <TableCell>
-        <Badge variant={transactionTypeVariant(transaction)}>
+        <Badge
+          variant={getDirectionBadgeVariant(
+            getTransactionDirection(transaction)
+          )}
+        >
           {transaction.type}
         </Badge>
       </TableCell>
@@ -47,10 +51,7 @@ export function TransactionRow({ transaction, rates }: TransactionRowProps) {
         {transaction.currency}
       </TableCell>
       <TableCell className="font-mono text-[11px] tabular-nums">
-        {transaction.amount.toLocaleString("zh-CN", {
-          maximumFractionDigits: 3,
-        })}{" "}
-        {transaction.currency}
+        {formatOriginalAmount(transaction.amount, transaction.currency)}
       </TableCell>
       <TableCell className="font-mono text-[11px] font-medium tabular-nums">
         {formatMoney(toRmb(transaction, rates))}

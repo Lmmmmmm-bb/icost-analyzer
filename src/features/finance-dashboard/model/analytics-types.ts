@@ -1,3 +1,5 @@
+import type { TransactionDirection } from "./transaction-rules"
+
 export type SummaryItem = {
   name: string
   count: number
@@ -81,7 +83,7 @@ export type MonthlyBillItem = {
   amount: number
   currency: string
   rmb: number
-  direction: "expense" | "income" | "other"
+  direction: TransactionDirection
 }
 
 export type DailyCashflowItem = {
@@ -105,7 +107,7 @@ export type DailyBillItem = {
   amount: number
   currency: string
   rmb: number
-  direction: "expense" | "income" | "other"
+  direction: TransactionDirection
 }
 
 export type WeekItem = {

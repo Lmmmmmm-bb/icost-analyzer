@@ -10,21 +10,13 @@ import type {
 } from "./analytics-types"
 import { unique } from "./collections"
 import { expenseRmb, toRmb } from "./money"
+import {
+  getTransactionDirection,
+  isExpenseTransaction,
+  isIncomeTransaction,
+  isReimburseTransaction,
+} from "./transaction-rules"
 import type { Dimensions, RateMap, Transaction } from "./types"
-
-function isExpense(tx: Transaction) {
-  return tx.type === "支出" || tx.amount < 0
-}
-
-function isIncome(tx: Transaction) {
-  return (
-    ["收入", "退款入账", "报销入账"].includes(tx.type) && tx.type !== "转账"
-  )
-}
-
-function isReimburse(tx: Transaction) {
-  return ["退款入账", "报销入账", "已报销", "待报销"].includes(tx.type)
-}
 
 export function summarizeBy(
   transactions: Transaction[],
@@ -33,7 +25,9 @@ export function summarizeBy(
   includeTags = false
 ): SummaryItem[] {
   const map = new Map<string, SummaryItem>()
-  for (const tx of transactions.filter(isExpense)) {
+  for (const tx of transactions) {
+    if (!isExpenseTransaction(tx)) continue
+
     const names = includeTags ? tx.tags : [pickName(tx)]
     for (const name of names) {
       const item = map.get(name) ?? {
@@ -65,10 +59,16 @@ export function getDimensions(transactions: Transaction[]): Dimensions {
 
 export function getDateRange(transactions: Transaction[]) {
   if (!transactions.length) return null
-  const sorted = [...transactions].sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
-  )
-  return { start: sorted[0].date, end: sorted[sorted.length - 1].date }
+
+  let start = transactions[0].date
+  let end = transactions[0].date
+
+  for (const tx of transactions) {
+    if (tx.date < start) start = tx.date
+    if (tx.date > end) end = tx.date
+  }
+
+  return { start, end }
 }
 
 export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
@@ -88,14 +88,14 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
     daySet.add(tx.dayKey)
     currencySet.add(tx.currency)
     tx.tags.forEach((tag) => tagSet.add(tag))
-    if (isExpense(tx)) {
+    if (isExpenseTransaction(tx)) {
       const expense = Math.abs(rmb)
       totalExpense += expense
       maxExpense = Math.max(maxExpense, expense)
       expenseCount += 1
     }
-    if (isIncome(tx)) totalIncome += Math.max(rmb, 0)
-    if (isReimburse(tx)) reimburse += Math.abs(rmb)
+    if (isIncomeTransaction(tx)) totalIncome += Math.max(rmb, 0)
+    if (isReimburseTransaction(tx)) reimburse += Math.abs(rmb)
   }
 
   const months = monthSet.size || 1
@@ -135,11 +135,7 @@ export function getMonthly(filtered: Transaction[], rates: RateMap) {
       bills: [],
     }
     const rmb = toRmb(tx, rates)
-    const direction = isIncome(tx)
-      ? "income"
-      : isExpense(tx)
-        ? "expense"
-        : "other"
+    const direction = getTransactionDirection(tx)
     item.bills.push({
       id: tx.id,
       date: tx.date,
@@ -155,7 +151,7 @@ export function getMonthly(filtered: Transaction[], rates: RateMap) {
       rmb,
       direction,
     })
-    if (isExpense(tx)) {
+    if (isExpenseTransaction(tx)) {
       const expense = expenseRmb(tx, rates)
       const categoryName = tx.category || "未分类"
       const categoryMap =
@@ -184,7 +180,7 @@ export function getMonthly(filtered: Transaction[], rates: RateMap) {
         }
       }
     }
-    if (isIncome(tx)) item.income += Math.max(rmb, 0)
+    if (isIncomeTransaction(tx)) item.income += Math.max(rmb, 0)
     item.net = item.income - item.expense
     item.savingsRate = item.income > 0 ? item.net / item.income : null
     map.set(tx.monthKey, item)
@@ -266,7 +262,7 @@ export function getPeriodComparison(
   for (const tx of currentScope) {
     const rmb = toRmb(tx, rates)
 
-    if (isExpense(tx)) {
+    if (isExpenseTransaction(tx)) {
       const expense = Math.abs(rmb)
       currentExpense += expense
       addExpenseToMap(currentCategoryExpense, tx.category, expense)
@@ -274,7 +270,7 @@ export function getPeriodComparison(
         addExpenseToMap(currentTagExpense, tag, expense)
     }
 
-    if (isIncome(tx)) {
+    if (isIncomeTransaction(tx)) {
       const income = Math.max(rmb, 0)
       currentIncome += income
     }
@@ -283,7 +279,7 @@ export function getPeriodComparison(
   for (const tx of previousScope) {
     const rmb = toRmb(tx, rates)
 
-    if (isExpense(tx)) {
+    if (isExpenseTransaction(tx)) {
       const expense = Math.abs(rmb)
       previousExpense += expense
       addExpenseToMap(previousCategoryExpense, tx.category, expense)
@@ -291,7 +287,7 @@ export function getPeriodComparison(
         addExpenseToMap(previousTagExpense, tag, expense)
     }
 
-    if (isIncome(tx)) {
+    if (isIncomeTransaction(tx)) {
       previousIncome += Math.max(rmb, 0)
     }
   }
@@ -335,8 +331,8 @@ export function getDailyCashflow(
       bills: [],
     }
     const rmb = toRmb(tx, rates)
-    if (isExpense(tx)) item.expense += Math.abs(rmb)
-    if (isIncome(tx)) item.income += Math.max(rmb, 0)
+    if (isExpenseTransaction(tx)) item.expense += Math.abs(rmb)
+    if (isIncomeTransaction(tx)) item.income += Math.max(rmb, 0)
     item.net = item.income - item.expense
     item.count += 1
     item.bills.push({
@@ -350,7 +346,7 @@ export function getDailyCashflow(
       amount: tx.amount,
       currency: tx.currency,
       rmb,
-      direction: isExpense(tx) ? "expense" : isIncome(tx) ? "income" : "other",
+      direction: getTransactionDirection(tx),
     })
     map.set(tx.dayKey, item)
   }
@@ -360,7 +356,9 @@ export function getDailyCashflow(
 export function getWeekSummary(filtered: Transaction[], rates: RateMap) {
   const labels = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
   const amounts = Array.from({ length: 7 }, () => 0)
-  for (const tx of filtered.filter(isExpense)) {
+  for (const tx of filtered) {
+    if (!isExpenseTransaction(tx)) continue
+
     const index = (tx.date.getDay() + 6) % 7
     amounts[index] += expenseRmb(tx, rates)
   }
@@ -371,7 +369,9 @@ export function getWeekSummary(filtered: Transaction[], rates: RateMap) {
 
 export function getHeatmap(filtered: Transaction[], rates: RateMap) {
   const map = new Map<string, number>()
-  for (const tx of filtered.filter(isExpense)) {
+  for (const tx of filtered) {
+    if (!isExpenseTransaction(tx)) continue
+
     map.set(tx.dayKey, (map.get(tx.dayKey) ?? 0) + expenseRmb(tx, rates))
   }
   return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]))

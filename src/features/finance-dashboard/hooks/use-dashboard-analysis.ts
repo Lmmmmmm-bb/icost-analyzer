@@ -8,6 +8,12 @@ import {
   type TagSort,
 } from "../model/dashboard-controls"
 import {
+  paginateRows,
+  sortCategorySummaryRows,
+  sortDetailRows,
+  sortTagSummaryRows,
+} from "../model/dashboard-rows"
+import {
   getCurrentDatePeriod,
   getPreviousDatePeriod,
   getYearOverYearDatePeriod,
@@ -28,7 +34,6 @@ import { unique } from "../model/collections"
 import { ALL_RANGE } from "../model/constants"
 import { dateKey } from "../model/date"
 import { filterTransactions } from "../model/filtering"
-import { toRmb } from "../model/money"
 import type { Filters, RateMap, Transaction } from "../model/types"
 
 type DashboardAnalysisParams = {
@@ -170,19 +175,13 @@ export function useDashboardAnalysis({
   )
   const heatmap = useMemo(() => getHeatmap(filtered, rates), [filtered, rates])
 
-  const detailRows = useMemo(() => {
-    return [...filtered].sort((a, b) => {
-      if (detailSort === "amount")
-        return Math.abs(toRmb(b, rates)) - Math.abs(toRmb(a, rates))
-      return b.date.getTime() - a.date.getTime()
-    })
-  }, [detailSort, filtered, rates])
-
-  const totalPages = Math.max(1, Math.ceil(detailRows.length / pageSize))
-  const safePage = Math.min(page, totalPages)
-  const pagedRows = useMemo(
-    () => detailRows.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [detailRows, pageSize, safePage]
+  const detailRows = useMemo(
+    () => sortDetailRows(filtered, detailSort, rates),
+    [detailSort, filtered, rates]
+  )
+  const { totalPages, safePage, pagedRows } = useMemo(
+    () => paginateRows(detailRows, page, pageSize),
+    [detailRows, page, pageSize]
   )
   const expenseTotal = useMemo(
     () => categorySummary.reduce((sum, item) => sum + item.amount, 0) || 1,
@@ -233,20 +232,14 @@ export function useDashboardAnalysis({
     ]
   )
 
-  const sortedCategoryRows = useMemo(() => {
-    return [...categorySummary].sort((a, b) => {
-      if (summarySort === "count") return b.count - a.count
-      if (summarySort === "avg") return b.amount / b.count - a.amount / a.count
-      return b.amount - a.amount
-    })
-  }, [categorySummary, summarySort])
-  const sortedTagRows = useMemo(() => {
-    return [...tagSummary].sort((a, b) => {
-      if (tagSort === "count") return b.count - a.count
-      if (tagSort === "days") return b.days.size - a.days.size
-      return b.amount - a.amount
-    })
-  }, [tagSort, tagSummary])
+  const sortedCategoryRows = useMemo(
+    () => sortCategorySummaryRows(categorySummary, summarySort),
+    [categorySummary, summarySort]
+  )
+  const sortedTagRows = useMemo(
+    () => sortTagSummaryRows(tagSummary, tagSort),
+    [tagSort, tagSummary]
+  )
 
   return {
     dimensions,

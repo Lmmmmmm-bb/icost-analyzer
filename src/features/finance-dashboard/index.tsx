@@ -1,12 +1,13 @@
 import { lazy, Suspense, useCallback, useState } from "react"
 
-import { ALL_RANGE, DEFAULT_RATES, EMPTY_FILTERS } from "./model/constants"
+import { DEFAULT_RATES, EMPTY_FILTERS } from "./model/constants"
 import { DashboardBackdrop } from "./components/layout/dashboard-backdrop"
 import { DashboardAlerts } from "./components/feedback/dashboard-alerts"
 import { NoResultEmptyState } from "./components/feedback/empty-states"
 import { EntryHero } from "./components/hero/entry-hero"
 import { ParsingStatusOverlay } from "./components/hero/parsing-status"
 import { useFileDrop } from "./components/hero/use-file-drop"
+import { WorkspaceDropOverlay } from "./components/hero/workspace-drop-overlay"
 import { WorkspaceHero } from "./components/hero/workspace-hero"
 import {
   RANK_LEVELS,
@@ -15,10 +16,10 @@ import {
   type SummarySort,
   type TagSort,
 } from "./model/dashboard-controls"
-import { makeRateInputs } from "./model/rate-inputs"
+import { createRatesForCurrencies, makeRateInputs } from "./model/rate-inputs"
 import type { Filters, RateMap, Transaction } from "./model/types"
 import { unique } from "./model/collections"
-import { dateKey } from "./model/date"
+import { getMonthDateRange } from "./model/date"
 import { useWorkbookUpload } from "./components/hero/use-workbook-upload"
 import { useDashboardAnalysis } from "./hooks/use-dashboard-analysis"
 
@@ -114,9 +115,7 @@ export function FinanceDashboard() {
       setFileName(file.name)
       resetAnalysisControls()
       const currencies = unique(parsed.map((tx) => tx.currency))
-      const nextRates = { ...DEFAULT_RATES }
-      for (const currency of currencies)
-        if (!nextRates[currency]) nextRates[currency] = 0
+      const nextRates = createRatesForCurrencies(currencies)
       setRates(nextRates)
       setRateInputs(makeRateInputs(nextRates))
     },
@@ -145,12 +144,9 @@ export function FinanceDashboard() {
   const applyMonth = useCallback((month: string) => {
     setFilters((current) => ({
       ...current,
-      quickRange: ALL_RANGE,
+      quickRange: EMPTY_FILTERS.quickRange,
       year: "",
-      startDate: `${month}-01`,
-      endDate: dateKey(
-        new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)
-      ),
+      ...getMonthDateRange(month),
     }))
   }, [])
 
@@ -177,25 +173,7 @@ export function FinanceDashboard() {
           <div
             className="ledger-stagger-stack relative mx-auto flex min-h-svh max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:gap-6 lg:px-10 lg:py-6"
           >
-            {isWorkspaceDragging ? (
-              <div
-                aria-hidden="true"
-                className="ledger-drop-overlay pointer-events-none fixed inset-0 z-40 grid place-items-center bg-background/55 shadow-ledger-overlay backdrop-blur-md"
-              >
-                <div className="absolute inset-4 border-2 border-dashed border-foreground/45" />
-                <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-ledger-popover backdrop-blur-xl">
-                  <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
-                    松开替换当前分析数据
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                    新的 iCost Excel 会在当前浏览器本地解析，并替换现有看板数据。
-                  </p>
-                  <div className="mt-2 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
-                    Drop anywhere · .xlsx / .xls
-                  </div>
-                </div>
-              </div>
-            ) : null}
+            {isWorkspaceDragging ? <WorkspaceDropOverlay /> : null}
             {uploadState.showParsingStatus ? (
               <ParsingStatusOverlay
                 fileName={uploadState.parsingFileName}

@@ -16,7 +16,7 @@ import type {
   PeriodTopMover,
   PeriodTrend,
 } from "../../../model/analytics-types"
-import { formatMoney } from "../../../model/money"
+import { formatMoney, formatSignedMoney } from "../../../model/money"
 
 type TrendTone = "expense" | "income" | "net"
 type TrendMetricConfig = {
@@ -337,12 +337,6 @@ function formatPercent(value: number | null) {
   if (value > 0) return `+${formatted}`
   if (value < 0) return `-${formatted}`
   return formatted
-}
-
-function formatSignedMoney(value: number, compact = false) {
-  if (value > 0) return `+${formatMoney(value, compact)}`
-  if (value < 0) return `-${formatMoney(Math.abs(value), compact)}`
-  return formatMoney(0, compact)
 }
 
 function getMoverBarWidth(item: PeriodTopMover, items: PeriodTopMover[]) {

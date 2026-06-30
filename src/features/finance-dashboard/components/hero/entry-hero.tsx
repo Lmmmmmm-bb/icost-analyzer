@@ -5,6 +5,7 @@ import { ParsingStatusOverlay } from "./parsing-status"
 import { UploadCard } from "./upload-card"
 import { useFileDrop } from "./use-file-drop"
 import type { WorkbookUploadState } from "./use-workbook-upload"
+import { DropOverlay } from "./workspace-drop-overlay"
 
 const ENTRY_STEPS = [
   ["01", "拖入 iCost 导出的 Excel"],
@@ -34,22 +35,11 @@ export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
       {...dropProps}
     >
       {isDragging ? (
-        <div
-          aria-hidden="true"
-          className="ledger-drop-overlay pointer-events-none absolute inset-4 z-40 grid place-items-center border border-dashed border-foreground/45 bg-background/55 shadow-ledger-overlay backdrop-blur-md"
-        >
-          <div className="ledger-drop-card max-w-sm border border-border/80 bg-card/92 px-6 py-5 text-center shadow-ledger-popover backdrop-blur-xl">
-            <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
-              松开开始本地解析
-            </div>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              已识别到文件拖入页面，松开后仅在当前浏览器解析 iCost Excel。
-            </p>
-            <div className="mt-2 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
-              Drop anywhere · .xlsx / .xls
-            </div>
-          </div>
-        </div>
+        <DropOverlay
+          title="松开开始本地解析"
+          description="已识别到文件拖入页面，松开后仅在当前浏览器解析 iCost Excel。"
+          className="absolute inset-4 border border-dashed border-foreground/45"
+        />
       ) : null}
       {uploadState.showParsingStatus ? (
         <ParsingStatusOverlay fileName={uploadState.parsingFileName} />

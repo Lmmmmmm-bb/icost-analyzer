@@ -23,7 +23,8 @@ import type {
   MonthlyItem,
   MonthlyLargestExpense,
 } from "../../../model/analytics-types"
-import { formatMoney } from "../../../model/money"
+import { formatMoney, formatOriginalAmount } from "../../../model/money"
+import { getDirectionBadgeVariant } from "../../../model/transaction-rules"
 
 type MonthlyReviewDialogProps = {
   monthlyReview: MonthlyItem[]
@@ -258,7 +259,9 @@ function MonthlyBillRow({ bill }: { bill: MonthlyBillItem }) {
         {bill.dateText}
       </TableCell>
       <TableCell>
-        <Badge variant={getBillBadgeVariant(bill)}>{bill.type}</Badge>
+        <Badge variant={getDirectionBadgeVariant(bill.direction)}>
+          {bill.type}
+        </Badge>
       </TableCell>
       <TableCell>
         {bill.category}
@@ -286,22 +289,13 @@ function MonthlyBillRow({ bill }: { bill: MonthlyBillItem }) {
       </TableCell>
       <TableCell className="font-mono text-[11px]">{bill.currency}</TableCell>
       <TableCell className="font-mono text-[11px] tabular-nums">
-        {bill.amount.toLocaleString("zh-CN", {
-          maximumFractionDigits: 3,
-        })}{" "}
-        {bill.currency}
+        {formatOriginalAmount(bill.amount, bill.currency)}
       </TableCell>
       <TableCell className="font-mono text-[11px] font-medium tabular-nums">
         {formatMoney(bill.rmb)}
       </TableCell>
     </TableRow>
   )
-}
-
-function getBillBadgeVariant(bill: MonthlyBillItem) {
-  if (bill.direction === "expense") return "destructive"
-  if (bill.direction === "income") return "positive"
-  return "secondary"
 }
 
 type ReviewTone = "positive" | "destructive"

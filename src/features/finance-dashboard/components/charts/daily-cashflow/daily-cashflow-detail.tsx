@@ -5,7 +5,8 @@ import type {
   DailyBillItem,
   DailyCashflowItem,
 } from "../../../model/analytics-types"
-import { formatMoney } from "../../../model/money"
+import { formatMoney, formatOriginalAmount } from "../../../model/money"
+import { getDirectionBadgeVariant } from "../../../model/transaction-rules"
 
 type DailyCashflowDetailProps = {
   selectedCashflow?: DailyCashflowItem
@@ -121,12 +122,6 @@ function DailyCashflowBill({ bill }: { bill: DailyBillItem }) {
     bill.direction === "expense" ? -Math.abs(bill.amount) : bill.amount
   const signedRmb =
     bill.direction === "expense" ? -Math.abs(bill.rmb) : bill.rmb
-  const badgeVariant =
-    bill.direction === "income"
-      ? "positive"
-      : bill.direction === "expense"
-        ? "destructive"
-        : "secondary"
 
   return (
     <div className="grid gap-2 border-b border-border/70 bg-transparent p-4 last:border-b-0">
@@ -137,7 +132,9 @@ function DailyCashflowBill({ bill }: { bill: DailyBillItem }) {
               {bill.category}
               {bill.subcategory ? ` / ${bill.subcategory}` : ""}
             </p>
-            <Badge variant={badgeVariant}>{bill.type}</Badge>
+            <Badge variant={getDirectionBadgeVariant(bill.direction)}>
+              {bill.type}
+            </Badge>
             {bill.tags.length ? (
               <>
                 <span className="h-3 w-px bg-border" />
@@ -167,10 +164,7 @@ function DailyCashflowBill({ bill }: { bill: DailyBillItem }) {
               bill.direction === "expense" && "text-destructive"
             )}
           >
-            {signedAmount.toLocaleString("zh-CN", {
-              maximumFractionDigits: 2,
-            })}{" "}
-            {bill.currency}
+            {formatOriginalAmount(signedAmount, bill.currency, 2)}
           </p>
           <p className="text-xs text-muted-foreground">
             折算 {formatMoney(signedRmb)}

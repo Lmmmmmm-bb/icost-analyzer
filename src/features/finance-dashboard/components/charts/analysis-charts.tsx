@@ -40,24 +40,48 @@ export function AnalysisCharts({
 }: AnalysisChartsProps) {
   const { resolvedTheme } = useTheme()
   const [reviewOpen, setReviewOpen] = useState(false)
-  const options = useMemo(
-    () => ({
-      monthlyOption: createMonthlyOption(data.monthly, resolvedTheme),
-      pieOption: createPieOption(data.categoryPie, resolvedTheme),
-      rankingOption: createRankingOption(data.ranking, resolvedTheme),
-      currencyOption: createCurrencyOption(data.currencySummary, resolvedTheme),
-      weekOption: createWeekOption(data.weekSummary, resolvedTheme),
-      tagOption: createTagOption(data.tagSummary, resolvedTheme),
-      heatmapOptions: createHeatmapOptionsByYear(data.heatmap, resolvedTheme),
-    }),
-    [data, resolvedTheme]
+  const monthlyOption = useMemo(
+    () => createMonthlyOption(data.monthly, resolvedTheme),
+    [data.monthly, resolvedTheme]
+  )
+  const pieOption = useMemo(
+    () => createPieOption(data.categoryPie, resolvedTheme),
+    [data.categoryPie, resolvedTheme]
+  )
+  const rankingOption = useMemo(
+    () => createRankingOption(data.ranking, resolvedTheme),
+    [data.ranking, resolvedTheme]
+  )
+  const currencyOption = useMemo(
+    () => createCurrencyOption(data.currencySummary, resolvedTheme),
+    [data.currencySummary, resolvedTheme]
+  )
+  const weekOption = useMemo(
+    () => createWeekOption(data.weekSummary, resolvedTheme),
+    [data.weekSummary, resolvedTheme]
+  )
+  const tagOption = useMemo(
+    () => createTagOption(data.tagSummary, resolvedTheme),
+    [data.tagSummary, resolvedTheme]
+  )
+  const heatmapOptions = useMemo(
+    () => createHeatmapOptionsByYear(data.heatmap, resolvedTheme),
+    [data.heatmap, resolvedTheme]
+  )
+  const categoryOptions = useMemo(
+    () => ({ pieOption, rankingOption }),
+    [pieOption, rankingOption]
+  )
+  const distributionOptions = useMemo(
+    () => ({ currencyOption, weekOption, tagOption }),
+    [currencyOption, tagOption, weekOption]
   )
 
   return (
     <>
       <div className="grid gap-6">
         <MonthlyTrendPanel
-          option={options.monthlyOption}
+          option={monthlyOption}
           monthlyReview={data.monthly}
           reviewOpen={reviewOpen}
           onReviewOpenChange={setReviewOpen}
@@ -65,17 +89,20 @@ export function AnalysisCharts({
         />
 
         <CategoryAnalysisGrid
-          options={options}
+          options={categoryOptions}
           drillCategory={drillCategory}
           rankLevel={rankLevel}
           onDrillCategoryChange={onDrillCategoryChange}
           onRankLevelChange={onRankLevelChange}
         />
 
-        <DistributionChartsGrid options={options} onTagSelect={onTagSelect} />
+        <DistributionChartsGrid
+          options={distributionOptions}
+          onTagSelect={onTagSelect}
+        />
       </div>
 
-      <HeatmapPanel heatmapOptions={options.heatmapOptions} />
+      <HeatmapPanel heatmapOptions={heatmapOptions} />
       <DailyCashflowPanel dailyCashflow={data.dailyCashflow} />
     </>
   )

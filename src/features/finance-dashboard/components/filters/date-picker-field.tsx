@@ -10,6 +10,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+import { dateKey, isSameDate, parseDateKey } from "../../model/date"
+
 type DateRangePickerFieldProps = {
   startDate: string
   endDate: string
@@ -24,8 +26,8 @@ export function DateRangePickerField({
   const [open, setOpen] = React.useState(false)
   const [draftRange, setDraftRange] = React.useState<DateRange | undefined>()
   const selectedRange = React.useMemo<DateRange | undefined>(() => {
-    const from = parseDateValue(startDate)
-    const to = parseDateValue(endDate)
+    const from = parseDateKey(startDate)
+    const to = parseDateKey(endDate)
 
     if (!from && !to) return undefined
 
@@ -65,11 +67,11 @@ export function DateRangePickerField({
             selected={visibleRange}
             onSelect={(range) => {
               const nextStartDate = range?.from
-                ? formatDateValue(range.from)
+                ? dateKey(range.from)
                 : ""
               const nextEndDate =
                 range?.from && range.to && !isSameDate(range.from, range.to)
-                  ? formatDateValue(range.to)
+                  ? dateKey(range.to)
                   : ""
 
               setDraftRange(
@@ -114,33 +116,10 @@ export function DateRangePickerField({
   )
 }
 
-function parseDateValue(value: string) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
-
-  if (!match) return undefined
-
-  const [, year, month, day] = match
-  const date = new Date(Number(year), Number(month) - 1, Number(day))
-
-  return formatDateValue(date) === value ? date : undefined
-}
-
 function formatRangeDisplay(startDate: string, endDate: string) {
   if (startDate && endDate) return `${startDate} → ${endDate}`
   if (startDate) return `${startDate} → 选择结束`
   if (endDate) return `选择开始 → ${endDate}`
 
   return ""
-}
-
-function isSameDate(a: Date, b: Date) {
-  return formatDateValue(a) === formatDateValue(b)
-}
-
-function formatDateValue(date: Date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
-
-  return `${year}-${month}-${day}`
 }

@@ -11,6 +11,22 @@ export function formatMoney(value: number, compact = false) {
   }).format(value)
 }
 
+export function formatOriginalAmount(
+  value: number,
+  currency: string,
+  maximumFractionDigits = 3
+) {
+  return `${value.toLocaleString("zh-CN", {
+    maximumFractionDigits,
+  })} ${currency}`
+}
+
+export function formatSignedMoney(value: number, compact = false) {
+  if (value > 0) return `+${formatMoney(value, compact)}`
+  if (value < 0) return `-${formatMoney(Math.abs(value), compact)}`
+  return formatMoney(0, compact)
+}
+
 export function toRmb(tx: Transaction, rates: RateMap) {
   return tx.amount * (rates[tx.currency] ?? 0)
 }
