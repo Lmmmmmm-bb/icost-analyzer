@@ -1,5 +1,6 @@
 import * as React from "react"
 import { RiCalendarLine, RiCloseLine } from "@remixicon/react"
+import type { DateRange } from "react-day-picker"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -9,50 +10,88 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-type DatePickerFieldProps = {
-  label: string
-  value: string
-  onChange: (value: string) => void
+type DateRangePickerFieldProps = {
+  startDate: string
+  endDate: string
+  onChange: (range: { startDate: string; endDate: string }) => void
 }
 
-export function DatePickerField({
-  label,
-  value,
+export function DateRangePickerField({
+  startDate,
+  endDate,
   onChange,
-}: DatePickerFieldProps) {
+}: DateRangePickerFieldProps) {
   const [open, setOpen] = React.useState(false)
-  const selectedDate = parseDateValue(value)
+  const [draftRange, setDraftRange] = React.useState<DateRange | undefined>()
+  const selectedRange = React.useMemo<DateRange | undefined>(() => {
+    const from = parseDateValue(startDate)
+    const to = parseDateValue(endDate)
+
+    if (!from && !to) return undefined
+
+    return { from, to }
+  }, [startDate, endDate])
+  const visibleRange = open ? draftRange : selectedRange
+  const displayValue = formatRangeDisplay(startDate, endDate)
 
   return (
     <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
       <span className="font-mono text-[10px] tracking-[0.14em] uppercase">
-        {label}
+        自定义
       </span>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={open}
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen)
+          setDraftRange(nextOpen ? selectedRange : undefined)
+        }}
+      >
         <PopoverTrigger
           render={
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="w-[9.5rem] justify-start font-mono text-[11px] font-normal"
+              className="w-[17rem] justify-start font-mono text-[11px] font-normal"
             />
           }
         >
           <RiCalendarLine data-icon="inline-start" />
-          {value || "选择日期"}
+          {displayValue || "选择日期范围"}
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto p-0">
           <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => {
-              if (!date) return
-              onChange(formatDateValue(date))
-              setOpen(false)
+            mode="range"
+            selected={visibleRange}
+            onSelect={(range) => {
+              const nextStartDate = range?.from
+                ? formatDateValue(range.from)
+                : ""
+              const nextEndDate =
+                range?.from && range.to && !isSameDate(range.from, range.to)
+                  ? formatDateValue(range.to)
+                  : ""
+
+              setDraftRange(
+                nextStartDate
+                  ? {
+                      from: range?.from,
+                      to: nextEndDate ? range?.to : undefined,
+                    }
+                  : undefined
+              )
+
+              if (nextStartDate && nextEndDate) {
+                onChange({
+                  startDate: nextStartDate,
+                  endDate: nextEndDate,
+                })
+                setOpen(false)
+                setDraftRange(undefined)
+              }
             }}
           />
-          {value ? (
+          {startDate || endDate ? (
             <div className="border-t border-border p-2">
               <Button
                 type="button"
@@ -60,12 +99,12 @@ export function DatePickerField({
                 size="sm"
                 className="w-full justify-start"
                 onClick={() => {
-                  onChange("")
+                  onChange({ startDate: "", endDate: "" })
                   setOpen(false)
                 }}
               >
                 <RiCloseLine data-icon="inline-start" />
-                清除日期
+                清除日期范围
               </Button>
             </div>
           ) : null}
@@ -84,6 +123,18 @@ function parseDateValue(value: string) {
   const date = new Date(Number(year), Number(month) - 1, Number(day))
 
   return formatDateValue(date) === value ? date : undefined
+}
+
+function formatRangeDisplay(startDate: string, endDate: string) {
+  if (startDate && endDate) return `${startDate} → ${endDate}`
+  if (startDate) return `${startDate} → 选择结束`
+  if (endDate) return `选择开始 → ${endDate}`
+
+  return ""
+}
+
+function isSameDate(a: Date, b: Date) {
+  return formatDateValue(a) === formatDateValue(b)
 }
 
 function formatDateValue(date: Date) {

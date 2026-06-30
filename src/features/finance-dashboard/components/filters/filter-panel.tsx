@@ -13,7 +13,7 @@ import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
 import { describeTimeRange } from "../../model/date"
 import type { Dimensions, Filters } from "../../model/types"
 import { ChipGroup } from "./chip-group"
-import { DatePickerField } from "./date-picker-field"
+import { DateRangePickerField } from "./date-picker-field"
 import { QUICK_RANGES, TRANSACTION_TYPES } from "./filter-options"
 import { FilterRow } from "./filter-row"
 
@@ -76,27 +76,13 @@ export function FilterPanel({
             }}
           />
           <div className="flex flex-wrap items-center gap-2">
-            <DatePickerField
-              label="开始"
-              value={filters.startDate}
-              onChange={(startDate) =>
+            <DateRangePickerField
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+              onChange={({ startDate, endDate }) =>
                 onFiltersChange((current) => ({
                   ...current,
                   startDate,
-                  quickRange: ALL_RANGE,
-                  year: "",
-                }))
-              }
-            />
-            <span className="font-mono text-[10px] text-muted-foreground/50">
-              →
-            </span>
-            <DatePickerField
-              label="结束"
-              value={filters.endDate}
-              onChange={(endDate) =>
-                onFiltersChange((current) => ({
-                  ...current,
                   endDate,
                   quickRange: ALL_RANGE,
                   year: "",
