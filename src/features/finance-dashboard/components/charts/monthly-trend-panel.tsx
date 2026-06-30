@@ -32,7 +32,7 @@ export function MonthlyTrendPanel({
           <DialogTrigger
             render={<Button type="button" variant="outline" size="xs" />}
           >
-            打开月度复盘
+            查看月度复盘
           </DialogTrigger>
         }
       >
