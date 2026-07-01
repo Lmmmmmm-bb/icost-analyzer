@@ -190,18 +190,20 @@ export function FilterPanel({
           />
         </FilterRow>
 
-        <FilterRow label="账户">
-          <ChipGroup
-            title="账户"
-            items={dimensions.accounts}
-            value={filters.accounts}
-            showTitle={false}
-            onChange={(accounts) =>
-              onFiltersChange((current) => ({ ...current, accounts }))
-            }
-            limit={24}
-          />
-        </FilterRow>
+        {dimensions.accounts.length ? (
+          <FilterRow label="账户">
+            <ChipGroup
+              title="账户"
+              items={dimensions.accounts}
+              value={filters.accounts}
+              showTitle={false}
+              onChange={(accounts) =>
+                onFiltersChange((current) => ({ ...current, accounts }))
+              }
+              limit={24}
+            />
+          </FilterRow>
+        ) : null}
 
         <FilterRow label="分类">
           <ChipGroup
