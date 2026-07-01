@@ -2,6 +2,7 @@ import type { EChartsOption } from "echarts"
 
 import { dateKey } from "../../../model/date"
 import { formatMoney } from "../../../model/money"
+import type { HeatmapColorScaleMode } from "../types"
 import type { ChartTheme } from "./types"
 import {
   chartHairlineColor,
@@ -26,6 +27,36 @@ function fillYearHeatmap(year: string, heatmap: [string, number][]) {
   return daysInYear(year).map(
     (day) => [day, valueByDate.get(day) ?? 0] as [string, number]
   )
+}
+
+function getPercentile(values: number[], percentile: number) {
+  if (!values.length) return 0
+
+  const sorted = [...values].sort((a, b) => a - b)
+  const index = Math.min(
+    sorted.length - 1,
+    Math.floor((sorted.length - 1) * percentile)
+  )
+  return sorted[index]
+}
+
+function getHeatmapScaleValues(
+  heatmap: [string, number][],
+  scaleMode: HeatmapColorScaleMode
+) {
+  const values = heatmap.map((item) => item[1]).filter((value) => value > 0)
+  const actualMaxValue = Math.max(...values, 1)
+  const robustMaxValue = getPercentile(values, 0.95)
+  const colorMaxValue =
+    scaleMode === "robust" && robustMaxValue > 0
+      ? Math.min(robustMaxValue, actualMaxValue)
+      : actualMaxValue
+
+  return {
+    actualMaxValue,
+    colorMaxValue,
+    cappedDays: values.filter((value) => value > colorMaxValue).length,
+  }
 }
 
 export function createHeatmapOption(
@@ -76,9 +107,13 @@ export function createHeatmapOption(
 
 export function createHeatmapOptionsByYear(
   heatmap: [string, number][],
-  theme?: ChartTheme
+  theme?: ChartTheme,
+  scaleMode: HeatmapColorScaleMode = "robust"
 ) {
-  const maxValue = Math.max(...heatmap.map((item) => item[1]), 1)
+  const { actualMaxValue, cappedDays, colorMaxValue } = getHeatmapScaleValues(
+    heatmap,
+    scaleMode
+  )
   const groups = heatmap.reduce((map, item) => {
     const year = item[0].slice(0, 4)
     const group = map.get(year) ?? []
@@ -96,8 +131,11 @@ export function createHeatmapOptionsByYear(
           fillYearHeatmap(year, []),
           theme,
           year,
-          maxValue
+          colorMaxValue
         ),
+        cappedDays,
+        colorMaxValue,
+        actualMaxValue,
       },
     ]
   }
@@ -108,7 +146,10 @@ export function createHeatmapOptionsByYear(
       fillYearHeatmap(year, items),
       theme,
       year,
-      maxValue
+      colorMaxValue
     ),
+    cappedDays: items.filter((item) => item[1] > colorMaxValue).length,
+    colorMaxValue,
+    actualMaxValue,
   }))
 }

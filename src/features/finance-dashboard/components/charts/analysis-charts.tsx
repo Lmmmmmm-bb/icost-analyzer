@@ -18,6 +18,7 @@ import { DailyCashflowPanel } from "./daily-cashflow/daily-cashflow-panel"
 import { DistributionChartsGrid } from "./distribution-charts-grid"
 import { HeatmapPanel } from "./heatmap-panel"
 import { MonthlyTrendPanel } from "./monthly-trend-panel"
+import type { HeatmapColorScaleMode } from "./types"
 
 type AnalysisChartsProps = {
   data: DashboardChartData
@@ -40,6 +41,8 @@ export function AnalysisCharts({
 }: AnalysisChartsProps) {
   const { resolvedTheme } = useTheme()
   const [reviewOpen, setReviewOpen] = useState(false)
+  const [heatmapScaleMode, setHeatmapScaleMode] =
+    useState<HeatmapColorScaleMode>("robust")
   const monthlyOption = useMemo(
     () => createMonthlyOption(data.monthly, resolvedTheme),
     [data.monthly, resolvedTheme]
@@ -65,8 +68,9 @@ export function AnalysisCharts({
     [data.tagSummary, resolvedTheme]
   )
   const heatmapOptions = useMemo(
-    () => createHeatmapOptionsByYear(data.heatmap, resolvedTheme),
-    [data.heatmap, resolvedTheme]
+    () =>
+      createHeatmapOptionsByYear(data.heatmap, resolvedTheme, heatmapScaleMode),
+    [data.heatmap, heatmapScaleMode, resolvedTheme]
   )
   const categoryOptions = useMemo(
     () => ({ pieOption, rankingOption }),
@@ -102,7 +106,11 @@ export function AnalysisCharts({
         />
       </div>
 
-      <HeatmapPanel heatmapOptions={heatmapOptions} />
+      <HeatmapPanel
+        heatmapOptions={heatmapOptions}
+        scaleMode={heatmapScaleMode}
+        onScaleModeChange={setHeatmapScaleMode}
+      />
       <DailyCashflowPanel dailyCashflow={data.dailyCashflow} />
     </>
   )

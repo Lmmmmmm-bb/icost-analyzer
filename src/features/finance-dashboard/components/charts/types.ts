@@ -3,7 +3,12 @@ import type { EChartsOption } from "echarts"
 export type HeatmapChartOption = {
   year: string
   option: EChartsOption
+  cappedDays: number
+  colorMaxValue: number
+  actualMaxValue: number
 }
+
+export type HeatmapColorScaleMode = "robust" | "full"
 
 export type ChartPanelOptions = {
   monthlyOption: EChartsOption
