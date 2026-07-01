@@ -34,6 +34,7 @@ export const EMPTY_FILTERS: Filters = {
   types: [],
   currencies: [],
   categories: [],
+  accounts: [],
   tags: [],
   excludedTags: [],
   keyword: "",

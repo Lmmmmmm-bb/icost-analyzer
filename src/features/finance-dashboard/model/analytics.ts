@@ -47,9 +47,11 @@ export function summarizeBy(
 
 export function getDimensions(transactions: Transaction[]): Dimensions {
   const tags = transactions.flatMap((tx) => tx.tags)
+  const accounts = transactions.flatMap((tx) => [tx.account1, tx.account2])
   return {
     currencies: unique(transactions.map((tx) => tx.currency)),
     categories: unique(transactions.map((tx) => tx.category)),
+    accounts: unique(accounts.filter(Boolean)),
     tags: unique(tags),
     years: unique(
       transactions.map((tx) => String(tx.date.getFullYear()))

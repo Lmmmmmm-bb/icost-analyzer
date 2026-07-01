@@ -19,6 +19,8 @@ export type Transaction = {
   currency: string
   category: string
   subcategory: string
+  account1: string
+  account2: string
   note: string
   tags: string[]
   location: string
@@ -32,6 +34,7 @@ export type Filters = {
   types: string[]
   currencies: string[]
   categories: string[]
+  accounts: string[]
   tags: string[]
   excludedTags: string[]
   keyword: string
@@ -42,6 +45,7 @@ export type RateMap = Record<string, number>
 export type Dimensions = {
   currencies: string[]
   categories: string[]
+  accounts: string[]
   tags: string[]
   years: string[]
 }

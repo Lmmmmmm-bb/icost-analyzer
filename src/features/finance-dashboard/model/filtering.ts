@@ -37,6 +37,7 @@ export function filterTransactions(
   const categorySet = filters.categories.length
     ? new Set(filters.categories)
     : null
+  const accountSet = filters.accounts.length ? new Set(filters.accounts) : null
   const tagSet = filters.tags.length ? new Set(filters.tags) : null
   const excludedTagSet = filters.excludedTags.length
     ? new Set(filters.excludedTags)
@@ -50,6 +51,8 @@ export function filterTransactions(
           tx.note,
           tx.category,
           tx.subcategory,
+          tx.account1,
+          tx.account2,
           tx.tags.join(" "),
           tx.location,
           tx.currency,
@@ -64,9 +67,18 @@ export function filterTransactions(
       (!typeSet || typeSet.has(tx.type)) &&
       (!currencySet || currencySet.has(tx.currency)) &&
       (!categorySet || categorySet.has(tx.category)) &&
+      (!accountSet || matchesAccount(tx, accountSet)) &&
       (!tagSet || tx.tags.some((tag) => tagSet.has(tag))) &&
       !hasExcludedTag &&
       matchesKeyword
     )
   })
+}
+
+function matchesAccount(tx: Transaction, accountSet: Set<string>) {
+  if (tx.type === "转账") {
+    return accountSet.has(tx.account1) || accountSet.has(tx.account2)
+  }
+
+  return accountSet.has(tx.account1)
 }

@@ -14,6 +14,8 @@ type TransactionRowProps = {
 }
 
 export function TransactionRow({ transaction, rates }: TransactionRowProps) {
+  const accountText = formatTransactionAccount(transaction)
+
   return (
     <TableRow className="group/tx">
       <TableCell className="font-mono text-[11px] text-muted-foreground transition-colors group-hover/tx:text-foreground">
@@ -30,6 +32,9 @@ export function TransactionRow({ transaction, rates }: TransactionRowProps) {
       </TableCell>
       <TableCell>
         {transaction.category} / {transaction.subcategory}
+      </TableCell>
+      <TableCell className="max-w-48 truncate" title={accountText}>
+        {accountText}
       </TableCell>
       <TableCell
         className="max-w-80 truncate"
@@ -58,4 +63,16 @@ export function TransactionRow({ transaction, rates }: TransactionRowProps) {
       </TableCell>
     </TableRow>
   )
+}
+
+function formatTransactionAccount(transaction: Transaction) {
+  if (transaction.type === "转账") {
+    if (!transaction.account1 && !transaction.account2) return "未记录"
+
+    return `${transaction.account1 || "未记录"} → ${
+      transaction.account2 || "未记录"
+    }`
+  }
+
+  return transaction.account1 || "未记录"
 }

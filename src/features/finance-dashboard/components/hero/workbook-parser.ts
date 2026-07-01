@@ -66,6 +66,8 @@ export async function parseWorkbook(buffer: ArrayBuffer) {
         ).toUpperCase(),
         category: getCell(row, ["一级分类", "分类"]) || "未分类",
         subcategory: getCell(row, ["二级分类", "子分类"]) || "未分类",
+        account1: getCell(row, ["账户1", "账户", "支付账户"]),
+        account2: getCell(row, ["账户2", "收款账户"]),
         note: getCell(row, ["备注", "说明"]),
         tags,
         location: getCell(row, ["位置", "地点"]),

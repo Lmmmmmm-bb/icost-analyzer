@@ -82,6 +82,7 @@ export function TransactionTable({
               <TableHead>日期</TableHead>
               <TableHead>类型</TableHead>
               <TableHead>分类</TableHead>
+              <TableHead>账户</TableHead>
               <TableHead>备注 / 地点</TableHead>
               <TableHead>标签</TableHead>
               <TableHead>币种</TableHead>

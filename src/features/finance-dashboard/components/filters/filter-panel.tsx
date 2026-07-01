@@ -59,7 +59,7 @@ export function FilterPanel({
           <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
-          调整时间、类型、币种、分类、标签或关键词后，指标、图表和明细会同步刷新。
+          调整时间、类型、币种、账户、分类、标签或关键词后，指标、图表和明细会同步刷新。
         </CardDescription>
         <CardAction>
           <div className="flex items-center gap-2">
@@ -154,7 +154,7 @@ export function FilterPanel({
 
         <FilterRow label="关键词">
           <Input
-            placeholder="搜索备注、分类、标签、地点、币种……"
+            placeholder="搜索备注、分类、账户、标签、地点、币种……"
             className="bg-background/70"
             value={filters.keyword}
             onChange={(event) =>
@@ -187,6 +187,19 @@ export function FilterPanel({
             onChange={(currencies) =>
               onFiltersChange((current) => ({ ...current, currencies }))
             }
+          />
+        </FilterRow>
+
+        <FilterRow label="账户">
+          <ChipGroup
+            title="账户"
+            items={dimensions.accounts}
+            value={filters.accounts}
+            showTitle={false}
+            onChange={(accounts) =>
+              onFiltersChange((current) => ({ ...current, accounts }))
+            }
+            limit={24}
           />
         </FilterRow>
 
@@ -304,6 +317,7 @@ function getActiveFilterSummaries(filters: Filters): ActiveFilterSummary[] {
 
   appendListSummary(summaries, "类型", filters.types)
   appendListSummary(summaries, "币种", filters.currencies)
+  appendListSummary(summaries, "账户", filters.accounts)
   appendListSummary(summaries, "分类", filters.categories)
   appendListSummary(summaries, "包含标签", filters.tags)
   appendListSummary(summaries, "排除标签", filters.excludedTags)
