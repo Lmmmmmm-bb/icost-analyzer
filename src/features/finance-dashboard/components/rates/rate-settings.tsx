@@ -2,6 +2,7 @@ import { useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 import { BASE_CURRENCY, DEFAULT_RATES } from "../../model/constants"
 import { unique } from "../../model/collections"
@@ -43,6 +44,27 @@ function compareCurrencies(a: string, b: string) {
   if (bIndex >= 0) return 1
 
   return a.localeCompare(b)
+}
+
+function isLastGridRow(index: number, total: number, columns: number) {
+  return index >= Math.floor((total - 1) / columns) * columns
+}
+
+function hasRightGridBorder(index: number, columns: number) {
+  const position = index + 1
+
+  return position % columns !== 0
+}
+
+function getRateCellBorderClass(index: number, total: number) {
+  return cn(
+    "border-border/70",
+    index === total - 1 ? "border-b-0" : "border-b",
+    isLastGridRow(index, total, 2) ? "sm:border-b-0" : "sm:border-b",
+    isLastGridRow(index, total, 5) ? "lg:border-b-0" : "lg:border-b",
+    hasRightGridBorder(index, 2) ? "sm:border-r" : "sm:border-r-0",
+    hasRightGridBorder(index, 5) ? "lg:border-r" : "lg:border-r-0"
+  )
 }
 
 type RateSettingsProps = {
@@ -95,8 +117,8 @@ export function RateSettings({
       }
       contentClassName="p-0"
     >
-      <div className="grid border-t border-l border-border/70 sm:grid-cols-2 lg:grid-cols-5">
-        {currencies.map((currency) => {
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5">
+        {currencies.map((currency, index) => {
           const raw = rateInputs[currency] ?? ""
           const value = Number(raw)
           const isBaseCurrency = currency === BASE_CURRENCY
@@ -105,15 +127,25 @@ export function RateSettings({
           return (
             <label
               key={currency}
-              className="group/rate-cell flex flex-col gap-2 border-r border-b border-border/70 px-3 py-2.5 transition-colors hover:bg-muted/35"
+              className={cn(
+                "group/rate-cell flex flex-col gap-2 px-3 py-2.5 transition-colors hover:bg-muted/35",
+                getRateCellBorderClass(index, currencies.length)
+              )}
             >
-              <span className="inline-flex items-baseline gap-2">
-                <span className="font-mono text-[11px] tracking-[0.1em] text-foreground uppercase">
-                  {currency}
+              <span className="flex items-baseline justify-between gap-3">
+                <span className="inline-flex min-w-0 items-baseline gap-2">
+                  <span className="font-mono text-[11px] tracking-[0.1em] text-foreground uppercase">
+                    {currency}
+                  </span>
+                  <span className="truncate text-[11px] text-muted-foreground/70">
+                    {CURRENCY_LABELS[currency] ?? "外币"}
+                  </span>
                 </span>
-                <span className="text-[11px] text-muted-foreground/70">
-                  {CURRENCY_LABELS[currency] ?? "外币"}
-                </span>
+                {isBaseCurrency ? (
+                  <span className="shrink-0 font-mono text-[10px] tracking-[0.14em] text-muted-foreground/55 uppercase">
+                    固定
+                  </span>
+                ) : null}
               </span>
               <span className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 text-xs text-muted-foreground">
                 <span className="font-mono tracking-[0.08em] text-foreground uppercase">

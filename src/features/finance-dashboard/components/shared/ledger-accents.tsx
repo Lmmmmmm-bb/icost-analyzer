@@ -33,7 +33,10 @@ export function LedgerEdgeNotch({ className }: LedgerAccentProps) {
   return (
     <span
       aria-hidden="true"
-      className={cn("pointer-events-none absolute size-7", className)}
+      className={cn(
+        "pointer-events-none absolute size-7 transition-opacity duration-300",
+        className
+      )}
     >
       <span className="absolute inset-x-0 top-0 h-px bg-border/75" />
       <span className="absolute top-0 bottom-0 left-0 w-px bg-border/75" />

@@ -15,6 +15,7 @@ type MetricItem = {
   label: string
   value: string
   caption?: string
+  marker?: string
 }
 
 export function HeroMetrics({
@@ -27,21 +28,25 @@ export function HeroMetrics({
       label: "总支出",
       value: formatMoney(stats.totalExpense),
       caption: `${stats.expenseCount} 笔支出`,
+      marker: "OUT",
     },
     {
       label: "总收入",
       value: formatMoney(stats.totalIncome),
       caption: "不包含转账",
+      marker: "IN",
     },
     {
       label: "净结余",
       value: formatMoney(stats.net),
       caption: "总收入 - 总支出",
+      marker: "NET",
     },
     {
       label: "交易笔数",
       value: `${stats.count} 笔`,
       caption: "当前筛选后的交易总数",
+      marker: "TX",
     },
   ]
   const secondaryMetrics: MetricItem[] = [
@@ -66,6 +71,14 @@ export function HeroMetrics({
               className="group/metric relative flex flex-col gap-2 bg-background/35 p-4 transition-colors hover:bg-muted/35"
             >
               <LedgerCornerGrid className="top-3 right-3 opacity-0 group-hover/metric:opacity-45" />
+              {metric.marker ? (
+                <div
+                  aria-hidden="true"
+                  className="absolute right-3 bottom-3 font-mono text-5xl leading-none font-semibold tracking-[-0.12em] text-foreground opacity-[0.045] transition-opacity select-none group-hover/metric:opacity-[0.075]"
+                >
+                  {metric.marker}
+                </div>
+              ) : null}
               <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
                 {metric.label}
               </div>
