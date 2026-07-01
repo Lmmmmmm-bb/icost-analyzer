@@ -2,8 +2,14 @@ import { useMemo, useState } from "react"
 
 import { useTheme } from "@/components/theme-provider"
 
-import type { DashboardChartData } from "../../model/analytics-types"
-import { type RankLevel } from "../../model/dashboard-controls"
+import type {
+  DashboardChartData,
+  SummaryItem,
+} from "../../model/analytics-types"
+import {
+  type AccountSort,
+  type RankLevel,
+} from "../../model/dashboard-controls"
 import {
   createCurrencyOption,
   createHeatmapOptionsByYear,
@@ -13,6 +19,7 @@ import {
   createTagOption,
   createWeekOption,
 } from "./chart-options"
+import { AccountAnalysisGrid } from "./account-analysis-grid"
 import { CategoryAnalysisGrid } from "./category-analysis-grid"
 import { DailyCashflowPanel } from "./daily-cashflow/daily-cashflow-panel"
 import { DistributionChartsGrid } from "./distribution-charts-grid"
@@ -22,21 +29,29 @@ import type { HeatmapColorScaleMode } from "./types"
 
 type AnalysisChartsProps = {
   data: DashboardChartData
+  accountRows: SummaryItem[]
   drillCategory: string
   rankLevel: RankLevel
+  accountSort: AccountSort
   onApplyMonth: (month: string) => void
   onDrillCategoryChange: (category: string) => void
   onRankLevelChange: (level: RankLevel) => void
+  onAccountSortChange: (sort: AccountSort) => void
+  onAccountSelect: (account: string) => void
   onTagSelect: (tag: string) => void
 }
 
 export function AnalysisCharts({
   data,
+  accountRows,
   drillCategory,
   rankLevel,
+  accountSort,
   onApplyMonth,
   onDrillCategoryChange,
   onRankLevelChange,
+  onAccountSortChange,
+  onAccountSelect,
   onTagSelect,
 }: AnalysisChartsProps) {
   const { resolvedTheme } = useTheme()
@@ -54,6 +69,10 @@ export function AnalysisCharts({
   const rankingOption = useMemo(
     () => createRankingOption(data.ranking, resolvedTheme),
     [data.ranking, resolvedTheme]
+  )
+  const accountOption = useMemo(
+    () => createPieOption(data.accountSummary, resolvedTheme),
+    [data.accountSummary, resolvedTheme]
   )
   const currencyOption = useMemo(
     () => createCurrencyOption(data.currencySummary, resolvedTheme),
@@ -99,6 +118,16 @@ export function AnalysisCharts({
           onDrillCategoryChange={onDrillCategoryChange}
           onRankLevelChange={onRankLevelChange}
         />
+
+        {data.accountSummary.length ? (
+          <AccountAnalysisGrid
+            option={accountOption}
+            rows={accountRows}
+            sort={accountSort}
+            onSortChange={onAccountSortChange}
+            onAccountSelect={onAccountSelect}
+          />
+        ) : null}
 
         <DistributionChartsGrid
           options={distributionOptions}

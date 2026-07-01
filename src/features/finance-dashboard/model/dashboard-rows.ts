@@ -1,6 +1,7 @@
 import type { SummaryItem } from "./analytics-types"
 import { toRmb } from "./money"
 import type {
+  AccountSort,
   DetailSort,
   SummarySort,
   TagSort,
@@ -45,6 +46,13 @@ export function sortTagSummaryRows(rows: SummaryItem[], sort: TagSort) {
   return [...rows].sort((a, b) => {
     if (sort === "count") return b.count - a.count
     if (sort === "days") return b.days.size - a.days.size
+    return b.amount - a.amount
+  })
+}
+
+export function sortAccountSummaryRows(rows: SummaryItem[], sort: AccountSort) {
+  return [...rows].sort((a, b) => {
+    if (sort === "count") return b.count - a.count
     return b.amount - a.amount
   })
 }

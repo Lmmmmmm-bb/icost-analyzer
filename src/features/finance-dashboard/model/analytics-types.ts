@@ -121,6 +121,7 @@ export type DashboardChartData = {
   monthly: MonthlyItem[]
   categoryPie: SummaryItem[]
   ranking: SummaryItem[]
+  accountSummary: SummaryItem[]
   currencySummary: SummaryItem[]
   weekSummary: WeekItem[]
   tagSummary: SummaryItem[]

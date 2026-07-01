@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 
 import {
+  type AccountSort,
   RANK_LEVELS,
   type DetailSort,
   type RankLevel,
@@ -9,6 +10,7 @@ import {
 } from "../model/dashboard-controls"
 import {
   paginateRows,
+  sortAccountSummaryRows,
   sortCategorySummaryRows,
   sortDetailRows,
   sortTagSummaryRows,
@@ -44,6 +46,7 @@ type DashboardAnalysisParams = {
   rankLevel: RankLevel
   summarySort: SummarySort
   tagSort: TagSort
+  accountSort: AccountSort
   detailSort: DetailSort
   page: number
   pageSize: number
@@ -57,6 +60,7 @@ export function useDashboardAnalysis({
   rankLevel,
   summarySort,
   tagSort,
+  accountSort,
   detailSort,
   page,
   pageSize,
@@ -165,6 +169,15 @@ export function useDashboardAnalysis({
     () => summarizeBy(filtered, rates, (tx) => tx.currency),
     [filtered, rates]
   )
+  const accountSummary = useMemo(
+    () =>
+      summarizeBy(
+        filtered.filter((tx) => tx.account1),
+        rates,
+        (tx) => tx.account1
+      ),
+    [filtered, rates]
+  )
   const weekSummary = useMemo(
     () => getWeekSummary(filtered, rates),
     [filtered, rates]
@@ -214,6 +227,7 @@ export function useDashboardAnalysis({
       monthly,
       categoryPie,
       ranking,
+      accountSummary,
       currencySummary,
       weekSummary,
       tagSummary,
@@ -222,6 +236,7 @@ export function useDashboardAnalysis({
     }),
     [
       categoryPie,
+      accountSummary,
       currencySummary,
       dailyCashflow,
       heatmap,
@@ -239,6 +254,10 @@ export function useDashboardAnalysis({
   const sortedTagRows = useMemo(
     () => sortTagSummaryRows(tagSummary, tagSort),
     [tagSort, tagSummary]
+  )
+  const sortedAccountRows = useMemo(
+    () => sortAccountSummaryRows(accountSummary, accountSort),
+    [accountSort, accountSummary]
   )
 
   return {
@@ -258,5 +277,6 @@ export function useDashboardAnalysis({
     chartData,
     sortedCategoryRows,
     sortedTagRows,
+    sortedAccountRows,
   }
 }

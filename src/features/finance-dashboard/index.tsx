@@ -10,6 +10,7 @@ import { useFileDrop } from "./components/hero/use-file-drop"
 import { WorkspaceDropOverlay } from "./components/hero/workspace-drop-overlay"
 import { WorkspaceHero } from "./components/hero/workspace-hero"
 import {
+  type AccountSort,
   RANK_LEVELS,
   type DetailSort,
   type RankLevel,
@@ -65,6 +66,7 @@ export function FinanceDashboard() {
   const [rankLevel, setRankLevel] = useState<RankLevel>(RANK_LEVELS[0])
   const [summarySort, setSummarySort] = useState<SummarySort>("amount")
   const [tagSort, setTagSort] = useState<TagSort>("amount")
+  const [accountSort, setAccountSort] = useState<AccountSort>("amount")
   const [detailSort, setDetailSort] = useState<DetailSort>("date")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -86,6 +88,7 @@ export function FinanceDashboard() {
     chartData,
     sortedCategoryRows,
     sortedTagRows,
+    sortedAccountRows,
   } = useDashboardAnalysis({
     transactions,
     filters,
@@ -94,6 +97,7 @@ export function FinanceDashboard() {
     rankLevel,
     summarySort,
     tagSort,
+    accountSort,
     detailSort,
     page,
     pageSize,
@@ -105,6 +109,7 @@ export function FinanceDashboard() {
     setRankLevel(RANK_LEVELS[0])
     setSummarySort("amount")
     setTagSort("amount")
+    setAccountSort("amount")
     setDetailSort("date")
     setPage(1)
   }, [])
@@ -157,6 +162,9 @@ export function FinanceDashboard() {
   const selectCategory = useCallback((category: string) => {
     setFilters((current) => ({ ...current, categories: [category] }))
   }, [])
+  const selectAccount = useCallback((account: string) => {
+    setFilters((current) => ({ ...current, accounts: [account] }))
+  }, [])
 
   return (
     <main
@@ -170,9 +178,7 @@ export function FinanceDashboard() {
         <EntryHero uploadState={uploadState} onUpload={uploadWorkbook} />
       ) : (
         <Suspense fallback={null}>
-          <div
-            className="ledger-stagger-stack relative mx-auto flex min-h-svh max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:gap-6 lg:px-10 lg:py-6"
-          >
+          <div className="ledger-stagger-stack relative mx-auto flex min-h-svh max-w-7xl flex-col gap-5 px-5 py-5 md:px-8 lg:gap-6 lg:px-10 lg:py-6">
             {isWorkspaceDragging ? <WorkspaceDropOverlay /> : null}
             {uploadState.showParsingStatus ? (
               <ParsingStatusOverlay
@@ -214,11 +220,15 @@ export function FinanceDashboard() {
               <>
                 <AnalysisCharts
                   data={chartData}
+                  accountRows={sortedAccountRows}
                   drillCategory={drillCategory}
                   rankLevel={rankLevel}
+                  accountSort={accountSort}
                   onApplyMonth={applyMonth}
                   onDrillCategoryChange={setDrillCategory}
                   onRankLevelChange={setRankLevel}
+                  onAccountSortChange={setAccountSort}
+                  onAccountSelect={selectAccount}
                   onTagSelect={selectTag}
                 />
 
