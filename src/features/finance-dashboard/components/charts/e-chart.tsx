@@ -50,19 +50,29 @@ export function EChart({ option, className = "h-72", onClick }: EChartProps) {
   useEffect(() => {
     if (!ref.current) return
 
-    const chart = init(ref.current, undefined, { renderer: "svg" })
+    const chartElement = ref.current
+    const chart = init(chartElement, undefined, { renderer: "svg" })
     chartRef.current = chart
     chart.setOption(optionRef.current, true)
     const handleClick = (params: ECharts.ECElementEvent) => {
       onClickRef.current?.(params)
     }
+    const hideTooltip = () => {
+      chart.dispatchAction({ type: "hideTip" })
+    }
+
     chart.on("click", handleClick)
+    chart.getZr().on("globalout", hideTooltip)
+    chartElement.addEventListener("pointerleave", hideTooltip)
     const resize = () => chart.resize()
     window.addEventListener("resize", resize)
 
     return () => {
       window.removeEventListener("resize", resize)
       chart.off("click", handleClick)
+      chart.getZr().off("globalout", hideTooltip)
+      chartElement.removeEventListener("pointerleave", hideTooltip)
+      hideTooltip()
       chart.dispose()
       chartRef.current = null
     }
