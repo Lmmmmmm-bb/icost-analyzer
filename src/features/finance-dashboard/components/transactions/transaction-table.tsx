@@ -17,6 +17,11 @@ import {
 
 import type { DetailSort } from "../../model/dashboard-controls"
 import type { RateMap, Transaction } from "../../model/types"
+import {
+  LedgerCornerGrid,
+  LedgerEdgeNotch,
+  LedgerTitleTicks,
+} from "../shared/ledger-accents"
 import { TransactionPagination } from "./transaction-pagination"
 import { TransactionRow } from "./transaction-row"
 import { TransactionTableControls } from "./transaction-table-controls"
@@ -49,10 +54,12 @@ export function TransactionTable({
   return (
     <Card className="relative gap-0 py-0 transition-all duration-300 hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-ledger-chart-hover motion-reduce:hover:translate-y-0">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
+      <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-70" />
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
           <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
           交易明细
+          <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
           共 {rows.length} 条匹配记录，外币保留原币金额，并展示人民币折算金额。
@@ -67,7 +74,8 @@ export function TransactionTable({
           />
         </CardAction>
       </CardHeader>
-      <CardContent className="flex flex-col gap-0 px-0">
+      <CardContent className="relative flex flex-col gap-0 px-0">
+        <LedgerCornerGrid className="right-3 bottom-14 opacity-20 group-hover/card:opacity-45" />
         <Table>
           <TableHeader>
             <TableRow>

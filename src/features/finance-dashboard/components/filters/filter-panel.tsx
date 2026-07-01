@@ -16,6 +16,11 @@ import { ChipGroup } from "./chip-group"
 import { DateRangePickerField } from "./date-picker-field"
 import { QUICK_RANGES, TRANSACTION_TYPES } from "./filter-options"
 import { FilterRow } from "./filter-row"
+import {
+  LedgerCornerGrid,
+  LedgerEdgeNotch,
+  LedgerTitleTicks,
+} from "../shared/ledger-accents"
 
 type FilterPanelProps = {
   filters: Filters
@@ -33,10 +38,12 @@ export function FilterPanel({
   return (
     <Card className="relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
+      <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-70" />
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
           <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
           筛选
+          <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
           调整时间、类型、币种、分类、标签或关键词后，指标、图表和明细会同步刷新。
@@ -54,7 +61,8 @@ export function FilterPanel({
           </Button>
         </CardAction>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent className="relative px-0">
+        <LedgerCornerGrid className="right-3 bottom-3 opacity-20 group-hover/card:opacity-45" />
         <FilterRow label="时间" contentClassName="flex flex-col gap-3" inline>
           <div className="grid gap-2.5">
             <ChipGroup

@@ -6,6 +6,7 @@ import { UploadCard } from "./upload-card"
 import { useFileDrop } from "./use-file-drop"
 import type { WorkbookUploadState } from "./use-workbook-upload"
 import { DropOverlay } from "./workspace-drop-overlay"
+import { LedgerCornerGrid } from "../shared/ledger-accents"
 
 const ENTRY_STEPS = [
   ["01", "拖入 iCost 导出的 Excel"],
@@ -65,6 +66,7 @@ function EntrySteps() {
           style={{ animationDelay: `${140 + index * 70}ms` }}
         >
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+          <LedgerCornerGrid className="top-3 right-3 opacity-0 group-hover:opacity-45" />
           <div className="font-mono text-[10px] tracking-[0.22em] text-muted-foreground uppercase">
             Step {step}
           </div>

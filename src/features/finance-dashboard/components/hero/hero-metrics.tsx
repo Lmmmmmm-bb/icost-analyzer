@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 import type { MetricStats, PeriodComparison } from "../../model/analytics-types"
 import { formatMoney } from "../../model/money"
+import { LedgerCornerGrid, LedgerEdgeNotch } from "../shared/ledger-accents"
 import { CollapsibleComparisonSection } from "./metrics-comparison/collapsible-comparison-section"
 
 type HeroMetricsProps = {
@@ -56,6 +57,7 @@ export function HeroMetrics({
   return (
     <Card className="relative gap-0 overflow-hidden bg-card/90 py-0 shadow-ledger-panel backdrop-blur-xl">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
+      <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-70" />
       <CardContent className="p-0">
         <div className="grid divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {primaryMetrics.map((metric) => (
@@ -63,6 +65,7 @@ export function HeroMetrics({
               key={metric.label}
               className="group/metric relative flex flex-col gap-2 bg-background/35 p-4 transition-colors hover:bg-muted/35"
             >
+              <LedgerCornerGrid className="top-3 right-3 opacity-0 group-hover/metric:opacity-45" />
               <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
                 {metric.label}
               </div>

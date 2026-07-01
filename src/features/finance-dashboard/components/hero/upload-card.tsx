@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 
 import { ParsingFileName, ParsingMark, ParsingSweep } from "./parsing-status"
+import { LedgerEdgeNotch, LedgerTitleTicks } from "../shared/ledger-accents"
 import type { WorkbookUploadState } from "./use-workbook-upload"
 
 type UploadCardProps = {
@@ -38,10 +39,12 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
         className="absolute -top-10 -right-10 size-28 rotate-12 border border-border/60 bg-background/35 transition-transform duration-500 group-hover/upload:rotate-6"
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
+      <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-70" />
       <CardHeader className="relative border-b border-border/70 p-5">
         <CardTitle className="flex items-center gap-2">
           <span className="size-2 bg-primary shadow-ledger-glow-primary" />
           {showParsingStatus ? "正在解析账本" : "整页拖拽导入"}
+          <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
           {showParsingStatus
