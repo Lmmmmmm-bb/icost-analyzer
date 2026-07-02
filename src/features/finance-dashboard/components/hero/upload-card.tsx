@@ -10,10 +10,17 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { RiFileChartLine } from "@remixicon/react"
 
 import { ParsingFileName, ParsingMark, ParsingSweep } from "./parsing-status"
 import { LedgerEdgeNotch, LedgerTitleTicks } from "../shared/ledger-accents"
 import type { WorkbookUploadState } from "./use-workbook-upload"
+
+const UPLOAD_FACTS = [
+  ["文件类型", ".xlsx / .xls"],
+  ["处理位置", "当前浏览器"],
+  ["数据保留", "仅当前会话"],
+] as const
 
 type UploadCardProps = {
   uploadState: WorkbookUploadState
@@ -43,23 +50,21 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
       <CardHeader className="relative border-b border-border/70 p-5">
         <CardTitle className="flex items-center gap-2">
           <span className="size-2 bg-primary shadow-ledger-glow-primary" />
-          {showParsingStatus ? "正在解析账本" : "整页拖拽导入"}
+          {showParsingStatus ? "正在解析账本" : "导入账单文件"}
           <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
           {showParsingStatus
-            ? "Excel 文件越大，本地解析越需要一点时间，请保持当前页面打开。"
-            : "右侧面板仅作提示与手动选择；把文件拖到页面任意位置即可本地解析。"}
+            ? "文件越大，本地解析越需要一点时间，请保持当前页面打开。"
+            : "把文件拖到页面任意位置，或在这里选择文件，解析完成后直接进入分析看板。"}
         </CardDescription>
       </CardHeader>
       <CardContent className="relative flex flex-col gap-3 p-5">
         <button
           type="button"
-          className="relative flex min-h-44 cursor-pointer flex-col items-start justify-between overflow-hidden border border-dashed border-border/80 bg-background/65 p-5 text-left transition-all duration-300 hover:border-foreground/45 hover:bg-muted/45 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-wait disabled:hover:border-border/80 disabled:hover:bg-background/65"
+          className="relative flex min-h-44 cursor-pointer flex-col items-start justify-between gap-4 overflow-hidden border border-dashed border-border/80 bg-background/65 p-5 text-left transition-all duration-300 hover:border-foreground/45 hover:bg-muted/45 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-wait disabled:hover:border-border/80 disabled:hover:bg-background/65"
           aria-label={
-            isParsing
-              ? "正在解析 iCost Excel 文件"
-              : "拖拽到页面任意位置，或点击选择 iCost Excel 文件进行本地解析"
+            isParsing ? "正在解析账单文件" : "选择或拖入账单文件进行本地解析"
           }
           aria-busy={isParsing}
           disabled={isParsing}
@@ -69,36 +74,32 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
         >
           <span
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/40 to-transparent"
-          />
-          <span
-            aria-hidden="true"
             className="absolute right-4 bottom-12 h-16 w-16 border border-border/60 bg-card/55 transition-transform duration-500 group-hover/upload:-translate-y-1"
           />
           <span className="flex w-full items-start justify-between gap-4">
-            <span className="flex flex-col gap-2">
-              <span className="font-heading text-xl leading-none font-semibold tracking-[-0.025em]">
-                {showParsingStatus ? "正在拆解 Excel" : "拖入页面任意位置"}
+            <span className="flex flex-col gap-3">
+              <span className="font-heading text-xl leading-none font-semibold">
+                {showParsingStatus ? "正在拆解文件" : "选择或拖入文件"}
               </span>
               <span className="text-sm leading-6 text-muted-foreground">
                 {showParsingStatus
                   ? "我们正在读取工作簿、识别交易行，并重建分类、标签与币种维度。"
-                  : "将 iCost Excel 拖进当前页面即可本地解析；也可以点击这里选择文件。"}
+                  : "解析会在本页完成，不需要上传到远端；完成后即可查看图表、汇总与明细。"}
               </span>
             </span>
             <span className="relative grid size-12 shrink-0 place-items-center overflow-hidden border bg-primary font-mono text-xs text-primary-foreground shadow-ledger-tag transition-transform duration-300 group-hover/upload:-rotate-3">
               {showParsingStatus ? (
                 <ParsingMark className="border-primary-foreground/70" />
               ) : (
-                "XLS"
+                <RiFileChartLine aria-hidden="true" />
               )}
             </span>
           </span>
           {showParsingStatus ? (
             <span className="flex w-full flex-col gap-2">
               <span className="flex items-center justify-between gap-3 font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
-                <span>Local parser</span>
-                <span>Working</span>
+                <span>本地解析</span>
+                <span>进行中</span>
               </span>
               <span
                 aria-hidden="true"
@@ -107,13 +108,22 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
                 <span className="ledger-parse-bar absolute inset-y-0 left-0 w-1/2 bg-primary" />
               </span>
             </span>
-          ) : (
-            <span className="grid w-full grid-cols-3 border border-border/70 bg-card/75 text-center font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
-              <span className="border-r border-border/70 py-2">Page</span>
-              <span className="border-r border-border/70 py-2">Drop</span>
-              <span className="py-2">Analyze</span>
-            </span>
-          )}
+          ) : null}
+          <span className="grid w-full border border-border/70 bg-card/75 text-left sm:grid-cols-3">
+            {UPLOAD_FACTS.map(([label, value]) => (
+              <span
+                key={label}
+                className="flex flex-col gap-1 border-b border-border/70 px-3 py-2 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              >
+                <span className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
+                  {label}
+                </span>
+                <span className="text-xs font-medium">
+                  {showParsingStatus && label === "数据保留" ? "解析中" : value}
+                </span>
+              </span>
+            ))}
+          </span>
         </button>
         <Input
           ref={inputRef}
@@ -121,20 +131,13 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
           accept=".xlsx,.xls"
           className="sr-only"
           tabIndex={-1}
-          aria-label="选择 iCost Excel 文件"
+          aria-label="选择账单文件"
           disabled={isParsing}
           onChange={(event) => {
             uploadFile(event.target.files?.[0])
             event.currentTarget.value = ""
           }}
         />
-        <div className="grid grid-cols-3 border border-border/70 bg-background/45 text-center font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
-          <span className="border-r border-border/70 py-2">XLSX</span>
-          <span className="border-r border-border/70 py-2">Local</span>
-          <span className="py-2">
-            {showParsingStatus ? "Parsing" : "Realtime"}
-          </span>
-        </div>
         {showParsingStatus ? (
           <div
             role="status"
@@ -154,7 +157,7 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
                   variant="secondary"
                   className="shrink-0 font-mono uppercase"
                 >
-                  Busy
+                  解析中
                 </Badge>
               </div>
               <ParsingFileName
