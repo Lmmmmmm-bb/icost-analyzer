@@ -27,11 +27,13 @@
 
 - `README.md` is the public entry point for the project. Keep it friendly to
   non-internal users and update it whenever product behavior, supported iCost
-  export fields, commands, privacy boundaries, or contribution expectations
-  change.
-- Treat the README as user documentation first, not an implementation tour.
-  Lead with what the project does, how to use it, privacy expectations, and
-  supported iCost export fields before local development details.
+  export fields, privacy boundaries, or contribution expectations change.
+- Treat the README as user documentation only, not an implementation tour or
+  developer setup guide. Do not add local development commands, package manager
+  instructions, framework notes, source-file walkthroughs, or internal
+  architecture details to README.md.
+- Put engineering setup, command references, and codebase guidance in
+  `AGENTS.md` or a dedicated contributor document instead of the README.
 - Public-facing documentation should default to Simplified Chinese unless the
   user asks for another language. Technical agent guidance in `AGENTS.md` may
   remain in English for tool compatibility and precision.
@@ -43,7 +45,7 @@
   telemetry, cloud parsing, live exchange-rate fetching, or account features
   without an explicit product decision and matching README/UI disclosure.
 - If a product change affects parsing rules, analytics semantics, exchange-rate
-  behavior, persistence, browser storage, supported commands, or expected user
+  behavior, persistence, browser storage, privacy boundaries, or expected user
   workflow, update README.md in the same change.
 - Use fictional, anonymized, or generated examples only. Never add real finance
   exports, private screenshots, personal categories, or sensitive sample data to
