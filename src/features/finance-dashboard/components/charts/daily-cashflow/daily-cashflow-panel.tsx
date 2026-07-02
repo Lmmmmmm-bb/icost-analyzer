@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { zhCN } from "react-day-picker/locale"
 
@@ -21,6 +21,7 @@ export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
   )
   const latestCashflow = dailyCashflow.at(-1)
   const [selectedCashflowDay, setSelectedCashflowDay] = useState("")
+  const [visibleMonth, setVisibleMonth] = useState<Date | undefined>()
   const safeSelectedCashflowDay = dailyCashflowByDay.has(selectedCashflowDay)
     ? selectedCashflowDay
     : latestCashflow?.day
@@ -30,6 +31,19 @@ export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
   const selectedCashflow = safeSelectedCashflowDay
     ? dailyCashflowByDay.get(safeSelectedCashflowDay)
     : undefined
+
+  useEffect(() => {
+    if (!latestCashflow) {
+      setSelectedCashflowDay("")
+      setVisibleMonth(undefined)
+      return
+    }
+
+    if (dailyCashflowByDay.has(selectedCashflowDay)) return
+
+    setSelectedCashflowDay(latestCashflow.day)
+    setVisibleMonth(latestCashflow.date)
+  }, [dailyCashflowByDay, latestCashflow, selectedCashflowDay])
 
   return (
     <DashboardPanel
@@ -46,7 +60,8 @@ export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
               setSelectedCashflowDay(date ? dateKey(date) : "")
             }
             locale={zhCN}
-            defaultMonth={selectedCashflowDate}
+            month={visibleMonth ?? selectedCashflowDate}
+            onMonthChange={setVisibleMonth}
             numberOfMonths={1}
             showOutsideDays={false}
             disabled={(date) => !dailyCashflowByDay.has(dateKey(date))}
