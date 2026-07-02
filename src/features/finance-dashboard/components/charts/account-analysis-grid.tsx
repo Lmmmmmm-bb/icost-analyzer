@@ -1,5 +1,6 @@
 import type { EChartsOption } from "echarts"
 
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -32,24 +33,39 @@ type AccountAnalysisGridProps = {
   option: EChartsOption
   rows: SummaryItem[]
   sort: AccountSort
+  activeAccounts: string[]
   onSortChange: (sort: AccountSort) => void
   onAccountSelect: (account: string) => void
+  onResetAccounts: () => void
 }
 
 export function AccountAnalysisGrid({
   option,
   rows,
   sort,
+  activeAccounts,
   onSortChange,
   onAccountSelect,
+  onResetAccounts,
 }: AccountAnalysisGridProps) {
   const expenseTotal = rows.reduce((sum, item) => sum + item.amount, 0) || 1
+  const hasAccountFilter = activeAccounts.length > 0
+  const accountDescription = hasAccountFilter
+    ? `正在查看「${activeAccounts.join("、")}」的账户支出。`
+    : "按账户1汇总有账户记录的支出交易。"
+  const renderResetAction = () =>
+    hasAccountFilter ? (
+      <Button variant="outline" size="xs" onClick={onResetAccounts}>
+        返回全部账户
+      </Button>
+    ) : null
 
   return (
     <div className="grid gap-6 xl:grid-cols-2">
       <DashboardPanel
         title="账户支出分布"
-        description="按账户1汇总有账户记录的支出交易。"
+        description={accountDescription}
+        action={renderResetAction()}
       >
         <EChart
           option={option}
@@ -62,24 +78,27 @@ export function AccountAnalysisGrid({
         description="点击行可按账户筛选明细、指标和图表。"
         contentClassName="p-0"
         action={
-          <Select
-            items={ACCOUNT_SORT_OPTIONS}
-            value={sort}
-            onValueChange={(value) => onSortChange(value as AccountSort)}
-          >
-            <SelectTrigger size="sm" className="w-[7.75rem]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectGroup>
-                {ACCOUNT_SORT_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap justify-end gap-2">
+            {renderResetAction()}
+            <Select
+              items={ACCOUNT_SORT_OPTIONS}
+              value={sort}
+              onValueChange={(value) => onSortChange(value as AccountSort)}
+            >
+              <SelectTrigger size="sm" className="w-[7.75rem]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectGroup>
+                  {ACCOUNT_SORT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         }
       >
         <AccountSummaryTable

@@ -33,11 +33,13 @@ type AnalysisChartsProps = {
   drillCategory: string
   rankLevel: RankLevel
   accountSort: AccountSort
+  activeAccounts: string[]
   onApplyMonth: (month: string) => void
   onDrillCategoryChange: (category: string) => void
   onRankLevelChange: (level: RankLevel) => void
   onAccountSortChange: (sort: AccountSort) => void
   onAccountSelect: (account: string) => void
+  onResetAccounts: () => void
   onTagSelect: (tag: string) => void
 }
 
@@ -47,11 +49,13 @@ export function AnalysisCharts({
   drillCategory,
   rankLevel,
   accountSort,
+  activeAccounts,
   onApplyMonth,
   onDrillCategoryChange,
   onRankLevelChange,
   onAccountSortChange,
   onAccountSelect,
+  onResetAccounts,
   onTagSelect,
 }: AnalysisChartsProps) {
   const { resolvedTheme } = useTheme()
@@ -124,8 +128,10 @@ export function AnalysisCharts({
             option={accountOption}
             rows={accountRows}
             sort={accountSort}
+            activeAccounts={activeAccounts}
             onSortChange={onAccountSortChange}
             onAccountSelect={onAccountSelect}
+            onResetAccounts={onResetAccounts}
           />
         ) : null}
 

@@ -94,6 +94,9 @@ export function useDashboardController() {
   const selectAccount = useCallback((account: string) => {
     setFilters((current) => ({ ...current, accounts: [account] }))
   }, [])
+  const resetAccountFilter = useCallback(() => {
+    setFilters((current) => ({ ...current, accounts: [] }))
+  }, [])
 
   return {
     transactions,
@@ -129,6 +132,7 @@ export function useDashboardController() {
     selectTag,
     selectCategory,
     selectAccount,
+    resetAccountFilter,
   }
 }
 

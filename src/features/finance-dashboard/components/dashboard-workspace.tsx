@@ -107,11 +107,13 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
               drillCategory={dashboard.drillCategory}
               rankLevel={dashboard.rankLevel}
               accountSort={dashboard.accountSort}
+              activeAccounts={dashboard.filters.accounts}
               onApplyMonth={dashboard.applyMonth}
               onDrillCategoryChange={dashboard.setDrillCategory}
               onRankLevelChange={dashboard.setRankLevel}
               onAccountSortChange={dashboard.setAccountSort}
               onAccountSelect={dashboard.selectAccount}
+              onResetAccounts={dashboard.resetAccountFilter}
               onTagSelect={dashboard.selectTag}
             />
 
