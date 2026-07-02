@@ -101,6 +101,18 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
 
         {dashboard.hasAnalysisCharts ? (
           <>
+            <SummaryTables
+              categoryRows={analysis.sortedCategoryRows}
+              tagRows={analysis.sortedTagRows}
+              expenseTotal={analysis.expenseTotal}
+              summarySort={dashboard.summarySort}
+              tagSort={dashboard.tagSort}
+              onSummarySortChange={dashboard.setSummarySort}
+              onTagSortChange={dashboard.setTagSort}
+              onCategorySelect={dashboard.selectCategory}
+              onTagSelect={dashboard.selectTag}
+            />
+
             <AnalysisCharts
               data={analysis.chartData}
               accountRows={analysis.sortedAccountRows}
@@ -114,18 +126,6 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
               onAccountSortChange={dashboard.setAccountSort}
               onAccountSelect={dashboard.selectAccount}
               onResetAccounts={dashboard.resetAccountFilter}
-              onTagSelect={dashboard.selectTag}
-            />
-
-            <SummaryTables
-              categoryRows={analysis.sortedCategoryRows}
-              tagRows={analysis.sortedTagRows}
-              expenseTotal={analysis.expenseTotal}
-              summarySort={dashboard.summarySort}
-              tagSort={dashboard.tagSort}
-              onSummarySortChange={dashboard.setSummarySort}
-              onTagSortChange={dashboard.setTagSort}
-              onCategorySelect={dashboard.selectCategory}
               onTagSelect={dashboard.selectTag}
             />
           </>
