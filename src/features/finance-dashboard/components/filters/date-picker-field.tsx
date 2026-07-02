@@ -66,9 +66,7 @@ export function DateRangePickerField({
             mode="range"
             selected={visibleRange}
             onSelect={(range) => {
-              const nextStartDate = range?.from
-                ? dateKey(range.from)
-                : ""
+              const nextStartDate = range?.from ? dateKey(range.from) : ""
               const nextEndDate =
                 range?.from && range.to && !isSameDate(range.from, range.to)
                   ? dateKey(range.to)

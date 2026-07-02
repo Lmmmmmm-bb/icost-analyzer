@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import type { Transaction } from "../../model/types"
+import type { Transaction } from "../model/types"
 import { parseWorkbook } from "./workbook-parser"
 
 const PARSING_STATUS_DELAY_MS = 650

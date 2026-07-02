@@ -1,6 +1,6 @@
-import { BASE_CURRENCY } from "../../model/constants"
-import { dateKey, monthKey } from "../../model/date"
-import type { Transaction } from "../../model/types"
+import { BASE_CURRENCY } from "../model/constants"
+import { dateKey, monthKey } from "../model/date"
+import type { Transaction } from "../model/types"
 
 function getCell(row: Record<string, unknown>, names: string[]) {
   for (const name of names) {

@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import type { MetricStats, PeriodComparison } from "../../model/analytics-types"
+import type { WorkbookUploadState } from "../../upload/use-workbook-upload"
 import { HeroMetrics } from "./hero-metrics"
 import {
   LedgerCornerGrid,
   LedgerEdgeNotch,
   LedgerTitleTicks,
 } from "../shared/ledger-accents"
-import type { WorkbookUploadState } from "./use-workbook-upload"
 
 type WorkspaceHeroProps = {
   fileName: string

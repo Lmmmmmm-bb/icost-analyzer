@@ -12,9 +12,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { RiFileChartLine } from "@remixicon/react"
 
+import type { WorkbookUploadState } from "../../upload/use-workbook-upload"
 import { ParsingFileName, ParsingMark, ParsingSweep } from "./parsing-status"
 import { LedgerEdgeNotch, LedgerTitleTicks } from "../shared/ledger-accents"
-import type { WorkbookUploadState } from "./use-workbook-upload"
 
 const UPLOAD_FACTS = [
   ["文件类型", ".xlsx / .xls"],

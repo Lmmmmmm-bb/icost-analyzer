@@ -8,11 +8,11 @@ import {
 
 import { cn } from "@/lib/utils"
 
+import { useFileDrop } from "../../upload/use-file-drop"
+import type { WorkbookUploadState } from "../../upload/use-workbook-upload"
 import { HeroCopy } from "./hero-copy"
 import { ParsingStatusOverlay } from "./parsing-status"
 import { UploadCard } from "./upload-card"
-import { useFileDrop } from "./use-file-drop"
-import type { WorkbookUploadState } from "./use-workbook-upload"
 import { DropOverlay } from "./workspace-drop-overlay"
 import { LedgerCornerGrid } from "../shared/ledger-accents"
 

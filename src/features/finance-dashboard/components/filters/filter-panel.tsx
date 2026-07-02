@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardAction,
@@ -9,26 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 
 import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
 import { describeTimeRange } from "../../model/date"
 import type { Dimensions, Filters } from "../../model/types"
+import { ActiveFilterBadge } from "./active-filter-badge"
+import { getActiveFilterSummaries } from "./active-filter-summary"
 import { ChipGroup } from "./chip-group"
 import { DateRangePickerField } from "./date-picker-field"
 import { QUICK_RANGES, TRANSACTION_TYPES } from "./filter-options"
 import { FilterRow } from "./filter-row"
 import { LedgerEdgeNotch, LedgerTitleTicks } from "../shared/ledger-accents"
-
-type ActiveFilterSummary = {
-  label: string
-  detail: string
-  count: number
-}
 
 type FilterPanelProps = {
   filters: Filters
@@ -247,107 +237,4 @@ export function FilterPanel({
       <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-75" />
     </Card>
   )
-}
-
-function ActiveFilterBadge({
-  count,
-  filters,
-}: {
-  count: number
-  filters: ActiveFilterSummary[]
-}) {
-  const trigger = (
-    <Badge
-      variant="outline"
-      tabIndex={0}
-      className="cursor-help bg-background/65 font-mono tracking-[0.08em] text-muted-foreground"
-    >
-      已启用 {count} 项
-    </Badge>
-  )
-
-  return (
-    <Tooltip>
-      <TooltipTrigger render={trigger} />
-      <TooltipContent
-        side="top"
-        align="end"
-        className="flex max-w-xs flex-col items-start gap-1.5 text-left"
-      >
-        {filters.map((filter) => (
-          <span key={filter.label}>
-            <span className="text-background/70">{filter.label}：</span>
-            {filter.detail}
-          </span>
-        ))}
-      </TooltipContent>
-    </Tooltip>
-  )
-}
-
-function getActiveFilterSummaries(filters: Filters): ActiveFilterSummary[] {
-  const summaries: ActiveFilterSummary[] = []
-  const keyword = filters.keyword.trim()
-
-  if (filters.startDate || filters.endDate) {
-    summaries.push({
-      label: "日期",
-      detail: formatDateRange(filters.startDate, filters.endDate),
-      count: 1,
-    })
-  } else if (filters.year) {
-    summaries.push({
-      label: "年份",
-      detail: filters.year,
-      count: 1,
-    })
-  } else if (filters.quickRange !== ALL_RANGE) {
-    summaries.push({
-      label: "时间",
-      detail: formatQuickRange(filters.quickRange),
-      count: 1,
-    })
-  }
-
-  if (keyword) {
-    summaries.push({
-      label: "关键词",
-      detail: keyword,
-      count: 1,
-    })
-  }
-
-  appendListSummary(summaries, "类型", filters.types)
-  appendListSummary(summaries, "币种", filters.currencies)
-  appendListSummary(summaries, "账户", filters.accounts)
-  appendListSummary(summaries, "分类", filters.categories)
-  appendListSummary(summaries, "包含标签", filters.tags)
-  appendListSummary(summaries, "排除标签", filters.excludedTags)
-
-  return summaries
-}
-
-function appendListSummary(
-  summaries: ActiveFilterSummary[],
-  label: string,
-  values: string[]
-) {
-  if (!values.length) return
-  summaries.push({
-    label,
-    detail: values.join("、"),
-    count: values.length,
-  })
-}
-
-function formatDateRange(startDate: string, endDate: string) {
-  if (startDate && endDate) return `${startDate} 至 ${endDate}`
-  if (startDate) return `自 ${startDate} 起`
-  return `截至 ${endDate}`
-}
-
-function formatQuickRange(range: string) {
-  const detail = describeTimeRange(range)
-
-  return detail ? `${range}（${detail}）` : range
 }
