@@ -7,6 +7,7 @@ import { NoResultEmptyState } from "./feedback/empty-states"
 import { ParsingStatusOverlay } from "./hero/parsing-status"
 import { WorkspaceDropOverlay } from "./hero/workspace-drop-overlay"
 import { WorkspaceHero } from "./hero/workspace-hero"
+import { FilterDock } from "./filters/filter-dock"
 
 const AnalysisCharts = lazy(() =>
   import("./charts/analysis-charts").then((module) => ({
@@ -91,6 +92,23 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
           onFiltersChange={dashboard.setFilters}
           onResetDrill={dashboard.resetDrill}
         />
+
+        <FilterDock
+          filters={dashboard.filters}
+          filteredCount={analysis.filtered.length}
+          totalCount={dashboard.transactions.length}
+          onFiltersChange={dashboard.setFilters}
+          onResetDrill={dashboard.resetDrill}
+        >
+          <FilterPanel
+            filters={dashboard.filters}
+            dimensions={analysis.dimensions}
+            onFiltersChange={dashboard.setFilters}
+            onResetDrill={dashboard.resetDrill}
+            className="shadow-none"
+            headerActionClassName="mr-8"
+          />
+        </FilterDock>
 
         <RateSettings
           dimensions={analysis.dimensions}

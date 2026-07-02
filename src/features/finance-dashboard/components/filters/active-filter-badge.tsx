@@ -35,6 +35,9 @@ export function ActiveFilterBadge({ count, filters }: ActiveFilterBadgeProps) {
           <span key={filter.label}>
             <span className="text-background/70">{filter.label}：</span>
             {filter.detail}
+            {filter.tooltip ? (
+              <span className="block text-background/70">{filter.tooltip}</span>
+            ) : null}
           </span>
         ))}
       </TooltipContent>

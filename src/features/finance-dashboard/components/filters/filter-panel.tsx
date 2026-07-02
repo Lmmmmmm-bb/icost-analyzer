@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
 import { describeTimeRange } from "../../model/date"
@@ -25,6 +26,8 @@ type FilterPanelProps = {
   dimensions: Dimensions
   onFiltersChange: (filters: Filters | ((current: Filters) => Filters)) => void
   onResetDrill: () => void
+  className?: string
+  headerActionClassName?: string
 }
 
 export function FilterPanel({
@@ -32,6 +35,8 @@ export function FilterPanel({
   dimensions,
   onFiltersChange,
   onResetDrill,
+  className,
+  headerActionClassName,
 }: FilterPanelProps) {
   const activeFilters = getActiveFilterSummaries(filters)
   const activeFilterCount = activeFilters.reduce(
@@ -40,7 +45,12 @@ export function FilterPanel({
   )
 
   return (
-    <Card className="relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm">
+    <Card
+      className={cn(
+        "relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm",
+        className
+      )}
+    >
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
       <CardHeader className="border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">
@@ -51,7 +61,7 @@ export function FilterPanel({
         <CardDescription>
           调整时间、类型、币种、账本、账户、分类、标签或关键词后，指标、图表和明细会同步刷新。
         </CardDescription>
-        <CardAction>
+        <CardAction className={headerActionClassName}>
           <div className="flex items-center gap-2">
             {activeFilterCount ? (
               <ActiveFilterBadge

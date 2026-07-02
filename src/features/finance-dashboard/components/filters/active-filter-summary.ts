@@ -5,6 +5,7 @@ import type { Filters } from "../../model/types"
 export type ActiveFilterSummary = {
   label: string
   detail: string
+  tooltip?: string
   count: number
 }
 
@@ -27,9 +28,12 @@ export function getActiveFilterSummaries(
       count: 1,
     })
   } else if (filters.quickRange !== ALL_RANGE) {
+    const tooltip = describeTimeRange(filters.quickRange) ?? undefined
+
     summaries.push({
       label: "时间",
-      detail: formatQuickRange(filters.quickRange),
+      detail: filters.quickRange,
+      tooltip,
       count: 1,
     })
   }
@@ -70,10 +74,4 @@ function formatDateRange(startDate: string, endDate: string) {
   if (startDate && endDate) return `${startDate} 至 ${endDate}`
   if (startDate) return `自 ${startDate} 起`
   return `截至 ${endDate}`
-}
-
-function formatQuickRange(range: string) {
-  const detail = describeTimeRange(range)
-
-  return detail ? `${range}（${detail}）` : range
 }
