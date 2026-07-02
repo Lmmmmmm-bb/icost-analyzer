@@ -101,8 +101,8 @@ function EntryInsightPreview() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
       <LedgerCornerGrid className="top-3 right-3 opacity-25" />
       <div className="relative grid md:grid-cols-[minmax(0,1.1fr)_minmax(220px,0.9fr)]">
-        <div className="flex min-w-0 flex-col">
-          <div className="flex items-start justify-between gap-3 border-b border-border/70 p-3.5">
+        <div className="flex min-w-0 flex-col md:h-[17rem]">
+          <div className="flex items-start justify-between gap-3 border-b border-border/70 p-3.5 md:h-[4.25rem]">
             <div className="flex flex-col gap-1">
               <div className="font-mono text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
                 账本预览
@@ -115,7 +115,7 @@ function EntryInsightPreview() {
               本地解析
             </div>
           </div>
-          <div className="grid max-h-52 [scrollbar-width:none] grid-cols-[1.15fr_0.8fr_0.62fr_0.8fr] overflow-auto text-xs [&::-webkit-scrollbar]:hidden">
+          <div className="grid max-h-52 [scrollbar-width:none] grid-cols-[1.15fr_0.8fr_0.62fr_0.8fr] overflow-auto text-xs md:flex-1 [&::-webkit-scrollbar]:hidden">
             {PREVIEW_ROWS.flatMap((row, rowIndex) =>
               row.map((cell, cellIndex) => (
                 <div
@@ -141,7 +141,7 @@ function EntryInsightPreview() {
             )}
           </div>
         </div>
-        <div className="grid border-t border-border/70 md:border-t-0 md:border-l">
+        <div className="grid border-t border-border/70 md:h-[17rem] md:grid-rows-4 md:border-t-0 md:border-l">
           {ENTRY_INSIGHTS.map((insight) => {
             const Icon = insight.icon
 
