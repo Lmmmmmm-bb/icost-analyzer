@@ -12,7 +12,8 @@ import type { DetailSort } from "../../model/dashboard-controls"
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200]
 
 const DETAIL_SORT_OPTIONS = [
-  { value: "date", label: "按日期排序" },
+  { value: "date", label: "日期倒序" },
+  { value: "dateAsc", label: "日期正序" },
   { value: "amount", label: "按金额排序" },
 ] satisfies Array<{ value: DetailSort; label: string }>
 

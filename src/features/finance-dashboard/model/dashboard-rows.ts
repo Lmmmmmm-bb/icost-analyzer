@@ -16,6 +16,7 @@ export function sortDetailRows(
   return [...rows].sort((a, b) => {
     if (sort === "amount")
       return Math.abs(toRmb(b, rates)) - Math.abs(toRmb(a, rates))
+    if (sort === "dateAsc") return a.date.getTime() - b.date.getTime()
     return b.date.getTime() - a.date.getTime()
   })
 }

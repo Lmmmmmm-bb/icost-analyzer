@@ -8,4 +8,4 @@ export const RANK_LEVELS = [
 export type SummarySort = "amount" | "count" | "avg"
 export type TagSort = "amount" | "count" | "days"
 export type AccountSort = "amount" | "count"
-export type DetailSort = "date" | "amount"
+export type DetailSort = "date" | "dateAsc" | "amount"
