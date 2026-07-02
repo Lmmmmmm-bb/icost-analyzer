@@ -17,7 +17,7 @@ export function NoResultEmptyState() {
         <EmptyMedia variant="icon">∅</EmptyMedia>
         <EmptyTitle>暂无匹配的交易记录</EmptyTitle>
         <EmptyDescription>
-          可放宽时间、分类、标签或关键词后再试。
+          可放宽时间、账本、账户、分类、标签或关键词后再试。
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

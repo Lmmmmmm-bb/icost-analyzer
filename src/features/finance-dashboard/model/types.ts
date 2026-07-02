@@ -21,6 +21,7 @@ export type Transaction = {
   subcategory: string
   account1: string
   account2: string
+  book: string
   note: string
   tags: string[]
   location: string
@@ -35,6 +36,7 @@ export type Filters = {
   currencies: string[]
   categories: string[]
   accounts: string[]
+  books: string[]
   tags: string[]
   excludedTags: string[]
   keyword: string
@@ -46,6 +48,7 @@ export type Dimensions = {
   currencies: string[]
   categories: string[]
   accounts: string[]
+  books: string[]
   tags: string[]
   years: string[]
 }

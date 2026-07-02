@@ -44,6 +44,7 @@ export function getActiveFilterSummaries(
 
   appendListSummary(summaries, "类型", filters.types)
   appendListSummary(summaries, "币种", filters.currencies)
+  appendListSummary(summaries, "账本", filters.books)
   appendListSummary(summaries, "账户", filters.accounts)
   appendListSummary(summaries, "分类", filters.categories)
   appendListSummary(summaries, "包含标签", filters.tags)

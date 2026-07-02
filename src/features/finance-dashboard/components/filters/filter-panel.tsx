@@ -49,7 +49,7 @@ export function FilterPanel({
           <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
-          调整时间、类型、币种、账户、分类、标签或关键词后，指标、图表和明细会同步刷新。
+          调整时间、类型、币种、账本、账户、分类、标签或关键词后，指标、图表和明细会同步刷新。
         </CardDescription>
         <CardAction>
           <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export function FilterPanel({
 
         <FilterRow label="关键词">
           <Input
-            placeholder="搜索备注、分类、账户、标签、地点、币种……"
+            placeholder="搜索备注、分类、账本、账户、标签、地点、币种……"
             className="bg-background/70"
             value={filters.keyword}
             onChange={(event) =>
@@ -179,6 +179,21 @@ export function FilterPanel({
             }
           />
         </FilterRow>
+
+        {dimensions.books.length ? (
+          <FilterRow label="账本">
+            <ChipGroup
+              title="账本"
+              items={dimensions.books}
+              value={filters.books}
+              showTitle={false}
+              onChange={(books) =>
+                onFiltersChange((current) => ({ ...current, books }))
+              }
+              limit={18}
+            />
+          </FilterRow>
+        ) : null}
 
         {dimensions.accounts.length ? (
           <FilterRow label="账户">

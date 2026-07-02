@@ -38,6 +38,7 @@ export function filterTransactions(
     ? new Set(filters.categories)
     : null
   const accountSet = filters.accounts.length ? new Set(filters.accounts) : null
+  const bookSet = filters.books.length ? new Set(filters.books) : null
   const tagSet = filters.tags.length ? new Set(filters.tags) : null
   const excludedTagSet = filters.excludedTags.length
     ? new Set(filters.excludedTags)
@@ -53,6 +54,7 @@ export function filterTransactions(
           tx.subcategory,
           tx.account1,
           tx.account2,
+          tx.book,
           tx.tags.join(" "),
           tx.location,
           tx.currency,
@@ -68,6 +70,7 @@ export function filterTransactions(
       (!currencySet || currencySet.has(tx.currency)) &&
       (!categorySet || categorySet.has(tx.category)) &&
       (!accountSet || matchesAccount(tx, accountSet)) &&
+      (!bookSet || bookSet.has(tx.book)) &&
       (!tagSet || tx.tags.some((tag) => tagSet.has(tag))) &&
       !hasExcludedTag &&
       matchesKeyword

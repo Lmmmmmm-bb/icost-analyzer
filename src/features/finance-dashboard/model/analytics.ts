@@ -52,6 +52,7 @@ export function getDimensions(transactions: Transaction[]): Dimensions {
     currencies: unique(transactions.map((tx) => tx.currency)),
     categories: unique(transactions.map((tx) => tx.category)),
     accounts: unique(accounts.filter(Boolean)),
+    books: unique(transactions.map((tx) => tx.book).filter(Boolean)),
     tags: unique(tags),
     years: unique(
       transactions.map((tx) => String(tx.date.getFullYear()))

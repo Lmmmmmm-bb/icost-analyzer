@@ -83,7 +83,7 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
               </span>
               <span className="text-sm leading-6 text-muted-foreground">
                 {showParsingStatus
-                  ? "我们正在读取工作簿、识别交易行，并重建分类、标签与币种维度。"
+                  ? "我们正在读取工作簿、识别交易行，并重建账本、账户、分类、标签与币种维度。"
                   : "解析会在本页完成，不需要上传到远端；完成后即可查看图表、汇总与明细。"}
               </span>
             </span>

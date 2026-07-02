@@ -68,6 +68,7 @@ export async function parseWorkbook(buffer: ArrayBuffer) {
         subcategory: getCell(row, ["二级分类", "子分类"]) || "未分类",
         account1: getCell(row, ["账户1", "账户", "支付账户"]),
         account2: getCell(row, ["账户2", "收款账户"]),
+        book: getCell(row, ["账本", "账簿", "Book"]),
         note: getCell(row, ["备注", "说明"]),
         tags,
         location: getCell(row, ["位置", "地点"]),

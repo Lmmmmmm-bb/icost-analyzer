@@ -67,7 +67,7 @@ export function WorkspaceHero({
                 <LedgerTitleTicks className="mb-1" />
               </div>
               <p className="max-w-2xl border-l border-border/70 pl-3 text-xs leading-5 text-muted-foreground md:mb-0.5">
-                当前文件已在本地解析完成，数据仅保留在当前页面会话中。可按时间、分类、标签与币种查看交易；调整筛选或汇率后，图表与明细会同步刷新。
+                当前文件已在本地解析完成，数据仅保留在当前页面会话中。可按时间、账本、账户、分类、标签与币种查看交易；调整筛选或汇率后，图表与明细会同步刷新。
               </p>
             </div>
           </div>
