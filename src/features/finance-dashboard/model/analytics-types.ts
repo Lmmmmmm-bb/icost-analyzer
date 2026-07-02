@@ -32,6 +32,11 @@ export type PeriodComparison = {
 export type MetricStats = {
   totalExpense: number
   totalIncome: number
+  incomeBreakdown: {
+    income: number
+    refund: number
+    reimburse: number
+  }
   net: number
   count: number
   monthlyExpense: number

@@ -76,6 +76,9 @@ export function getDateRange(transactions: Transaction[]) {
 export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
   let totalExpense = 0
   let totalIncome = 0
+  let income = 0
+  let refundIncome = 0
+  let reimburseIncome = 0
   let reimburse = 0
   let maxExpense = 0
   let expenseCount = 0
@@ -96,7 +99,13 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
       maxExpense = Math.max(maxExpense, expense)
       expenseCount += 1
     }
-    if (isIncomeTransaction(tx)) totalIncome += Math.max(rmb, 0)
+    if (isIncomeTransaction(tx)) {
+      const incomeAmount = Math.max(rmb, 0)
+      totalIncome += incomeAmount
+      if (tx.type === "退款入账") refundIncome += incomeAmount
+      else if (tx.type === "报销入账") reimburseIncome += incomeAmount
+      else income += incomeAmount
+    }
     if (isReimburseTransaction(tx)) reimburse += Math.abs(rmb)
   }
 
@@ -105,6 +114,11 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
   return {
     totalExpense,
     totalIncome,
+    incomeBreakdown: {
+      income,
+      refund: refundIncome,
+      reimburse: reimburseIncome,
+    },
     net: totalIncome - totalExpense,
     count: filtered.length,
     monthlyExpense: totalExpense / months,

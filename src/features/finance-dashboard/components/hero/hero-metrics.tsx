@@ -1,4 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 import type { MetricStats, PeriodComparison } from "../../model/analytics-types"
 import { formatMoney } from "../../model/money"
@@ -16,6 +22,10 @@ type MetricItem = {
   value: string
   caption?: string
   marker?: string
+  tooltipRows?: {
+    label: string
+    value: string
+  }[]
 }
 
 export function HeroMetrics({
@@ -35,6 +45,11 @@ export function HeroMetrics({
       value: formatMoney(stats.totalIncome),
       caption: "不包含转账",
       marker: "IN",
+      tooltipRows: [
+        { label: "收入", value: formatMoney(stats.incomeBreakdown.income) },
+        { label: "退款", value: formatMoney(stats.incomeBreakdown.refund) },
+        { label: "报销", value: formatMoney(stats.incomeBreakdown.reimburse) },
+      ],
     },
     {
       label: "净结余",
@@ -65,31 +80,58 @@ export function HeroMetrics({
       <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-70" />
       <CardContent className="p-0">
         <div className="grid divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
-          {primaryMetrics.map((metric) => (
-            <div
-              key={metric.label}
-              className="group/metric relative flex flex-col gap-2 bg-background/35 p-4 transition-colors hover:bg-muted/35"
-            >
-              <LedgerCornerGrid className="top-3 right-3 opacity-0 group-hover/metric:opacity-45" />
-              {metric.marker ? (
-                <div
-                  aria-hidden="true"
-                  className="absolute right-3 bottom-3 font-mono text-5xl leading-none font-semibold tracking-[-0.12em] text-foreground opacity-[0.045] transition-opacity select-none group-hover/metric:opacity-[0.075]"
-                >
-                  {metric.marker}
+          {primaryMetrics.map((metric) => {
+            const card = (
+              <div
+                key={metric.label}
+                tabIndex={metric.tooltipRows ? 0 : undefined}
+                className={cn(
+                  "group/metric relative flex flex-col gap-2 bg-background/35 p-4 transition-colors hover:bg-muted/35",
+                  metric.tooltipRows && "cursor-help"
+                )}
+              >
+                <LedgerCornerGrid className="top-3 right-3 opacity-0 group-hover/metric:opacity-45" />
+                {metric.marker ? (
+                  <div
+                    aria-hidden="true"
+                    className="absolute right-3 bottom-3 font-mono text-5xl leading-none font-semibold tracking-[-0.12em] text-foreground opacity-[0.045] transition-opacity select-none group-hover/metric:opacity-[0.075]"
+                  >
+                    {metric.marker}
+                  </div>
+                ) : null}
+                <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
+                  {metric.label}
                 </div>
-              ) : null}
-              <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
-                {metric.label}
+                <div className="font-heading text-2xl leading-tight font-semibold tracking-tight tabular-nums">
+                  {metric.value}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {metric.caption}
+                </div>
               </div>
-              <div className="font-heading text-2xl leading-tight font-semibold tracking-tight tabular-nums">
-                {metric.value}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {metric.caption}
-              </div>
-            </div>
-          ))}
+            )
+
+            if (!metric.tooltipRows) return card
+
+            return (
+              <Tooltip key={metric.label}>
+                <TooltipTrigger render={card} />
+                <TooltipContent
+                  side="top"
+                  className="flex min-w-36 flex-col items-stretch gap-1.5 text-left"
+                >
+                  {metric.tooltipRows.map((row) => (
+                    <div key={row.label} className="flex items-center gap-4">
+                      <span className="text-background/70">{row.label}</span>
+                      <span className="ml-auto font-mono tabular-nums">
+                        {row.value}
+                      </span>
+                    </div>
+                  ))}
+                </TooltipContent>
+              </Tooltip>
+            )
+          })}
         </div>
         <div className="grid border-t border-border/70 bg-background/35 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7">
           {secondaryMetrics.map((metric) => (
