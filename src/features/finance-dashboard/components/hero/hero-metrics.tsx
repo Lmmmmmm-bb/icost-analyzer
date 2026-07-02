@@ -102,7 +102,13 @@ export function HeroMetrics({
                 <div className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase transition-colors group-hover/metric:text-foreground">
                   {metric.label}
                 </div>
-                <div className="font-heading text-2xl leading-tight font-semibold tracking-tight tabular-nums">
+                <div
+                  className={cn(
+                    "w-fit border-b border-transparent font-heading text-2xl leading-tight font-semibold tracking-tight tabular-nums transition-colors",
+                    metric.tooltipRows &&
+                      "border-dotted border-muted-foreground/40 group-hover/metric:border-foreground/60 group-focus-visible/metric:border-ring"
+                  )}
+                >
                   {metric.value}
                 </div>
                 <div className="text-sm text-muted-foreground">
