@@ -6,18 +6,18 @@
   Tailwind CSS v4, and shadcn/ui.
 - The product is a local-first iCost Excel analyzer. Users upload `.xlsx` or
   `.xls` exports in the browser, then inspect spending metrics, linked charts,
-  summaries, filters, exchange rates, and paginated transaction details.
+  summary tables, filters, exchange rates, and paginated transaction details.
 - This is an open-source, third-party companion project for iCost exports. Do
   not imply official iCost affiliation in product copy, documentation, package
   metadata, or repository materials unless the user explicitly provides that
   relationship.
 - There is no backend service in this repo. Workbook parsing happens in the
-  browser through a lazy `xlsx` import, and the app should not upload personal
+  browser through a lazy `xlsx` import, and the app must not upload personal
   finance data to any remote service.
 - `src/main.tsx` mounts React in `StrictMode`, wraps the app in
-  `ThemeProvider`, and renders `App`.
+  `ThemeProvider` and `TooltipProvider`, and renders `App`.
 - `src/App.tsx` lazy-loads `FinanceDashboard` from
-  `src/features/finance-dashboard/finance-dashboard.tsx`.
+  `src/features/finance-dashboard`.
 - The theme system stores the selected theme in `localStorage` under the
   `theme` key, supports `dark`, `light`, and `system`, applies the resolved
   class to `<html>`, syncs across tabs, and toggles with the `d` key when focus
@@ -31,7 +31,7 @@
 - Treat the README as user documentation only, not an implementation tour or
   developer setup guide. Do not add local development commands, package manager
   instructions, framework notes, source-file walkthroughs, or internal
-  architecture details to README.md.
+  architecture details to `README.md`.
 - Put engineering setup, command references, and codebase guidance in
   `AGENTS.md` or a dedicated contributor document instead of the README.
 - Public-facing documentation should default to Simplified Chinese unless the
@@ -59,11 +59,11 @@
 - The upload flow accepts `.xlsx` and `.xls` files via full-page drag-and-drop
   or a hidden file input.
 - Uploaded workbook data lives only in React state during the current page
-  session. Do not persist transaction data to localStorage, sessionStorage,
+  session. Do not persist transaction data to `localStorage`, `sessionStorage`,
   IndexedDB, cookies, or remote services without an explicit product decision
   and matching README/UI disclosure.
-- `workbook-parser.ts` reads the first worksheet and maps supported column
-  aliases into `Transaction` records.
+- `src/features/finance-dashboard/upload/workbook-parser.ts` reads the first
+  worksheet and maps supported column aliases into `Transaction` records.
 - Required data is date plus amount. Rows with invalid dates or non-numeric
   amounts are skipped.
 - Missing transaction type falls back to `支出` for negative amounts and `收入`
@@ -71,39 +71,56 @@
 - Missing currency falls back to `CNY`; missing categories fall back to
   `未分类`.
 - Tags are split from comma-like separators, semicolons, pipes, whitespace, and
-  `#tag` style strings.
+  `#tag` style strings. Year-like tag fragments such as `2024` are ignored.
 - `CNY` is the base currency and is fixed at exchange rate `1`.
 - Default exchange rates in `model/constants.ts` are static application values,
   not live market data.
-- Empty, invalid, or non-positive non-base exchange rate inputs do not overwrite
-  the active calculation rate.
-- Analytics treat transactions as expense, income, and reimbursement according
-  to the helpers in `model/analytics.ts`; keep those domain rules centralized.
+- Empty, invalid, or non-positive non-base exchange-rate inputs do not
+  overwrite the active calculation rate.
+- Analytics treat transactions as expense, income, reimbursement, and other
+  according to helpers in `model/transaction-rules.ts`; keep those domain rules
+  centralized.
+- Account filtering matches `account1` for normal transactions and either
+  `account1` or `account2` for `转账` transactions.
+- Keyword filtering searches notes, category, subcategory, accounts, book,
+  tags, location, and currency.
 
 ## Feature Architecture
 
-- `src/features/finance-dashboard/finance-dashboard.tsx`: page-level state,
-  derived analytics, filter/rate coordination, chart option creation, and
-  dashboard composition.
+- `src/features/finance-dashboard/index.tsx`: feature entry point, top-level
+  dashboard shell, entry hero/workspace switch, and backdrop composition.
+- `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: page-level
+  state, workbook application, rates, filters, chart drilldowns, sorting,
+  pagination, and action handlers.
+- `src/features/finance-dashboard/hooks/use-dashboard-analysis.ts`: derived
+  analytics, comparisons, dimensions, chart data, filtered rows, sorted rows,
+  and pagination calculations.
 - `src/features/finance-dashboard/model`: pure data helpers for types,
-  constants, collections, dates, money conversion, filtering, and analytics.
+  constants, transaction rules, controls, rows, dates, date periods, money
+  conversion, filtering, rate inputs, collections, and analytics.
+- `src/features/finance-dashboard/upload`: workbook parsing, file drop handling,
+  and upload/parsing state.
 - `src/features/finance-dashboard/components/hero`: landing copy, workbook
-  upload, drag-and-drop handling, parsing state, parser, and loaded-workbook
-  hero.
-- `src/features/finance-dashboard/components/filters`: time, date, type,
-  currency, category, tag, and keyword filtering controls.
+  upload card, parsing status, loaded-workbook hero, workspace drop overlay,
+  metrics, and comparison sections.
+- `src/features/finance-dashboard/components/filters`: quick range, date, type,
+  currency, category, account, book, tag, excluded tag, keyword, active-filter,
+  panel, dock, and chip controls.
 - `src/features/finance-dashboard/components/rates`: editable exchange-rate
   inputs and reset behavior.
 - `src/features/finance-dashboard/components/charts`: ECharts wrapper, chart
-  theme helpers, chart option builders, and chart panels.
+  theme helpers, chart option builders, chart panels, category/account
+  analysis, monthly review, heatmap, and daily cashflow views.
 - `src/features/finance-dashboard/components/summaries`: category and tag
   summary tables.
 - `src/features/finance-dashboard/components/transactions`: transaction table,
   rows, controls, sorting, and pagination.
-- `src/features/finance-dashboard/components/shared`: reusable dashboard panel
-  and metric card primitives.
+- `src/features/finance-dashboard/components/shared`: reusable dashboard panel,
+  visual accents, and shared primitives.
 - `src/features/finance-dashboard/components/feedback`: alert and empty-state
   surfaces.
+- `src/features/finance-dashboard/components/layout`: dashboard background and
+  layout decoration.
 
 ## Build & Commands
 
@@ -156,6 +173,8 @@ pnpm preview
   with `tailwind-merge`.
 - Keep business/data logic in `model` files where possible. Components should
   mostly coordinate state and rendering.
+- Keep upload/parsing coordination in `upload` files and pure workbook mapping
+  in `upload/workbook-parser.ts`.
 - Preserve the lazy import of `xlsx` unless there is a clear reason to increase
   the initial bundle.
 - The ECharts wrapper registers only the chart/component modules this app uses.
@@ -174,8 +193,8 @@ pnpm preview
   - icon library: `remixicon`
   - import alias: `@` for `src`
 - Current shadcn-owned UI components live under `src/components/ui`:
-  `alert`, `badge`, `button`, `calendar`, `card`, `empty`, `input`, `popover`,
-  `select`, `separator`, and `table`.
+  `alert`, `badge`, `button`, `calendar`, `card`, `collapsible`, `dialog`,
+  `empty`, `input`, `popover`, `select`, `separator`, `table`, and `tooltip`.
 - Prefer existing components and variants before custom markup.
 - Add UI components through the shadcn CLI with the project package runner,
   then review generated files before using them.
@@ -259,8 +278,8 @@ pnpm build
   files, and the pnpm lockfile.
 - There are no `.cursor/rules/`, `.github/copilot-instructions.md`, or
   `.trae/rules/` files to merge into this overview. The repository does contain
-  local agent skills under `.trae/skills` and `.agents/skills`, including
-  shadcn guidance reflected in the Code Style section.
+  local agent skills under `.agents/skills`, including shadcn guidance reflected
+  in the Code Style section.
 
 ## Entry Points & Key Files
 
@@ -269,16 +288,29 @@ pnpm build
 - `src/App.tsx`: lazy application entry that renders `FinanceDashboard`.
 - `src/components/theme-provider.tsx`: theme context, localStorage persistence,
   system-theme detection, cross-tab sync, and keyboard toggle.
-- `src/features/finance-dashboard/finance-dashboard.tsx`: dashboard container
-  and derived application state.
-- `src/features/finance-dashboard/components/hero/workbook-parser.ts`: workbook
-  parser and column alias mapping.
+- `src/components/theme/theme-utils.ts`: pure theme helpers and view-transition
+  utilities.
+- `src/components/theme/use-theme-keyboard-shortcut.ts`: keyboard shortcut
+  handling for theme toggling.
+- `src/features/finance-dashboard/index.tsx`: dashboard feature shell.
+- `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: dashboard
+  state and actions.
+- `src/features/finance-dashboard/hooks/use-dashboard-analysis.ts`: derived
+  dashboard calculations.
+- `src/features/finance-dashboard/upload/workbook-parser.ts`: workbook parser
+  and column alias mapping.
+- `src/features/finance-dashboard/upload/use-workbook-upload.ts`: upload,
+  parsing, error, and status-overlay state.
+- `src/features/finance-dashboard/model/transaction-rules.ts`: transaction
+  direction, income, expense, and reimbursement rules.
 - `src/features/finance-dashboard/model/analytics.ts`: metric, summary, trend,
-  week, and heatmap calculations.
+  period comparison, week, daily cashflow, and heatmap calculations.
 - `src/features/finance-dashboard/model/filtering.ts`: filter application.
 - `src/features/finance-dashboard/model/constants.ts`: base currency, default
   rates, and empty filter state.
 - `src/features/finance-dashboard/components/charts/e-chart.tsx`: ECharts
   lifecycle wrapper.
+- `src/features/finance-dashboard/components/charts/options`: chart option
+  builders split by chart family.
 - `src/components/ui`: shadcn/Base UI components currently available to the app.
 - `src/lib/utils.ts`: `cn()` class-name helper.
