@@ -26,6 +26,7 @@ type FilterPanelProps = {
   dimensions: Dimensions
   onFiltersChange: (filters: Filters | ((current: Filters) => Filters)) => void
   onResetDrill: () => void
+  variant?: "page" | "dialog"
   className?: string
   headerActionClassName?: string
 }
@@ -35,9 +36,11 @@ export function FilterPanel({
   dimensions,
   onFiltersChange,
   onResetDrill,
+  variant = "page",
   className,
   headerActionClassName,
 }: FilterPanelProps) {
+  const isDialog = variant === "dialog"
   const activeFilters = getActiveFilterSummaries(filters)
   const activeFilterCount = activeFilters.reduce(
     (total, filter) => total + filter.count,
@@ -47,19 +50,34 @@ export function FilterPanel({
   return (
     <Card
       className={cn(
-        "relative gap-0 bg-card/95 py-0 shadow-ledger-panel backdrop-blur-sm",
+        "relative gap-0 py-0",
+        isDialog
+          ? "max-h-[min(88svh,46rem)] border-0 bg-transparent shadow-none"
+          : "bg-card/95 shadow-ledger-panel backdrop-blur-sm",
         className
       )}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
-      <CardHeader className="border-b border-border/70 p-4">
+      <div
+        className={cn(
+          "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent",
+          isDialog && "z-20"
+        )}
+      />
+      <CardHeader
+        className={cn(
+          "border-b border-border/70 p-4",
+          isDialog && "shrink-0 bg-background/92 pr-12 backdrop-blur-xl"
+        )}
+      >
         <CardTitle className="flex items-center gap-2">
           <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
-          筛选
+          {isDialog ? "调整筛选" : "筛选"}
           <LedgerTitleTicks />
         </CardTitle>
-        <CardDescription>
-          调整时间、类型、币种、账本、账户、分类、标签或关键词后，指标、图表和明细会同步刷新。
+        <CardDescription className={cn(isDialog && "max-w-2xl")}>
+          {isDialog
+            ? "在这里集中校准账单口径。改动会立即同步到指标、图表和明细；关闭弹窗后会保留当前筛选。"
+            : "调整时间、类型、币种、账本、账户、分类、标签或关键词后，指标、图表和明细会同步刷新。"}
         </CardDescription>
         <CardAction className={headerActionClassName}>
           <div className="flex items-center gap-2">
@@ -82,8 +100,19 @@ export function FilterPanel({
           </div>
         </CardAction>
       </CardHeader>
-      <CardContent className="relative px-0">
-        <FilterRow label="时间" contentClassName="flex flex-col gap-3" inline>
+      <CardContent
+        className={cn(
+          "relative px-0",
+          isDialog &&
+            "grid max-h-[calc(min(88svh,46rem)-5.75rem)] [scrollbar-color:color-mix(in_oklch,var(--foreground),transparent_78%)_transparent] auto-rows-max gap-0 overflow-y-auto overscroll-contain bg-background p-0"
+        )}
+      >
+        <FilterRow
+          label="时间"
+          variant={variant}
+          contentClassName="flex flex-col gap-3"
+          inline
+        >
           <div className="grid gap-2.5">
             <ChipGroup
               title="快捷时间"
@@ -152,7 +181,7 @@ export function FilterPanel({
           </div>
         </FilterRow>
 
-        <FilterRow label="关键词">
+        <FilterRow label="关键词" variant={variant}>
           <Input
             placeholder="搜索备注、分类、账本、账户、标签、地点、币种……"
             className="bg-background/70"
@@ -166,7 +195,7 @@ export function FilterPanel({
           />
         </FilterRow>
 
-        <FilterRow label="类型">
+        <FilterRow label="类型" variant={variant}>
           <ChipGroup
             title="类型"
             items={TRANSACTION_TYPES}
@@ -178,7 +207,7 @@ export function FilterPanel({
           />
         </FilterRow>
 
-        <FilterRow label="币种">
+        <FilterRow label="币种" variant={variant}>
           <ChipGroup
             title="币种"
             items={dimensions.currencies}
@@ -191,7 +220,7 @@ export function FilterPanel({
         </FilterRow>
 
         {dimensions.books.length ? (
-          <FilterRow label="账本">
+          <FilterRow label="账本" variant={variant}>
             <ChipGroup
               title="账本"
               items={dimensions.books}
@@ -206,7 +235,7 @@ export function FilterPanel({
         ) : null}
 
         {dimensions.accounts.length ? (
-          <FilterRow label="账户">
+          <FilterRow label="账户" variant={variant}>
             <ChipGroup
               title="账户"
               items={dimensions.accounts}
@@ -220,7 +249,7 @@ export function FilterPanel({
           </FilterRow>
         ) : null}
 
-        <FilterRow label="分类">
+        <FilterRow label="分类" variant={variant}>
           <ChipGroup
             title="一级分类"
             items={dimensions.categories}
@@ -233,7 +262,7 @@ export function FilterPanel({
           />
         </FilterRow>
 
-        <FilterRow label="标签">
+        <FilterRow label="标签" variant={variant}>
           <ChipGroup
             title="标签"
             items={dimensions.tags}
@@ -259,7 +288,12 @@ export function FilterPanel({
           />
         </FilterRow>
       </CardContent>
-      <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-75" />
+      <LedgerEdgeNotch
+        className={cn(
+          "right-0 bottom-0 opacity-45 group-hover/card:opacity-75",
+          isDialog && "opacity-25"
+        )}
+      />
     </Card>
   )
 }

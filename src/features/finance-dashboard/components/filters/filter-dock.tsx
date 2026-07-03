@@ -172,16 +172,14 @@ export function FilterDock({
                       <RiFilter3Line data-icon="inline-start" />
                       调整筛选
                     </DialogTrigger>
-                    <DialogContent className="flex max-h-[min(86svh,44rem)] w-[min(42rem,calc(100vw-2rem))] max-w-none flex-col gap-0 overflow-hidden bg-background p-0 shadow-ledger-popover sm:max-w-none lg:w-[min(56rem,calc(100vw-4rem))]">
+                    <DialogContent className="flex max-h-[min(88svh,46rem)] w-[min(44rem,calc(100vw-1.5rem))] max-w-none flex-col gap-0 overflow-hidden border-border/80 bg-background p-0 shadow-ledger-popover sm:max-w-none lg:w-[min(60rem,calc(100vw-4rem))]">
                       <DialogHeader className="sr-only">
                         <DialogTitle>调整筛选</DialogTitle>
                         <DialogDescription>
                           修改当前账单分析的筛选条件。
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
-                        {children}
-                      </div>
+                      <div className="min-h-0">{children}</div>
                     </DialogContent>
                   </Dialog>
                   <Button

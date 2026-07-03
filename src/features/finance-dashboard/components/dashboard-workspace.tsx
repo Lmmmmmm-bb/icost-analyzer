@@ -105,6 +105,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
             dimensions={analysis.dimensions}
             onFiltersChange={dashboard.setFilters}
             onResetDrill={dashboard.resetDrill}
+            variant="dialog"
             className="shadow-none"
           />
         </FilterDock>
