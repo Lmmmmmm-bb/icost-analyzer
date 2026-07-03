@@ -106,7 +106,6 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
             onFiltersChange={dashboard.setFilters}
             onResetDrill={dashboard.resetDrill}
             className="shadow-none"
-            headerActionClassName="mr-8"
           />
         </FilterDock>
 

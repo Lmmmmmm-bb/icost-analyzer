@@ -118,7 +118,12 @@ export function FilterDock({
           )}
         >
           <div>
-            <div className="relative overflow-hidden border border-border/80 bg-card/88 shadow-ledger-popover backdrop-blur-xl">
+            <div
+              className={cn(
+                "relative overflow-hidden border border-border/80 bg-card/88 shadow-ledger-panel backdrop-blur-xl transition-shadow duration-300",
+                isDocked && "shadow-ledger-popover"
+              )}
+            >
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
               <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                 <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
@@ -167,7 +172,7 @@ export function FilterDock({
                       <RiFilter3Line data-icon="inline-start" />
                       调整筛选
                     </DialogTrigger>
-                    <DialogContent className="top-auto right-0 bottom-0 left-0 flex max-h-[min(86svh,44rem)] max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden border-x-0 border-b-0 bg-background p-0 shadow-ledger-popover sm:top-3 sm:right-3 sm:bottom-3 sm:left-auto sm:max-h-none sm:w-[min(32rem,calc(100vw-2rem))] sm:max-w-none sm:translate-x-0 sm:translate-y-0 sm:border">
+                    <DialogContent className="flex max-h-[min(86svh,44rem)] w-[min(42rem,calc(100vw-2rem))] max-w-none flex-col gap-0 overflow-hidden bg-background p-0 shadow-ledger-popover sm:max-w-none lg:w-[min(56rem,calc(100vw-4rem))]">
                       <DialogHeader className="sr-only">
                         <DialogTitle>调整筛选</DialogTitle>
                         <DialogDescription>
