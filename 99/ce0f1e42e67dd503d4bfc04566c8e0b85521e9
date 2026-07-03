@@ -1,0 +1,21 @@
+AGENTS.md
+  s_2cf367b973b3ee::t_04e40373a3d078 9,15,18,20,34,62,65-66,74,78-86,90-97,99-102,104-108,112-113,118-119,122-123,176-177,196-197,281-282,291-305,307,313-314
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "99ce0f1e42e67dd503d4bfc04566c8e0b85521e9",
+  "prompts": {},
+  "sessions": {
+    "s_2cf367b973b3ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f2593-6c96-7b21-a76a-4c8f83d79571",
+        "model": "unknown"
+      },
+      "human_author": "_lmmmmmm <lmmmmmm12138@gmail.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
