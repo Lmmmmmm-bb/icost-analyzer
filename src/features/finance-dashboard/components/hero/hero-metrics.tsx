@@ -76,7 +76,7 @@ export function HeroMetrics({
 
   return (
     <Card className="relative gap-0 overflow-hidden bg-card/90 py-0 shadow-ledger-panel backdrop-blur-xl">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/35 via-transparent to-transparent" />
       <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-70" />
       <CardContent className="p-0">
         <div className="grid divide-y divide-border/70 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">

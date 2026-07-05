@@ -43,7 +43,7 @@ export function WorkspaceHero({
   return (
     <section className="flex flex-col gap-5">
       <div className="relative overflow-hidden border border-border/80 bg-card/88 shadow-ledger-panel backdrop-blur-xl">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-foreground/10 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/40 via-foreground/10 to-transparent" />
         <div className="absolute top-0 bottom-0 left-0 w-1 bg-foreground/85" />
         <LedgerEdgeNotch className="right-0 bottom-0 opacity-45" />
         <LedgerCornerGrid className="right-4 bottom-4 opacity-20" />

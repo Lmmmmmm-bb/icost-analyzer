@@ -59,7 +59,7 @@ export function FilterPanel({
     >
       <div
         className={cn(
-          "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent",
+          "absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/40 via-transparent to-transparent",
           isDialog && "z-20"
         )}
       />

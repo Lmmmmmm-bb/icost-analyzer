@@ -42,7 +42,7 @@ export function DashboardPanel({
           "hover:-translate-y-0.5 hover:bg-card/95 hover:shadow-ledger-chart-hover motion-reduce:hover:translate-y-0"
       )}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/40 via-transparent to-transparent" />
       <LedgerEdgeNotch className="right-0 bottom-0 opacity-45 group-hover/card:opacity-75" />
       <CardHeader className="relative border-b border-border/70 p-4">
         <CardTitle className="flex items-center gap-2">

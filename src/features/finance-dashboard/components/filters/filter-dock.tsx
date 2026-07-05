@@ -107,7 +107,7 @@ export function FilterDock({
   }
 
   return (
-    <div className="relative !transform-none !animate-none">
+    <div className="relative transform-none! animate-none!">
       <div ref={sentinelRef} aria-hidden="true" className="h-px" />
       <div style={isDocked ? { minHeight: barHeight } : undefined}>
         <div
@@ -124,7 +124,7 @@ export function FilterDock({
                 isDocked && "shadow-ledger-popover"
               )}
             >
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/40 via-transparent to-transparent" />
+              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/40 via-transparent to-transparent" />
               <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                 <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
                   <div className="flex shrink-0 items-center gap-2">

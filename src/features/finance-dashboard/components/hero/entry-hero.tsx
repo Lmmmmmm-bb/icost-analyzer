@@ -98,7 +98,7 @@ export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
 function EntryInsightPreview() {
   return (
     <div className="relative max-w-3xl overflow-hidden border border-border/70 bg-card/65 shadow-ledger-panel backdrop-blur">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-foreground/35 via-transparent to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/35 via-transparent to-transparent" />
       <LedgerCornerGrid className="top-3 right-3 opacity-25" />
       <div className="relative grid md:grid-cols-[minmax(0,1.1fr)_minmax(220px,0.9fr)]">
         <div className="flex min-w-0 flex-col md:h-[17rem]">
