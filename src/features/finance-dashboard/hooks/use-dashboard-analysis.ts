@@ -32,10 +32,10 @@ import {
   getWeekSummary,
   summarizeBy,
 } from "../model/analytics"
-import { unique } from "../model/collections"
 import { ALL_RANGE } from "../model/constants"
 import { dateKey } from "../model/date"
 import { filterTransactions } from "../model/filtering"
+import { getMissingRates } from "../model/money"
 import type { Filters, RateMap, Transaction } from "../model/types"
 
 type DashboardAnalysisParams = {
@@ -123,10 +123,7 @@ export function useDashboardAnalysis({
     )
   }, [filters, invalidDateRange, transactions, yearOverYearPeriod])
   const missingRates = useMemo(
-    () =>
-      unique(
-        filtered.map((tx) => tx.currency).filter((currency) => !rates[currency])
-      ),
+    () => getMissingRates(filtered, rates),
     [filtered, rates]
   )
   const stats = useMemo(() => getStats(filtered, rates), [filtered, rates])

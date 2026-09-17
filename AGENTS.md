@@ -7,6 +7,9 @@
 - The product is a local-first iCost Excel analyzer. Users upload `.xlsx` or
   `.xls` exports in the browser, then inspect spending metrics, linked charts,
   summary tables, filters, exchange rates, and paginated transaction details.
+- The dashboard also exposes four read-only WebMCP site tools to compatible
+  agent browsers after each workbook's explicit, in-page user opt-in. Only
+  aggregate results are returned; no transaction-list tool is exposed.
 - This is an open-source, third-party companion project for iCost exports. Do
   not imply official iCost affiliation in product copy, documentation, package
   metadata, or repository materials unless the user explicitly provides that
@@ -47,6 +50,9 @@
 - If a product change affects parsing rules, analytics semantics, exchange-rate
   behavior, persistence, browser storage, privacy boundaries, or expected user
   workflow, update README.md in the same change.
+- Agent tool results leave the page for the user's chosen agent when invoked.
+  Keep this disclosure visible in the UI and README. Do not claim that every
+  agent, browser, CLI, or extension supports WebMCP without a real call test.
 - Use fictional, anonymized, or generated examples only. Never add real finance
   exports, private screenshots, personal categories, or sensitive sample data to
   docs, fixtures, or commits.
@@ -66,6 +72,9 @@
   worksheet and maps supported column aliases into `Transaction` records.
 - Required data is date plus amount. Rows with invalid dates or non-numeric
   amounts are skipped.
+- Empty amount cells are invalid. Numeric Excel dates respect the workbook's
+  1900/1904 date system; date strings are validated strictly. The UI shows a
+  count of skipped invalid rows without logging their contents.
 - Missing transaction type falls back to `支出` for negative amounts and `收入`
   for non-negative amounts.
 - Missing currency falls back to `CNY`; missing categories fall back to
@@ -100,6 +109,9 @@
   conversion, filtering, rate inputs, collections, and analytics.
 - `src/features/finance-dashboard/upload`: workbook parsing, file drop handling,
   and upload/parsing state.
+- `src/features/finance-dashboard/agent`: Zod tool schemas, pure read-only
+  queries, the WebMCP adapter, and the React authorization bridge. Query-core
+  files must not import React, ECharts, or browser APIs.
 - `src/features/finance-dashboard/components/hero`: landing copy, workbook
   upload card, parsing status, loaded-workbook hero, workspace drop overlay,
   metrics, and comparison sections.
@@ -133,6 +145,7 @@ pnpm dev
 pnpm build
 pnpm lint
 pnpm typecheck
+pnpm test
 pnpm format
 pnpm preview
 ```
@@ -140,7 +153,9 @@ pnpm preview
 - `pnpm dev`: start the Vite dev server.
 - `pnpm build`: run `tsc -b` and then `vite build`.
 - `pnpm lint`: run ESLint across the repository.
-- `pnpm typecheck`: run `tsc --noEmit`.
+- `pnpm typecheck`: type-check both the app and Vite configuration projects.
+- `pnpm test`: run Vitest unit tests for parsing, agent queries, and WebMCP
+  authorization guards.
 - `pnpm format`: run Prettier over `**/*.{ts,tsx}`.
 - `pnpm preview`: preview the production build locally.
 - No deployment command is defined in `package.json`; production output is the
@@ -216,23 +231,21 @@ pnpm preview
 
 ## Testing
 
-- No unit test, browser test, or E2E framework is currently configured.
-- No `test` script exists in `package.json`.
+- Vitest is configured for small deterministic unit tests. Browser validation
+  for WebMCP must still be performed in an actual compatible agent browser.
 - Current verification commands are:
 
 ```bash
 pnpm lint
 pnpm typecheck
+pnpm test
 pnpm build
 ```
 
-- If tests are added, also add the relevant package script and document the
-  test command here.
-- Keep tests close to the implementation or follow the convention introduced by
-  the test framework chosen for this repo; there is no established in-repo test
-  file pattern yet.
-- For parser or analytics changes, prefer small deterministic tests around
-  `model` helpers and workbook parsing once a test framework exists.
+- Tests live beside the code they verify as `*.test.ts`; use generated or
+  fictional records/workbooks only.
+- For parser or analytics changes, extend deterministic tests around model
+  helpers and workbook parsing.
 
 ## Security & Privacy
 
@@ -247,6 +260,12 @@ pnpm build
 - The existing `ThemeProvider` reads and writes only the theme preference in
   `localStorage`; avoid storing sensitive user or application data in browser
   storage.
+- WebMCP tool definitions are registered in the top-level page. Every execute
+  call validates input and checks authorization, parsing state, and the latest
+  context ID. Upload start synchronously revokes authorization, including when
+  parsing later fails. Do not rely on the browser's tool permission alone.
+- Page refresh and replacement workbook require a fresh manual opt-in. Never
+  persist agent authorization or raw ledger data to browser storage.
 - Treat anything rendered in React as user-visible client code. Validate and
   sanitize any future external data at the boundary where it enters the app.
 - Keep dependencies and generated UI component code reviewable; shadcn

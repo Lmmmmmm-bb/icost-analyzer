@@ -28,9 +28,28 @@ export function formatSignedMoney(value: number, compact = false) {
 }
 
 export function toRmb(tx: Transaction, rates: RateMap) {
-  return tx.amount * (rates[tx.currency] ?? 0)
+  return tx.amount * getEffectiveRate(tx.currency, rates)
 }
 
 export function expenseRmb(tx: Transaction, rates: RateMap) {
   return Math.abs(toRmb(tx, rates))
+}
+
+export function getEffectiveRate(currency: string, rates: RateMap) {
+  if (currency === BASE_CURRENCY) return 1
+  const rate = rates[currency]
+  return Number.isFinite(rate) && rate > 0 ? rate : 0
+}
+
+export function getMissingRates(
+  transactions: readonly Transaction[],
+  rates: RateMap
+) {
+  return Array.from(
+    new Set(
+      transactions
+        .map((transaction) => transaction.currency)
+        .filter((currency) => getEffectiveRate(currency, rates) === 0)
+    )
+  )
 }

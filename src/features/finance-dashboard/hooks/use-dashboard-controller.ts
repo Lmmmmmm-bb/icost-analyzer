@@ -15,6 +15,7 @@ import { unique } from "../model/collections"
 import { getMonthDateRange } from "../model/date"
 import { useWorkbookUpload } from "../upload/use-workbook-upload"
 import { useDashboardAnalysis } from "./use-dashboard-analysis"
+import { useAgentAccess } from "../agent/use-agent-access"
 
 export function useDashboardController() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -47,6 +48,13 @@ export function useDashboardController() {
     pageSize,
   })
 
+  const agentAccess = useAgentAccess({
+    transactions,
+    currentViewRows: analysis.filtered,
+    filters,
+    rates,
+  })
+
   const resetAnalysisControls = useCallback(() => {
     setFilters(EMPTY_FILTERS)
     setDrillCategory("")
@@ -73,6 +81,8 @@ export function useDashboardController() {
 
   const { uploadState, uploadWorkbook } = useWorkbookUpload({
     onParsed: applyParsedWorkbook,
+    onStart: agentAccess.revokeForUpload,
+    onFinish: agentAccess.finishUpload,
   })
 
   const applyMonth = useCallback((month: string) => {
@@ -116,6 +126,7 @@ export function useDashboardController() {
     hasTransactions: transactions.length > 0,
     hasAnalysisCharts: analysis.filtered.length > 0,
     analysis,
+    agentAccess,
     setFilters,
     setRates,
     setRateInputs,

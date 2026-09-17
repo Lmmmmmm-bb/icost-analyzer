@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import type { Transaction } from "../model/types"
-import { parseWorkbook } from "./workbook-parser"
+import { parseWorkbookWithDiagnostics } from "./workbook-parser"
 
 const PARSING_STATUS_DELAY_MS = 650
 const PARSING_STATUS_MIN_VISIBLE_MS = 700
@@ -12,6 +12,7 @@ export type WorkbookUploadState = {
   isParsing: boolean
   showParsingStatus: boolean
   parsingFileName: string
+  skippedRows: number
 }
 
 const IDLE_UPLOAD_STATE: WorkbookUploadState = {
@@ -19,13 +20,20 @@ const IDLE_UPLOAD_STATE: WorkbookUploadState = {
   isParsing: false,
   showParsingStatus: false,
   parsingFileName: "",
+  skippedRows: 0,
 }
 
 type UseWorkbookUploadOptions = {
   onParsed: (parsed: Transaction[], file: File) => void | Promise<void>
+  onStart?: () => void
+  onFinish?: () => void
 }
 
-export function useWorkbookUpload({ onParsed }: UseWorkbookUploadOptions) {
+export function useWorkbookUpload({
+  onParsed,
+  onStart,
+  onFinish,
+}: UseWorkbookUploadOptions) {
   const uploadSeq = useRef(0)
   const isParsingRef = useRef(false)
   const statusDelayTimer = useRef<number | null>(null)
@@ -111,6 +119,7 @@ export function useWorkbookUpload({ onParsed }: UseWorkbookUploadOptions) {
     async (file: File) => {
       if (isParsingRef.current) return
 
+      onStart?.()
       const seq = (uploadSeq.current += 1)
       isParsingRef.current = true
       setUploadState({
@@ -118,6 +127,7 @@ export function useWorkbookUpload({ onParsed }: UseWorkbookUploadOptions) {
         isParsing: true,
         showParsingStatus: false,
         parsingFileName: file.name,
+        skippedRows: 0,
       })
       statusDelayTimer.current = window.setTimeout(() => {
         statusDelayTimer.current = null
@@ -134,7 +144,8 @@ export function useWorkbookUpload({ onParsed }: UseWorkbookUploadOptions) {
           await waitForNextPaint()
         }
 
-        const parsed = await parseWorkbook(buffer)
+        const { transactions: parsed, skippedRows } =
+          await parseWorkbookWithDiagnostics(buffer)
         if (seq !== uploadSeq.current) return
         if (!parsed.length)
           throw new Error("未识别到有效交易记录，请确认是 iCost 导出的 Excel。")
@@ -142,6 +153,7 @@ export function useWorkbookUpload({ onParsed }: UseWorkbookUploadOptions) {
         await waitBeforeLeavingParsingStatus()
         if (seq !== uploadSeq.current) return
         await onParsed(parsed, file)
+        setUploadState((current) => ({ ...current, skippedRows }))
       } catch (uploadError) {
         if (seq !== uploadSeq.current) return
         await waitBeforeLeavingParsingStatus()
@@ -154,13 +166,18 @@ export function useWorkbookUpload({ onParsed }: UseWorkbookUploadOptions) {
               : "Excel 解析失败",
         }))
       } finally {
-        if (seq === uploadSeq.current) finishParsing()
+        if (seq === uploadSeq.current) {
+          finishParsing()
+          onFinish?.()
+        }
       }
     },
     [
       clearStatusDelayTimer,
       finishParsing,
       onParsed,
+      onStart,
+      onFinish,
       showParsingStatus,
       waitBeforeLeavingParsingStatus,
       waitForNextPaint,

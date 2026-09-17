@@ -19,7 +19,7 @@ import {
 import type { Dimensions, RateMap, Transaction } from "./types"
 
 export function summarizeBy(
-  transactions: Transaction[],
+  transactions: readonly Transaction[],
   rates: RateMap,
   pickName: (tx: Transaction) => string,
   includeTags = false
@@ -60,7 +60,7 @@ export function getDimensions(transactions: Transaction[]): Dimensions {
   }
 }
 
-export function getDateRange(transactions: Transaction[]) {
+export function getDateRange(transactions: readonly Transaction[]) {
   if (!transactions.length) return null
 
   let start = transactions[0].date
@@ -74,7 +74,10 @@ export function getDateRange(transactions: Transaction[]) {
   return { start, end }
 }
 
-export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
+export function getStats(
+  filtered: readonly Transaction[],
+  rates: RateMap
+): MetricStats {
   let totalExpense = 0
   let totalIncome = 0
   let income = 0
@@ -134,7 +137,7 @@ export function getStats(filtered: Transaction[], rates: RateMap): MetricStats {
   }
 }
 
-export function getMonthly(filtered: Transaction[], rates: RateMap) {
+export function getMonthly(filtered: readonly Transaction[], rates: RateMap) {
   const map = new Map<string, MonthlyItem>()
   const categoryMaps = new Map<string, Map<string, number>>()
   for (const tx of filtered) {
@@ -259,8 +262,8 @@ function getTopMovers(
 }
 
 export function getPeriodComparison(
-  currentScope: Transaction[],
-  previousScope: Transaction[],
+  currentScope: readonly Transaction[],
+  previousScope: readonly Transaction[],
   currentLabel: string,
   previousLabel: string,
   rates: RateMap

@@ -8,6 +8,7 @@ import { ParsingStatusOverlay } from "./hero/parsing-status"
 import { WorkspaceDropOverlay } from "./hero/workspace-drop-overlay"
 import { WorkspaceHero } from "./hero/workspace-hero"
 import { FilterDock } from "./filters/filter-dock"
+import { AgentAccessPanel } from "./agent/agent-access-panel"
 
 const AnalysisCharts = lazy(() =>
   import("./charts/analysis-charts").then((module) => ({
@@ -80,10 +81,19 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
           onUpload={dashboard.uploadWorkbook}
         />
 
+        <AgentAccessPanel
+          access={dashboard.agentAccess}
+          isParsing={uploadState.isParsing}
+          matchedRows={analysis.filtered.length}
+          totalRows={dashboard.transactions.length}
+          missingRates={analysis.missingRates}
+        />
+
         <DashboardAlerts
           uploadError={uploadState.error}
           invalidDateRange={analysis.invalidDateRange}
           missingRates={analysis.missingRates}
+          skippedRows={uploadState.skippedRows}
         />
 
         <FilterPanel
