@@ -14,62 +14,50 @@ function getPackageName(id: string) {
   return scopeOrName?.startsWith("@") ? `${scopeOrName}/${name}` : scopeOrName
 }
 
-function getVendorChunk(id: string) {
-  const packageName = getPackageName(id)
-  if (!packageName) return
-
-  if (["react", "react-dom", "scheduler"].includes(packageName)) {
-    return "vendor-react"
+function matchesPackages(packageNames: string[]) {
+  const packages = new Set(packageNames)
+  return (id: string) => {
+    const packageName = getPackageName(id)
+    return packageName !== undefined && packages.has(packageName)
   }
-
-  if (packageName === "echarts") return "vendor-echarts"
-  if (packageName === "zrender") return "vendor"
-
-  if (
-    [
-      "xlsx",
-      "adler-32",
-      "cfb",
-      "codepage",
-      "crc-32",
-      "ssf",
-      "wmf",
-      "word",
-    ].includes(packageName)
-  ) {
-    return "vendor-xlsx"
-  }
-
-  if (
-    [
-      "@base-ui/react",
-      "@base-ui/utils",
-      "@floating-ui/react-dom",
-      "@floating-ui/utils",
-      "use-sync-external-store",
-    ].includes(packageName)
-  ) {
-    return "vendor-base-ui"
-  }
-
-  if (packageName === "@remixicon/react") return "vendor-icons"
-
-  if (["react-day-picker", "date-fns", "@date-fns/tz"].includes(packageName)) {
-    return "vendor-calendar"
-  }
-
-  return "vendor"
 }
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks(id) {
-          if (!id.includes("node_modules")) return
-          return getVendorChunk(id)
+        codeSplitting: {
+          groups: [
+            {
+              name: "charts-echarts",
+              test: matchesPackages(["echarts"]),
+              priority: 1,
+            },
+            {
+              name: "charts-renderer",
+              test: matchesPackages(["zrender"]),
+              priority: 2,
+            },
+            {
+              name: "workbook",
+              test: matchesPackages([
+                "xlsx",
+                "adler-32",
+                "cfb",
+                "codepage",
+                "crc-32",
+                "ssf",
+                "wmf",
+                "word",
+              ]),
+            },
+            {
+              name: "agent-tools",
+              test: matchesPackages(["zod"]),
+            },
+          ],
         },
       },
     },

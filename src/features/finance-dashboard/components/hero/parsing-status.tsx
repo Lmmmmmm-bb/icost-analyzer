@@ -44,9 +44,13 @@ export function ParsingFileName({ className, fileName }: ParsingFileNameProps) {
 export function ParsingStatusOverlay({
   className,
   fileName,
+  title = "Excel 正在本地解析",
+  description = "文件较大或记录较多时需要等待，完成后会自动进入分析看板。",
 }: {
   className?: string
   fileName: string
+  title?: string
+  description?: string
 }) {
   return (
     <div
@@ -66,10 +70,10 @@ export function ParsingStatusOverlay({
             <ParsingMark className="border-foreground/70" />
           </div>
           <div className="font-heading text-2xl leading-none font-semibold tracking-[-0.05em]">
-            Excel 正在本地解析
+            {title}
           </div>
           <p className="text-sm leading-6 text-muted-foreground">
-            文件较大或记录较多时需要等待，完成后会自动进入分析看板。
+            {description}
           </p>
           <ParsingFileName
             fileName={fileName}

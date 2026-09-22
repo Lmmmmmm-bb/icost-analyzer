@@ -1,17 +1,7 @@
-import { lazy, Suspense } from "react"
-
-const FinanceDashboard = lazy(() =>
-  import("@/features/finance-dashboard").then((module) => ({
-    default: module.FinanceDashboard,
-  }))
-)
+import { FinanceDashboard } from "@/features/finance-dashboard"
 
 function App() {
-  return (
-    <Suspense fallback={null}>
-      <FinanceDashboard />
-    </Suspense>
-  )
+  return <FinanceDashboard />
 }
 
 export default App
