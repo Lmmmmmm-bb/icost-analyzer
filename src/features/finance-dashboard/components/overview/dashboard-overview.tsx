@@ -4,40 +4,39 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import type { MetricStats, PeriodComparison } from "../../model/analytics-types"
-import type { WorkbookUploadState } from "../../upload/use-workbook-upload"
-import { HeroMetrics } from "./hero-metrics"
+import { OverviewMetrics } from "./overview-metrics"
 import {
   LedgerCornerGrid,
   LedgerEdgeNotch,
   LedgerTitleTicks,
 } from "../shared/ledger-accents"
 
-type WorkspaceHeroProps = {
+type DashboardOverviewProps = {
   fileName: string
   rangeText: string
   stats: MetricStats
   periodComparison: PeriodComparison
   yearComparison: PeriodComparison
-  uploadState: WorkbookUploadState
+  isParsing: boolean
   onUpload: (file: File) => void
 }
 
-export function WorkspaceHero({
+export function DashboardOverview({
   fileName,
   rangeText,
   stats,
   periodComparison,
   yearComparison,
-  uploadState,
+  isParsing,
   onUpload,
-}: WorkspaceHeroProps) {
+}: DashboardOverviewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const uploadFile = useCallback(
     (file?: File) => {
-      if (!file || uploadState.isParsing) return
+      if (!file || isParsing) return
       onUpload(file)
     },
-    [onUpload, uploadState.isParsing]
+    [onUpload, isParsing]
   )
 
   return (
@@ -82,10 +81,10 @@ export function WorkspaceHero({
               <Button
                 type="button"
                 className="shrink-0 font-mono hover:-translate-y-0.5"
-                disabled={uploadState.isParsing}
+                disabled={isParsing}
                 onClick={() => inputRef.current?.click()}
               >
-                {uploadState.isParsing ? "解析中" : "更换文件"}
+                {isParsing ? "解析中" : "更换文件"}
               </Button>
               <Input
                 ref={inputRef}
@@ -94,7 +93,7 @@ export function WorkspaceHero({
                 className="sr-only"
                 tabIndex={-1}
                 aria-label="选择新的 iCost Excel 文件"
-                disabled={uploadState.isParsing}
+                disabled={isParsing}
                 onChange={(event) => {
                   uploadFile(event.target.files?.[0])
                   event.currentTarget.value = ""
@@ -104,7 +103,7 @@ export function WorkspaceHero({
           </div>
         </div>
       </div>
-      <HeroMetrics
+      <OverviewMetrics
         stats={stats}
         periodComparison={periodComparison}
         yearComparison={yearComparison}

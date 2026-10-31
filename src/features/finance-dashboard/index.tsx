@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect } from "react"
 
 import { DashboardBackdrop } from "./components/layout/dashboard-backdrop"
-import { EntryHero } from "./components/hero/entry-hero"
-import { ParsingStatusOverlay } from "./components/hero/parsing-status"
+import { EntryHero } from "./components/entry/entry-hero"
+import { ParsingStatusOverlay } from "./components/feedback/parsing-status"
 import { useDashboardController } from "./hooks/use-dashboard-controller"
 
 function loadDashboardWorkspace() {

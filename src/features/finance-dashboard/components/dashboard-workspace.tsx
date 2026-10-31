@@ -4,9 +4,9 @@ import { useFileDrop } from "../upload/use-file-drop"
 import type { DashboardController } from "../hooks/use-dashboard-controller"
 import { DashboardAlerts } from "./feedback/dashboard-alerts"
 import { NoResultEmptyState } from "./feedback/empty-states"
-import { ParsingStatusOverlay } from "./hero/parsing-status"
-import { WorkspaceDropOverlay } from "./hero/workspace-drop-overlay"
-import { WorkspaceHero } from "./hero/workspace-hero"
+import { ParsingStatusOverlay } from "./feedback/parsing-status"
+import { WorkspaceDropOverlay } from "./feedback/drop-overlay"
+import { DashboardOverview } from "./overview/dashboard-overview"
 import { FilterDock } from "./filters/filter-dock"
 import { AgentAccessPanel } from "./agent/agent-access-panel"
 import { AnalysisCharts } from "./charts/analysis-charts"
@@ -20,12 +20,20 @@ type DashboardWorkspaceProps = {
 }
 
 export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
-  const { analysis, display, uploadState, view, actions, exchange } = dashboard
+  const {
+    analysis,
+    display,
+    uploadState,
+    view,
+    actions,
+    exchange,
+    uploadWorkbook,
+  } = dashboard
   const handleWorkspaceFileDrop = useCallback(
     (file: File) => {
-      if (!uploadState.isParsing) dashboard.uploadWorkbook(file)
+      if (!uploadState.isParsing) uploadWorkbook(file)
     },
-    [dashboard, uploadState.isParsing]
+    [uploadWorkbook, uploadState.isParsing]
   )
 
   const { isDragging: isWorkspaceDragging, dropProps: workspaceDropProps } =
@@ -45,13 +53,13 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
           className="fixed inset-0"
         />
       ) : null}
-      <WorkspaceHero
+      <DashboardOverview
         fileName={dashboard.fileName}
         rangeText={display.rangeText}
         stats={analysis.stats}
         periodComparison={analysis.periodComparison}
         yearComparison={analysis.yearComparison}
-        uploadState={uploadState}
+        isParsing={uploadState.isParsing}
         onUpload={dashboard.uploadWorkbook}
       />
 
@@ -59,7 +67,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
         access={dashboard.agentAccess}
         isParsing={uploadState.isParsing}
         matchedRows={analysis.filtered.length}
-        totalRows={dashboard.transactions.length}
+        totalRows={dashboard.totalRows}
         missingRates={analysis.missingRates}
       />
 
@@ -81,7 +89,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
         filters={view.filters}
         asOf={dashboard.asOf}
         filteredCount={analysis.filtered.length}
-        totalCount={dashboard.transactions.length}
+        totalCount={dashboard.totalRows}
         actions={actions.filters}
       >
         <FilterPanel
@@ -137,7 +145,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
       )}
 
       <TransactionTable
-        rows={display.detailRows}
+        rowCount={display.rowCount}
         pagedRows={display.pagedRows}
         safePage={display.safePage}
         totalPages={display.totalPages}

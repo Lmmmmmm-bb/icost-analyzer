@@ -27,7 +27,7 @@ import { TransactionRow } from "./transaction-row"
 import { TransactionTableControls } from "./transaction-table-controls"
 
 type TransactionTableProps = {
-  rows: Transaction[]
+  rowCount: number
   pagedRows: Transaction[]
   safePage: number
   totalPages: number
@@ -40,7 +40,7 @@ type TransactionTableProps = {
 }
 
 export function TransactionTable({
-  rows,
+  rowCount,
   pagedRows,
   pageSize,
   safePage,
@@ -62,7 +62,7 @@ export function TransactionTable({
           <LedgerTitleTicks />
         </CardTitle>
         <CardDescription>
-          共 {rows.length} 条匹配记录，外币保留原币金额，并展示人民币折算金额。
+          共 {rowCount} 条匹配记录，外币保留原币金额，并展示人民币折算金额。
         </CardDescription>
         <CardAction>
           <TransactionTableControls
@@ -97,7 +97,7 @@ export function TransactionTable({
         </Table>
         <Separator />
         <TransactionPagination
-          rowCount={rows.length}
+          rowCount={rowCount}
           pageCount={pagedRows.length}
           safePage={safePage}
           totalPages={totalPages}

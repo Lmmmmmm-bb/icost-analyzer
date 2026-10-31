@@ -14,7 +14,7 @@ import type {
   MonthlyReviewItem,
 } from "../../../model/transaction-details"
 import { formatMoney, formatOriginalAmount } from "../../../model/money"
-import { getDirectionBadgeVariant } from "../../../model/transaction-rules"
+import { getDirectionBadgeVariant } from "../../shared/transaction-presentation"
 
 type MonthlyBillsDetailProps = {
   month: MonthlyReviewItem

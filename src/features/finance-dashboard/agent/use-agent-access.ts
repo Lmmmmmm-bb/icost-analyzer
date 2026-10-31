@@ -10,8 +10,12 @@ import {
 import type { Filters, RateMap, Transaction } from "../model/types"
 import type { LedgerSnapshot } from "./query-types"
 import type { AgentAccessState } from "./webmcp"
+import type { AgentAccessView, AgentSupportStatus } from "./access-types"
 
-type AgentSupportStatus = "checking" | "ready" | "unsupported" | "error"
+type AgentAccessController = AgentAccessView & {
+  revokeForUpload: () => void
+  finishUpload: () => void
+}
 
 type UseAgentAccessOptions = {
   transactions: Transaction[]
@@ -36,7 +40,7 @@ export function useAgentAccess({
   filters,
   rates,
   asOf,
-}: UseAgentAccessOptions) {
+}: UseAgentAccessOptions): AgentAccessController {
   const [enabled, setEnabled] = useState(false)
   const [supportStatus, setSupportStatus] = useState<AgentSupportStatus>(() =>
     hasSiteToolSupport() ? "checking" : "unsupported"

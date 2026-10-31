@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import type { DailySummary } from "../../../model/analytics-types"
 import type { TransactionDetail } from "../../../model/transaction-details"
 import { formatMoney, formatOriginalAmount } from "../../../model/money"
-import { getDirectionBadgeVariant } from "../../../model/transaction-rules"
+import { getDirectionBadgeVariant } from "../../shared/transaction-presentation"
 
 type DailyCashflowDetailProps = {
   selectedCashflow?: DailySummary

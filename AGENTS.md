@@ -130,9 +130,10 @@
 - `src/features/finance-dashboard/agent`: Zod tool schemas, pure read-only
   queries, the WebMCP adapter, and the React authorization bridge. Query-core
   files must not import React, ECharts, or browser APIs.
-- `src/features/finance-dashboard/components/hero`: landing copy, workbook
-  upload card, parsing status, loaded-workbook hero, workspace drop overlay,
-  metrics, and comparison sections.
+- `components/entry`: landing copy, upload card, and entry-page composition.
+- `components/overview`: loaded-workbook overview, metrics, and comparisons.
+- `components/agent`: authorization UI, depending on `agent/access-types.ts`,
+  never the complete dashboard controller.
 - `src/features/finance-dashboard/components/filters`: quick range, date, type,
   currency, category, account, book, tag, excluded tag, keyword, active-filter,
   panel, dock, and chip controls.
@@ -146,9 +147,13 @@
 - `src/features/finance-dashboard/components/transactions`: transaction table,
   rows, controls, sorting, and pagination.
 - `src/features/finance-dashboard/components/shared`: reusable dashboard panel,
-  visual accents, and shared primitives.
+  visual accents, shared primitives, and transaction badge presentation. Domain
+  transaction rules must not contain UI variants.
 - `src/features/finance-dashboard/components/feedback`: alert and empty-state
-  surfaces.
+  surfaces, parsing status, and drop overlays shared by entry and workspace.
+- `components/dashboard-workspace.tsx` is the composition root allowed to
+  receive the controller. Child components declare narrow value/action contracts;
+  transaction tables receive a row count plus current-page rows, not all rows.
 - `src/features/finance-dashboard/components/layout`: dashboard background and
   layout decoration.
 

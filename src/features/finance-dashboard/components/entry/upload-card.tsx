@@ -13,7 +13,11 @@ import { Input } from "@/components/ui/input"
 import { RiFileChartLine } from "@remixicon/react"
 
 import type { WorkbookUploadState } from "../../upload/use-workbook-upload"
-import { ParsingFileName, ParsingMark, ParsingSweep } from "./parsing-status"
+import {
+  ParsingFileName,
+  ParsingMark,
+  ParsingSweep,
+} from "../feedback/parsing-status"
 import { LedgerEdgeNotch, LedgerTitleTicks } from "../shared/ledger-accents"
 
 const UPLOAD_FACTS = [

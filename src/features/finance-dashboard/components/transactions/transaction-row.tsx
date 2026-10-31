@@ -3,10 +3,8 @@ import { TableCell, TableRow } from "@/components/ui/table"
 
 import type { RateMap, Transaction } from "../../model/types"
 import { formatMoney, formatOriginalAmount, toRmb } from "../../model/money"
-import {
-  getDirectionBadgeVariant,
-  getTransactionDirection,
-} from "../../model/transaction-rules"
+import { getTransactionDirection } from "../../model/transaction-rules"
+import { getDirectionBadgeVariant } from "../shared/transaction-presentation"
 
 type TransactionRowProps = {
   transaction: Transaction

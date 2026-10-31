@@ -11,7 +11,7 @@ import { formatMoney } from "../../model/money"
 import { LedgerCornerGrid, LedgerEdgeNotch } from "../shared/ledger-accents"
 import { CollapsibleComparisonSection } from "./metrics-comparison/collapsible-comparison-section"
 
-type HeroMetricsProps = {
+type OverviewMetricsProps = {
   stats: MetricStats
   periodComparison: PeriodComparison
   yearComparison: PeriodComparison
@@ -28,11 +28,11 @@ type MetricItem = {
   }[]
 }
 
-export function HeroMetrics({
+export function OverviewMetrics({
   stats,
   periodComparison,
   yearComparison,
-}: HeroMetricsProps) {
+}: OverviewMetricsProps) {
   const primaryMetrics: MetricItem[] = [
     {
       label: "总支出",

@@ -2,8 +2,6 @@ import type { Transaction } from "./types"
 
 export type TransactionDirection = "expense" | "income" | "other"
 
-export type DirectionBadgeVariant = "destructive" | "positive" | "secondary"
-
 export const INCOME_TRANSACTION_TYPES = [
   "收入",
   "退款入账",
@@ -39,12 +37,4 @@ export function getTransactionDirection(
   if (isIncomeTransaction(tx)) return "income"
   if (isExpenseTransaction(tx)) return "expense"
   return "other"
-}
-
-export function getDirectionBadgeVariant(
-  direction: TransactionDirection
-): DirectionBadgeVariant {
-  if (direction === "expense") return "destructive"
-  if (direction === "income") return "positive"
-  return "secondary"
 }

@@ -16,7 +16,7 @@ const HERO_FACTS = [
   },
 ] as const
 
-export function HeroCopy() {
+export function EntryCopy() {
   return (
     <div className="flex max-w-4xl flex-col gap-5">
       <div className="flex flex-wrap items-center gap-2">

@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils"
 
 import { useFileDrop } from "../../upload/use-file-drop"
 import type { WorkbookUploadState } from "../../upload/use-workbook-upload"
-import { HeroCopy } from "./hero-copy"
-import { ParsingStatusOverlay } from "./parsing-status"
+import { EntryCopy } from "./entry-copy"
+import { ParsingStatusOverlay } from "../feedback/parsing-status"
 import { UploadCard } from "./upload-card"
-import { DropOverlay } from "./workspace-drop-overlay"
+import { DropOverlay } from "../feedback/drop-overlay"
 import { LedgerCornerGrid } from "../shared/ledger-accents"
 
 const PREVIEW_ROWS = [
@@ -82,7 +82,7 @@ export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
       ) : null}
       <div className="ledger-rise relative z-20 mx-auto grid w-full max-w-7xl gap-7 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:grid-rows-[auto_auto] lg:items-start lg:gap-x-10 lg:gap-y-6 lg:px-10">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
-          <HeroCopy />
+          <EntryCopy />
         </div>
         <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
           <UploadCard uploadState={uploadState} onUpload={onUpload} />

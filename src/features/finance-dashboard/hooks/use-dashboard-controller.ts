@@ -45,7 +45,7 @@ export function useDashboardController() {
   })
 
   return {
-    transactions,
+    totalRows: transactions.length,
     fileName,
     asOf: context.asOf,
     view,

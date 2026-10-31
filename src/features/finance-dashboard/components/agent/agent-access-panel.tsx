@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button"
 
-import type { DashboardController } from "../../hooks/use-dashboard-controller"
+import type { AgentAccessView } from "../../agent/access-types"
 import { DashboardPanel } from "../shared/dashboard-panel"
 
 type AgentAccessPanelProps = {
-  access: DashboardController["agentAccess"]
+  access: AgentAccessView
   isParsing: boolean
   matchedRows: number
   totalRows: number

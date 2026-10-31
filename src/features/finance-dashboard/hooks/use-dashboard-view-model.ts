@@ -137,7 +137,7 @@ export function useDashboardViewModel({
   )
 
   return {
-    detailRows,
+    rowCount: detailRows.length,
     safePage,
     totalPages,
     pagedRows,
