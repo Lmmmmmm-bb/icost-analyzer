@@ -60,7 +60,11 @@ export function SummaryTables({
             value={summarySort}
             onValueChange={(value) => onSummarySortChange(value as SummarySort)}
           >
-            <SelectTrigger size="sm" className="w-[7.5rem]">
+            <SelectTrigger
+              aria-label="分类汇总排序"
+              size="sm"
+              className="w-[7.5rem]"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent align="end">
@@ -91,7 +95,11 @@ export function SummaryTables({
             value={tagSort}
             onValueChange={(value) => onTagSortChange(value as TagSort)}
           >
-            <SelectTrigger size="sm" className="w-[8rem]">
+            <SelectTrigger
+              aria-label="标签汇总排序"
+              size="sm"
+              className="w-[8rem]"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent align="end">

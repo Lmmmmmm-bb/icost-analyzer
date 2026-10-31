@@ -206,7 +206,7 @@ function VisibleFilterChip({
       variant="outline"
       size="xs"
       className="max-w-full min-w-0 justify-start bg-background/65 font-mono shadow-none sm:max-w-56"
-      aria-label={`清除${filter.label}筛选：${ariaDetail}`}
+      aria-label={`${filter.label}：${ariaDetail}，清除此筛选`}
       onClick={onClear}
     >
       <span className="min-w-0 truncate">

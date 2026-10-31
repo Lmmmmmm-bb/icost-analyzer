@@ -77,7 +77,11 @@ export function HeatmapPanel({
               onScaleModeChange(value as HeatmapColorScaleMode)
             }
           >
-            <SelectTrigger size="sm" className="w-full sm:w-[10.5rem]">
+            <SelectTrigger
+              aria-label="热力图颜色范围"
+              size="sm"
+              className="w-full sm:w-[10.5rem]"
+            >
               <SelectValue>{selectedScaleLabel}</SelectValue>
             </SelectTrigger>
             <SelectContent>

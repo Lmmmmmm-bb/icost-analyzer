@@ -80,7 +80,7 @@ export function EntryHero({ uploadState, onUpload }: EntryHeroProps) {
       {uploadState.showParsingStatus ? (
         <ParsingStatusOverlay fileName={uploadState.parsingFileName} />
       ) : null}
-      <div className="ledger-rise relative z-20 mx-auto grid w-full max-w-7xl gap-7 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:grid-rows-[auto_auto] lg:items-start lg:gap-x-10 lg:gap-y-6 lg:px-10">
+      <div className="relative z-20 mx-auto grid w-full max-w-7xl gap-7 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:grid-rows-[auto_auto] lg:items-start lg:gap-x-10 lg:gap-y-6 lg:px-10">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           <EntryCopy />
         </div>

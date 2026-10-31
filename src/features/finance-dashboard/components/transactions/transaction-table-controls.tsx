@@ -42,7 +42,11 @@ export function TransactionTableControls({
         value={detailSort}
         onValueChange={(value) => onDetailSortChange(value as DetailSort)}
       >
-        <SelectTrigger size="sm" className="w-[7.5rem]">
+        <SelectTrigger
+          aria-label="交易明细排序"
+          size="sm"
+          className="w-[7.5rem]"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent align="end">
@@ -62,7 +66,11 @@ export function TransactionTableControls({
           onPageSizeChange(Number(value))
         }}
       >
-        <SelectTrigger size="sm" className="w-[6.5rem]">
+        <SelectTrigger
+          aria-label="每页交易条数"
+          size="sm"
+          className="w-[6.5rem]"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent align="end">

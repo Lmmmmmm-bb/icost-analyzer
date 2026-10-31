@@ -67,9 +67,6 @@ export function UploadCard({ uploadState, onUpload }: UploadCardProps) {
         <button
           type="button"
           className="relative flex min-h-44 cursor-pointer flex-col items-start justify-between gap-4 overflow-hidden border border-dashed border-border/80 bg-background/65 p-5 text-left transition-all duration-300 hover:border-foreground/45 hover:bg-muted/45 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-wait disabled:hover:border-border/80 disabled:hover:bg-background/65"
-          aria-label={
-            isParsing ? "正在解析账单文件" : "选择或拖入账单文件进行本地解析"
-          }
           aria-busy={isParsing}
           disabled={isParsing}
           onClick={() => {

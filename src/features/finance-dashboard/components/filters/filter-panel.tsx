@@ -185,6 +185,7 @@ export function FilterPanel({
 
         <FilterRow label="关键词" variant={variant}>
           <Input
+            aria-label="关键词"
             placeholder="搜索备注、分类、账本、账户、标签、地点、币种……"
             className="bg-background/70"
             value={filters.keyword}

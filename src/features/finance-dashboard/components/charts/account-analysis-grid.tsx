@@ -85,7 +85,11 @@ export function AccountAnalysisGrid({
               value={sort}
               onValueChange={(value) => onSortChange(value as AccountSort)}
             >
-              <SelectTrigger size="sm" className="w-[7.75rem]">
+              <SelectTrigger
+                aria-label="账户支出排序"
+                size="sm"
+                className="w-[7.75rem]"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">

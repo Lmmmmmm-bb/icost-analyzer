@@ -17,6 +17,14 @@ export function DailyCashflowDayButton({
   className,
   ...props
 }: DailyCashflowDayButtonProps) {
+  const incomeText =
+    item && item.income > 0 ? `+${formatMoney(item.income, true)}` : ""
+  const expenseText =
+    item && item.expense > 0 ? `-${formatMoney(item.expense, true)}` : ""
+  const visibleLabel = [day.date.getDate(), incomeText, expenseText]
+    .filter(Boolean)
+    .join(" ")
+
   return (
     <CalendarDayButton
       day={day}
@@ -28,6 +36,7 @@ export function DailyCashflowDayButton({
         className
       )}
       {...props}
+      aria-label={`${visibleLabel}，${props["aria-label"] ?? day.date.toLocaleDateString("zh-CN")}`}
     >
       <span className="relative z-10 text-[0.7rem] font-medium">
         {day.date.getDate()}
@@ -35,14 +44,10 @@ export function DailyCashflowDayButton({
       {item ? (
         <span className="relative z-10 mt-auto flex w-full flex-col gap-0.5 text-[0.56rem] tracking-tight">
           {item.income > 0 ? (
-            <span className="truncate text-positive">
-              +{formatMoney(item.income, true)}
-            </span>
+            <span className="truncate text-positive">{incomeText}</span>
           ) : null}
           {item.expense > 0 ? (
-            <span className="truncate text-destructive">
-              -{formatMoney(item.expense, true)}
-            </span>
+            <span className="truncate text-destructive">{expenseText}</span>
           ) : null}
         </span>
       ) : null}
