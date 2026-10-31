@@ -69,6 +69,31 @@ function snapshot(filters: Filters = EMPTY_FILTERS): LedgerSnapshot {
 }
 
 describe("agent query core", () => {
+  it("returns monthly aggregates with counts and missing-rate status only", () => {
+    const result = getBreakdown(snapshot(), {
+      expectedContextId: CONTEXT_ID,
+      dimension: "month",
+      limit: 1,
+    })
+    expect(result.ok).toBe(true)
+    if (!result.ok || result.data.dimension !== "month") return
+    expect(result.truncated).toBe(true)
+    expect(result.data.totalGroups).toBe(2)
+    expect(result.data.groups[0]).toMatchObject({
+      name: "2026-08",
+      count: 5,
+      expense: 120,
+      income: 330,
+      net: 210,
+      conversionStatus: "partial",
+      missingCurrencies: ["XYZ"],
+      excludedFromConversionCount: 1,
+    })
+    expect(result.data.groups[0]).not.toHaveProperty("bills")
+    expect(result.data.groups[0]).not.toHaveProperty("largestExpense")
+    expect(JSON.stringify(result)).not.toContain("只用于测试的备注")
+  })
+
   it("defaults to the current filtered view and intersects extra conditions", () => {
     const state = snapshot({
       ...EMPTY_FILTERS,

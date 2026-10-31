@@ -102,6 +102,9 @@
 
 ## Feature Architecture
 
+See `docs/architecture.md` for dependency boundaries, transition semantics, and
+the staged refactor validation record. No additional ESLint rules are required.
+
 - `src/features/finance-dashboard/index.tsx`: feature entry point, top-level
   dashboard shell, entry hero/workspace switch, and backdrop composition.
 - `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: workbook
@@ -181,6 +184,9 @@ pnpm preview
   authorization guards.
 - `pnpm format`: run Prettier over `**/*.{ts,tsx}`.
 - `pnpm preview`: preview the production build locally.
+- `pnpm exec node scripts/benchmark-analytics.mjs`: benchmark pure analytics
+  with 1k/10k/50k generated records. Excludes parsing and browser rendering;
+  use repeated runs on the same machine for comparisons, not a CI time threshold.
 - No deployment command is defined in `package.json`; production output is the
   Vite `dist` directory produced by `pnpm build`.
 - `package.json` currently has `private: true` to prevent accidental npm
@@ -300,7 +306,7 @@ pnpm build
 ## Configuration
 
 - `vite.config.ts` enables React and Tailwind CSS plugins, maps `@` to `./src`,
-  and splits React, ECharts, XLSX, and other vendor code into manual chunks.
+  and separates ECharts, its renderer, XLSX, and Zod with code-splitting groups.
 - `components.json` defines shadcn/ui settings:
   - Tailwind CSS file: `src/index.css`
   - aliases: `@/components`, `@/components/ui`, `@/lib`, `@/lib/utils`,
@@ -336,9 +342,11 @@ pnpm build
   handling for theme toggling.
 - `src/features/finance-dashboard/index.tsx`: dashboard feature shell.
 - `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: dashboard
-  state and actions.
+  composition and workbook ownership.
 - `src/features/finance-dashboard/hooks/use-dashboard-analysis.ts`: derived
   dashboard calculations.
+- `src/features/finance-dashboard/hooks/use-dashboard-view-model.ts`: display
+  projections, sorting, pagination, and deferred detail selectors.
 - `src/features/finance-dashboard/upload/workbook-parser.ts`: workbook parser
   and column alias mapping.
 - `src/features/finance-dashboard/upload/use-workbook-upload.ts`: upload,

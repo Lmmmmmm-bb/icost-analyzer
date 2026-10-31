@@ -134,4 +134,34 @@ describe("WebMCP adapter", () => {
     )
     expect(registerTool).not.toHaveBeenCalled()
   })
+
+  it.each(["revoked", "replaced"] as const)(
+    "rejects a context %s while query code is loading",
+    async (change) => {
+      const initial = { ...state(), enabled: true }
+      const changed =
+        change === "revoked"
+          ? { ...initial, enabled: false }
+          : {
+              ...initial,
+              snapshot: {
+                ...initial.snapshot!,
+                contextId: "22222222-2222-4222-8222-222222222222",
+              },
+            }
+      const getState = vi
+        .fn()
+        .mockReturnValue(changed)
+        .mockReturnValueOnce(initial)
+      const onCalled = vi.fn()
+      const tool = createWebMcpTools(getState, onCalled).find(
+        (item) => item.name === "get_ledger_context"
+      )!
+      expect(await tool.execute({})).toMatchObject({
+        ok: false,
+        error: { code: "STALE_CONTEXT" },
+      })
+      expect(onCalled).not.toHaveBeenCalled()
+    }
+  )
 })
