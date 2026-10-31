@@ -42,7 +42,7 @@ export function CategoryAnalysisGrid({
         }
       >
         <EChart
-          option={options.pieOption}
+          createOption={options.pieOption}
           onClick={(params) => {
             if (!drillCategory) onDrillCategoryChange(String(params.name))
           }}
@@ -67,7 +67,7 @@ export function CategoryAnalysisGrid({
           </div>
         }
       >
-        <EChart option={options.rankingOption} />
+        <EChart createOption={options.rankingOption} />
       </DashboardPanel>
     </div>
   )

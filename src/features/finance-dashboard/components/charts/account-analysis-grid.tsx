@@ -1,4 +1,4 @@
-import type { EChartsOption } from "echarts"
+import type { ChartOptionFactory } from "@/features/finance-dashboard/components/charts/types"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -30,7 +30,7 @@ const ACCOUNT_SORT_OPTIONS = [
 ] satisfies Array<{ value: AccountSort; label: string }>
 
 type AccountAnalysisGridProps = {
-  option: EChartsOption
+  option: ChartOptionFactory
   rows: SummaryItem[]
   sort: AccountSort
   activeAccounts: string[]
@@ -68,7 +68,7 @@ export function AccountAnalysisGrid({
         action={renderResetAction()}
       >
         <EChart
-          option={option}
+          createOption={option}
           onClick={(params) => onAccountSelect(String(params.name))}
         />
       </DashboardPanel>

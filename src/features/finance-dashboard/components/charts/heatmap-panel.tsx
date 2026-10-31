@@ -1,3 +1,10 @@
+import { useCallback } from "react"
+import { useTheme } from "@/components/theme-provider"
+import { createHeatmapOption } from "@/features/finance-dashboard/components/charts/options/heatmap-option"
+import {
+  fillYearHeatmap,
+  type HeatmapYearData,
+} from "@/features/finance-dashboard/components/charts/options/heatmap-data"
 import {
   Select,
   SelectContent,
@@ -10,10 +17,10 @@ import {
 import { formatMoney } from "../../model/money"
 import { DashboardPanel } from "../shared/dashboard-panel"
 import { EChart } from "./e-chart"
-import type { HeatmapChartOption, HeatmapColorScaleMode } from "./types"
+import type { HeatmapColorScaleMode } from "./types"
 
 type HeatmapPanelProps = {
-  heatmapOptions: HeatmapChartOption[]
+  years: HeatmapYearData[]
   scaleMode: HeatmapColorScaleMode
   onScaleModeChange: (mode: HeatmapColorScaleMode) => void
 }
@@ -30,20 +37,20 @@ const heatmapScaleOptions = [
 ] satisfies { value: HeatmapColorScaleMode; label: string }[]
 
 export function HeatmapPanel({
-  heatmapOptions,
+  years,
   scaleMode,
   onScaleModeChange,
 }: HeatmapPanelProps) {
-  const cappedDays = heatmapOptions.reduce(
+  const cappedDays = years.reduce(
     (total, heatmap) => total + heatmap.cappedDays,
     0
   )
   const colorMaxValue = Math.max(
-    ...heatmapOptions.map((heatmap) => heatmap.colorMaxValue),
+    ...years.map((heatmap) => heatmap.colorMaxValue),
     1
   )
   const actualMaxValue = Math.max(
-    ...heatmapOptions.map((heatmap) => heatmap.actualMaxValue),
+    ...years.map((heatmap) => heatmap.actualMaxValue),
     1
   )
   const selectedScaleLabel =
@@ -95,17 +102,32 @@ export function HeatmapPanel({
             </SelectContent>
           </Select>
         </div>
-        {heatmapOptions.map((heatmap) => (
+        {years.map((heatmap) => (
           <div key={heatmap.year} className="grid gap-2">
             <div className="flex items-center gap-2 text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
               <span className="h-px flex-1 bg-border" />
               {heatmap.year}
               <span className="h-px flex-1 bg-border" />
             </div>
-            <EChart option={heatmap.option} className="h-40" />
+            <YearHeatmap data={heatmap} />
           </div>
         ))}
       </div>
     </DashboardPanel>
   )
+}
+
+function YearHeatmap({ data }: { data: HeatmapYearData }) {
+  const { resolvedTheme } = useTheme()
+  const createOption = useCallback(
+    () =>
+      createHeatmapOption(
+        fillYearHeatmap(data.year, data.values),
+        resolvedTheme,
+        data.year,
+        data.colorMaxValue
+      ),
+    [data, resolvedTheme]
+  )
+  return <EChart createOption={createOption} className="h-40" />
 }

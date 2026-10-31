@@ -1,21 +1,14 @@
 import type { EChartsOption } from "echarts"
 
-export type HeatmapChartOption = {
-  year: string
-  option: EChartsOption
-  cappedDays: number
-  colorMaxValue: number
-  actualMaxValue: number
-}
+export type ChartOptionFactory = () => EChartsOption
 
 export type HeatmapColorScaleMode = "robust" | "full"
 
 export type ChartPanelOptions = {
-  monthlyOption: EChartsOption
-  pieOption: EChartsOption
-  rankingOption: EChartsOption
-  currencyOption: EChartsOption
-  weekOption: EChartsOption
-  tagOption: EChartsOption
-  heatmapOptions: HeatmapChartOption[]
+  monthlyOption: ChartOptionFactory
+  pieOption: ChartOptionFactory
+  rankingOption: ChartOptionFactory
+  currencyOption: ChartOptionFactory
+  weekOption: ChartOptionFactory
+  tagOption: ChartOptionFactory
 }

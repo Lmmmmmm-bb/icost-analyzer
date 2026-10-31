@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { useTheme } from "@/components/theme-provider"
 
@@ -11,13 +11,13 @@ import {
 } from "../../model/dashboard-controls"
 import {
   createCurrencyOption,
-  createHeatmapOptionsByYear,
   createMonthlyOption,
   createPieOption,
   createRankingOption,
   createTagOption,
   createWeekOption,
 } from "./chart-options"
+import { createHeatmapYears } from "@/features/finance-dashboard/components/charts/options/heatmap-data"
 import { AccountAnalysisGrid } from "./account-analysis-grid"
 import { CategoryAnalysisGrid } from "./category-analysis-grid"
 import { DailyCashflowPanel } from "./daily-cashflow/daily-cashflow-panel"
@@ -63,38 +63,42 @@ export function AnalysisCharts({
   const [reviewOpen, setReviewOpen] = useState(false)
   const [heatmapScaleMode, setHeatmapScaleMode] =
     useState<HeatmapColorScaleMode>("robust")
-  const monthlyOption = useMemo(
+  const monthlyOption = useCallback(
     () => createMonthlyOption(data.monthly, resolvedTheme),
     [data.monthly, resolvedTheme]
   )
-  const pieOption = useMemo(
+  const pieOption = useCallback(
     () => createPieOption(data.categoryPie, resolvedTheme),
     [data.categoryPie, resolvedTheme]
   )
-  const rankingOption = useMemo(
+  const rankingOption = useCallback(
     () => createRankingOption(data.ranking, resolvedTheme),
     [data.ranking, resolvedTheme]
   )
-  const accountOption = useMemo(
+  const accountOption = useCallback(
     () => createPieOption(data.accountSummary, resolvedTheme),
     [data.accountSummary, resolvedTheme]
   )
-  const currencyOption = useMemo(
+  const currencyOption = useCallback(
     () => createCurrencyOption(data.currencySummary, resolvedTheme),
     [data.currencySummary, resolvedTheme]
   )
-  const weekOption = useMemo(
+  const weekOption = useCallback(
     () => createWeekOption(data.weekSummary, resolvedTheme),
     [data.weekSummary, resolvedTheme]
   )
-  const tagOption = useMemo(
+  const tagOption = useCallback(
     () => createTagOption(data.tagSummary, resolvedTheme),
     [data.tagSummary, resolvedTheme]
   )
-  const heatmapOptions = useMemo(
+  const heatmapYears = useMemo(
     () =>
-      createHeatmapOptionsByYear(data.heatmap, resolvedTheme, heatmapScaleMode),
-    [data.heatmap, heatmapScaleMode, resolvedTheme]
+      createHeatmapYears(
+        data.heatmap,
+        heatmapScaleMode,
+        String(new Date().getFullYear())
+      ),
+    [data.heatmap, heatmapScaleMode]
   )
   const categoryOptions = useMemo(
     () => ({ pieOption, rankingOption }),
@@ -143,7 +147,7 @@ export function AnalysisCharts({
       </div>
 
       <HeatmapPanel
-        heatmapOptions={heatmapOptions}
+        years={heatmapYears}
         scaleMode={heatmapScaleMode}
         onScaleModeChange={setHeatmapScaleMode}
       />

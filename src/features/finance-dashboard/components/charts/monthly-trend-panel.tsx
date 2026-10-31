@@ -1,4 +1,5 @@
-import type { EChartsOption, ECElementEvent } from "echarts"
+import type { ECElementEvent } from "echarts"
+import type { ChartOptionFactory } from "@/features/finance-dashboard/components/charts/types"
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -9,7 +10,7 @@ import { EChart } from "./e-chart"
 import { MonthlyReviewDialog } from "./monthly-review/monthly-review-dialog"
 
 type MonthlyTrendPanelProps = {
-  option: EChartsOption
+  option: ChartOptionFactory
   detailQueries: Pick<TransactionDetailQueries, "monthlyReview" | "month">
   reviewOpen: boolean
   onReviewOpenChange: (open: boolean) => void
@@ -37,7 +38,7 @@ export function MonthlyTrendPanel({
         }
       >
         <EChart
-          option={option}
+          createOption={option}
           onClick={(params) => onApplyMonth(getName(params))}
         />
       </DashboardPanel>

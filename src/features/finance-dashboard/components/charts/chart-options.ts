@@ -1,7 +1,6 @@
 export {
   createCurrencyOption,
   createHeatmapOption,
-  createHeatmapOptionsByYear,
   createMonthlyOption,
   createPieOption,
   createRankingOption,

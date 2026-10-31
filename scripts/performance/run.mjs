@@ -5,6 +5,7 @@ import { parseArgs } from "node:util"
 import { navigation } from "./navigation.mjs"
 import { workflows } from "./workflow.mjs"
 import { snapshots } from "./snapshot.mjs"
+import { charts } from "./charts.mjs"
 
 const { values } = parseArgs({
   options: {
@@ -33,7 +34,7 @@ if (
   throw new Error("性能工作流仅支持本机 HTTP 生产预览")
 if (!values.output.endsWith(".local"))
   throw new Error("请将报告输出到 Git 忽略的 .local 目录")
-const modes = { navigation, workflow: workflows, snapshot: snapshots }
+const modes = { navigation, workflow: workflows, snapshot: snapshots, charts }
 if (values.mode !== "all" && !modes[values.mode])
   throw new Error("未知测试模式")
 const config = {

@@ -20,20 +20,20 @@ export function DistributionChartsGrid({
         title="支出币种分布"
         description="按支出的原币种分组，并统一折算为人民币。"
       >
-        <EChart option={options.currencyOption} />
+        <EChart createOption={options.currencyOption} />
       </DashboardPanel>
       <DashboardPanel
         title="星期支出分布"
         description="观察支出集中发生在一周中的哪些日期。"
       >
-        <EChart option={options.weekOption} />
+        <EChart createOption={options.weekOption} />
       </DashboardPanel>
       <DashboardPanel
         title="标签支出排行"
         description="多标签交易会分别计入每个标签；点击柱子筛选标签。"
       >
         <EChart
-          option={options.tagOption}
+          createOption={options.tagOption}
           onClick={(params) => onTagSelect(String(params.name))}
         />
       </DashboardPanel>
