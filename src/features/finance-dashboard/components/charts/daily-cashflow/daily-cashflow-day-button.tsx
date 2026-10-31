@@ -3,11 +3,11 @@ import type { ComponentProps } from "react"
 import { CalendarDayButton } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 
-import type { DailyCashflowItem } from "../../../model/analytics-types"
+import type { DailySummary } from "../../../model/analytics-types"
 import { formatMoney } from "../../../model/money"
 
 type DailyCashflowDayButtonProps = ComponentProps<typeof CalendarDayButton> & {
-  item?: DailyCashflowItem
+  item?: DailySummary
 }
 
 export function DailyCashflowDayButton({

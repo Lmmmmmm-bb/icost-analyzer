@@ -1,32 +1,16 @@
 import { useMemo } from "react"
 
 import {
-  type AccountSort,
-  RANK_LEVELS,
-  type DetailSort,
-  type RankLevel,
-  type SummarySort,
-  type TagSort,
-} from "../model/dashboard-controls"
-import {
-  paginateRows,
-  sortAccountSummaryRows,
-  sortCategorySummaryRows,
-  sortDetailRows,
-  sortTagSummaryRows,
-} from "../model/dashboard-rows"
-import {
   getCurrentDatePeriod,
   getPreviousDatePeriod,
   getYearOverYearDatePeriod,
 } from "../model/date-periods"
-import type { DashboardChartData } from "../model/analytics-types"
 import {
-  getDailyCashflow,
+  getDailySummary,
   getDateRange,
   getDimensions,
   getHeatmap,
-  getMonthly,
+  getMonthlySummary,
   getPeriodComparison,
   getStats,
   getWeekSummary,
@@ -44,14 +28,6 @@ type DashboardAnalysisParams = {
   filters: Filters
   rates: RateMap
   asOf: string
-  drillCategory: string
-  rankLevel: RankLevel
-  summarySort: SummarySort
-  tagSort: TagSort
-  accountSort: AccountSort
-  detailSort: DetailSort
-  page: number
-  pageSize: number
 }
 
 export function useDashboardAnalysis({
@@ -59,14 +35,6 @@ export function useDashboardAnalysis({
   filters,
   rates,
   asOf,
-  drillCategory,
-  rankLevel,
-  summarySort,
-  tagSort,
-  accountSort,
-  detailSort,
-  page,
-  pageSize,
 }: DashboardAnalysisParams) {
   const dimensions = useMemo(() => getDimensions(transactions), [transactions])
   const dateRange = useMemo(() => getDateRange(transactions), [transactions])
@@ -150,7 +118,10 @@ export function useDashboardAnalysis({
       ),
     [currentPeriod, filtered, rates, yearOverYearPeriod, yearOverYearScope]
   )
-  const monthly = useMemo(() => getMonthly(filtered, rates), [filtered, rates])
+  const monthly = useMemo(
+    () => getMonthlySummary(filtered, rates),
+    [filtered, rates]
+  )
   const categorySummary = useMemo(
     () => summarizeBy(filtered, rates, (tx) => tx.category),
     [filtered, rates]
@@ -160,7 +131,7 @@ export function useDashboardAnalysis({
     [filtered, rates]
   )
   const tagSummary = useMemo(
-    () => summarizeBy(filtered, rates, (tx) => tx.category, true),
+    () => summarizeBy(filtered, rates, (tx) => tx.tags),
     [filtered, rates]
   )
   const currencySummary = useMemo(
@@ -181,100 +152,30 @@ export function useDashboardAnalysis({
     [filtered, rates]
   )
   const dailyCashflow = useMemo(
-    () => getDailyCashflow(filtered, rates),
+    () => getDailySummary(filtered, rates),
     [filtered, rates]
   )
   const heatmap = useMemo(() => getHeatmap(filtered, rates), [filtered, rates])
 
-  const detailRows = useMemo(
-    () => sortDetailRows(filtered, detailSort, rates),
-    [detailSort, filtered, rates]
-  )
-  const { totalPages, safePage, pagedRows } = useMemo(
-    () => paginateRows(detailRows, page, pageSize),
-    [detailRows, page, pageSize]
-  )
-  const expenseTotal = useMemo(
-    () => categorySummary.reduce((sum, item) => sum + item.amount, 0) || 1,
-    [categorySummary]
-  )
-  const rangeText = dateRange
-    ? `${dateKey(dateRange.start)} → ${dateKey(dateRange.end)}`
-    : "等待导入"
-  const categoryPie = useMemo(
-    () =>
-      drillCategory
-        ? summarizeBy(
-            filtered.filter((tx) => tx.category === drillCategory),
-            rates,
-            (tx) => tx.subcategory
-          )
-        : categorySummary,
-    [categorySummary, drillCategory, filtered, rates]
-  )
-  const ranking = useMemo(
-    () =>
-      (rankLevel === RANK_LEVELS[0]
-        ? categorySummary
-        : subcategorySummary
-      ).slice(0, 15),
-    [categorySummary, rankLevel, subcategorySummary]
-  )
-  const chartData = useMemo<DashboardChartData>(
-    () => ({
-      monthly,
-      categoryPie,
-      ranking,
-      accountSummary,
-      currencySummary,
-      weekSummary,
-      tagSummary,
-      heatmap,
-      dailyCashflow,
-    }),
-    [
-      categoryPie,
-      accountSummary,
-      currencySummary,
-      dailyCashflow,
-      heatmap,
-      monthly,
-      ranking,
-      tagSummary,
-      weekSummary,
-    ]
-  )
-
-  const sortedCategoryRows = useMemo(
-    () => sortCategorySummaryRows(categorySummary, summarySort),
-    [categorySummary, summarySort]
-  )
-  const sortedTagRows = useMemo(
-    () => sortTagSummaryRows(tagSummary, tagSort),
-    [tagSort, tagSummary]
-  )
-  const sortedAccountRows = useMemo(
-    () => sortAccountSummaryRows(accountSummary, accountSort),
-    [accountSort, accountSummary]
-  )
-
   return {
     dimensions,
+    dateRange,
     invalidDateRange,
     filtered,
     missingRates,
     stats,
     periodComparison,
     yearComparison,
-    detailRows,
-    safePage,
-    totalPages,
-    pagedRows,
-    expenseTotal,
-    rangeText,
-    chartData,
-    sortedCategoryRows,
-    sortedTagRows,
-    sortedAccountRows,
+    monthly,
+    categorySummary,
+    subcategorySummary,
+    tagSummary,
+    currencySummary,
+    accountSummary,
+    weekSummary,
+    dailyCashflow,
+    heatmap,
   }
 }
+
+export type DashboardAnalysis = ReturnType<typeof useDashboardAnalysis>

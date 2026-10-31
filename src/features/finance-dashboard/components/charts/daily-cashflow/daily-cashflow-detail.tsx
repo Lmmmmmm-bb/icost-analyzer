@@ -1,19 +1,19 @@
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-import type {
-  DailyBillItem,
-  DailyCashflowItem,
-} from "../../../model/analytics-types"
+import type { DailySummary } from "../../../model/analytics-types"
+import type { TransactionDetail } from "../../../model/transaction-details"
 import { formatMoney, formatOriginalAmount } from "../../../model/money"
 import { getDirectionBadgeVariant } from "../../../model/transaction-rules"
 
 type DailyCashflowDetailProps = {
-  selectedCashflow?: DailyCashflowItem
+  selectedCashflow?: DailySummary
+  bills: TransactionDetail[]
 }
 
 export function DailyCashflowDetail({
   selectedCashflow,
+  bills,
 }: DailyCashflowDetailProps) {
   return (
     <div className="flex min-h-0 flex-col xl:absolute xl:inset-y-0 xl:right-0 xl:left-[30rem]">
@@ -36,7 +36,7 @@ export function DailyCashflowDetail({
       {selectedCashflow ? (
         <>
           <DailyCashflowMetrics selectedCashflow={selectedCashflow} />
-          <DailyCashflowBillList bills={selectedCashflow.bills} />
+          <DailyCashflowBillList bills={bills} />
         </>
       ) : (
         <p className="text-sm leading-relaxed text-muted-foreground">
@@ -50,7 +50,7 @@ export function DailyCashflowDetail({
 function DailyCashflowMetrics({
   selectedCashflow,
 }: {
-  selectedCashflow: DailyCashflowItem
+  selectedCashflow: DailySummary
 }) {
   return (
     <div className="grid shrink-0 border-y border-border/70 sm:grid-cols-3">
@@ -107,7 +107,7 @@ function DailyCashflowMetric({
   )
 }
 
-function DailyCashflowBillList({ bills }: { bills: DailyBillItem[] }) {
+function DailyCashflowBillList({ bills }: { bills: TransactionDetail[] }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
       {bills.map((bill) => (
@@ -117,7 +117,7 @@ function DailyCashflowBillList({ bills }: { bills: DailyBillItem[] }) {
   )
 }
 
-function DailyCashflowBill({ bill }: { bill: DailyBillItem }) {
+function DailyCashflowBill({ bill }: { bill: TransactionDetail }) {
   const signedAmount =
     bill.direction === "expense" ? -Math.abs(bill.amount) : bill.amount
   const signedRmb =

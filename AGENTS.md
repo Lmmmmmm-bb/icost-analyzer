@@ -113,9 +113,15 @@
 - `hooks/use-exchange-rates.ts` wraps `model/rate-inputs.ts`; draft input and active
   rates update atomically. Invalid drafts preserve the active rates object, so
   they do not change calculations or Agent context.
-- `src/features/finance-dashboard/hooks/use-dashboard-analysis.ts`: derived
-  analytics, comparisons, dimensions, chart data, filtered rows, sorted rows,
-  and pagination calculations.
+- `hooks/use-dashboard-analysis.ts`: derived analytics, comparisons, dimensions,
+  and filtered rows. It does not depend on pagination, sorting, or chart drilldown.
+- `hooks/use-dashboard-view-model.ts`: sorting, pagination, chart projection,
+  and deferred detail queries. Chart data contracts live in `hooks/dashboard-view-types.ts`.
+- `model/analytics.ts` re-exports pure metric, summary, comparison, and time-series
+  modules from `model/analytics/`. Monthly and daily summaries contain no bills.
+- `model/transaction-details.ts`: selects one month/day of bill details on demand;
+  monthly review metadata is computed only while the review dialog is open.
+  Agent queries use aggregates and explicit result DTOs from `agent/query-types.ts`.
 - `src/features/finance-dashboard/model`: pure data helpers for types,
   constants, transaction rules, controls, rows, dates, date periods, money
   conversion, filtering, rate inputs, collections, and analytics.

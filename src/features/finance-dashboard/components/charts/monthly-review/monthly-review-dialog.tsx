@@ -8,26 +8,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-import type { MonthlyItem } from "../../../model/analytics-types"
+import type { TransactionDetailQueries } from "../../../model/transaction-details"
 import { MonthlyBillsDetail } from "./monthly-bills-detail"
 import { MonthlyReviewCard } from "./monthly-review-card"
 
 type MonthlyReviewDialogProps = {
-  monthlyReview: MonthlyItem[]
+  queries: Pick<TransactionDetailQueries, "monthlyReview" | "month">
 }
 
-export function MonthlyReviewDialog({
-  monthlyReview,
-}: MonthlyReviewDialogProps) {
+export function MonthlyReviewDialog({ queries }: MonthlyReviewDialogProps) {
   const [selectedReviewMonth, setSelectedReviewMonth] = useState("")
   const reviewContentRef = useRef<HTMLDivElement>(null)
   const monthlyReviewCards = useMemo(
-    () => [...monthlyReview].sort((a, b) => b.month.localeCompare(a.month)),
-    [monthlyReview]
+    () =>
+      queries.monthlyReview().sort((a, b) => b.month.localeCompare(a.month)),
+    [queries]
   )
   const selectedReview = selectedReviewMonth
     ? monthlyReviewCards.find((month) => month.month === selectedReviewMonth)
     : undefined
+
+  const bills = useMemo(
+    () => (selectedReview ? queries.month(selectedReview.month) : []),
+    [queries, selectedReview]
+  )
 
   useEffect(() => {
     reviewContentRef.current?.scrollTo({ top: 0 })
@@ -73,6 +77,7 @@ export function MonthlyReviewDialog({
         {selectedReview ? (
           <MonthlyBillsDetail
             month={selectedReview}
+            bills={bills}
             onBack={() => setSelectedReviewMonth("")}
           />
         ) : (

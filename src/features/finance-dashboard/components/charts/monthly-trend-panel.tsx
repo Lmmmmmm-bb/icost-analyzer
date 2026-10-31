@@ -3,14 +3,14 @@ import type { EChartsOption, ECElementEvent } from "echarts"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 
-import type { MonthlyItem } from "../../model/analytics-types"
+import type { TransactionDetailQueries } from "../../model/transaction-details"
 import { DashboardPanel } from "../shared/dashboard-panel"
 import { EChart } from "./e-chart"
 import { MonthlyReviewDialog } from "./monthly-review/monthly-review-dialog"
 
 type MonthlyTrendPanelProps = {
   option: EChartsOption
-  monthlyReview: MonthlyItem[]
+  detailQueries: Pick<TransactionDetailQueries, "monthlyReview" | "month">
   reviewOpen: boolean
   onReviewOpenChange: (open: boolean) => void
   onApplyMonth: (month: string) => void
@@ -18,7 +18,7 @@ type MonthlyTrendPanelProps = {
 
 export function MonthlyTrendPanel({
   option,
-  monthlyReview,
+  detailQueries,
   reviewOpen,
   onReviewOpenChange,
   onApplyMonth,
@@ -42,9 +42,7 @@ export function MonthlyTrendPanel({
         />
       </DashboardPanel>
 
-      {reviewOpen ? (
-        <MonthlyReviewDialog monthlyReview={monthlyReview} />
-      ) : null}
+      {reviewOpen ? <MonthlyReviewDialog queries={detailQueries} /> : null}
     </Dialog>
   )
 }

@@ -10,24 +10,29 @@ import {
 } from "@/components/ui/table"
 
 import type {
-  MonthlyBillItem,
-  MonthlyItem,
-} from "../../../model/analytics-types"
+  TransactionDetail,
+  MonthlyReviewItem,
+} from "../../../model/transaction-details"
 import { formatMoney, formatOriginalAmount } from "../../../model/money"
 import { getDirectionBadgeVariant } from "../../../model/transaction-rules"
 
 type MonthlyBillsDetailProps = {
-  month: MonthlyItem
+  month: MonthlyReviewItem
+  bills: TransactionDetail[]
   onBack: () => void
 }
 
-export function MonthlyBillsDetail({ month, onBack }: MonthlyBillsDetailProps) {
+export function MonthlyBillsDetail({
+  month,
+  bills,
+  onBack,
+}: MonthlyBillsDetailProps) {
   return (
     <div className="grid gap-4">
       <div className="flex flex-col gap-3 border border-border/80 bg-card/70 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="grid gap-1">
           <h3 className="font-heading text-lg font-semibold tracking-tight">
-            共 {month.bills.length} 笔交易
+            共 {bills.length} 笔交易
           </h3>
           <p className="text-xs text-muted-foreground">
             收入 {formatMoney(month.income)} · 支出 {formatMoney(month.expense)}{" "}
@@ -54,7 +59,7 @@ export function MonthlyBillsDetail({ month, onBack }: MonthlyBillsDetailProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {month.bills.map((bill) => (
+            {bills.map((bill) => (
               <MonthlyBillRow key={bill.id} bill={bill} />
             ))}
           </TableBody>
@@ -64,7 +69,7 @@ export function MonthlyBillsDetail({ month, onBack }: MonthlyBillsDetailProps) {
   )
 }
 
-function MonthlyBillRow({ bill }: { bill: MonthlyBillItem }) {
+function MonthlyBillRow({ bill }: { bill: TransactionDetail }) {
   return (
     <TableRow className="group/review-bill">
       <TableCell className="font-mono text-[11px] text-muted-foreground transition-colors group-hover/review-bill:text-foreground">

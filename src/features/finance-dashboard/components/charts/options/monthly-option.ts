@@ -1,7 +1,7 @@
 import type { EChartsOption } from "echarts"
 
 import { chartTokenColor } from "../chart-theme"
-import type { MonthlyItem } from "../../../model/analytics-types"
+import type { MonthlySummary } from "../../../model/analytics-types"
 import { formatMoney } from "../../../model/money"
 import type { ChartTheme } from "./types"
 import {
@@ -14,7 +14,7 @@ import {
 } from "./shared"
 
 export function createMonthlyOption(
-  monthly: MonthlyItem[],
+  monthly: MonthlySummary[],
   theme?: ChartTheme
 ): EChartsOption {
   const axis = axisStyle(theme)

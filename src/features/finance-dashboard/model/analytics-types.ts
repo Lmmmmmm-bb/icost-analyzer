@@ -1,5 +1,3 @@
-import type { TransactionDirection } from "./transaction-rules"
-
 export type SummaryItem = {
   name: string
   count: number
@@ -50,86 +48,23 @@ export type MetricStats = {
   days: number
 }
 
-export type MonthlyItem = {
+export type MonthlySummary = {
   month: string
   expense: number
   income: number
   net: number
+  count: number
   savingsRate: number | null
-  topExpenseCategory: {
-    name: string
-    amount: number
-  }
-  largestExpense: MonthlyLargestExpense | null
-  bills: MonthlyBillItem[]
 }
 
-export type MonthlyLargestExpense = {
-  id: string
-  day: string
-  category: string
-  subcategory: string
-  note: string
-  amount: number
-  currency: string
-  rmb: number
-}
-
-export type MonthlyBillItem = {
-  id: string
-  date: Date
-  dateText: string
-  type: string
-  category: string
-  subcategory: string
-  note: string
-  tags: string[]
-  location: string
-  amount: number
-  currency: string
-  rmb: number
-  direction: TransactionDirection
-}
-
-export type DailyCashflowItem = {
+export type DailySummary = {
   day: string
   date: Date
   expense: number
   income: number
   net: number
   count: number
-  bills: DailyBillItem[]
 }
 
-export type DailyBillItem = {
-  id: string
-  type: string
-  category: string
-  subcategory: string
-  note: string
-  tags: string[]
-  location: string
-  amount: number
-  currency: string
-  rmb: number
-  direction: TransactionDirection
-}
-
-export type WeekItem = {
-  name: string
-  amount: number
-}
-
-type HeatmapEntry = [day: string, amount: number]
-
-export type DashboardChartData = {
-  monthly: MonthlyItem[]
-  categoryPie: SummaryItem[]
-  ranking: SummaryItem[]
-  accountSummary: SummaryItem[]
-  currencySummary: SummaryItem[]
-  weekSummary: WeekItem[]
-  tagSummary: SummaryItem[]
-  heatmap: HeatmapEntry[]
-  dailyCashflow: DailyCashflowItem[]
-}
+export type WeekItem = { name: string; amount: number }
+export type HeatmapEntry = [day: string, amount: number]

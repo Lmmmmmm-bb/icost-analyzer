@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest"
 
 import { makeTransaction } from "../testing/transactions"
 import {
-  getDailyCashflow,
+  getDailySummary,
   getHeatmap,
-  getMonthly,
+  getMonthlySummary,
   getPeriodComparison,
   getStats,
   getWeekSummary,
@@ -62,7 +62,7 @@ describe("ledger analytics", () => {
   })
 
   it("agrees across monthly, daily, weekly and heatmap totals", () => {
-    const monthly = getMonthly(rows, rates)
+    const monthly = getMonthlySummary(rows, rates)
     expect(
       monthly.map(({ month, expense, income, net }) => ({
         month,
@@ -75,7 +75,7 @@ describe("ledger analytics", () => {
       { month: "2026-02", expense: 57, income: 2090, net: 2033 },
     ])
     expect(
-      getDailyCashflow(rows, rates).reduce((sum, day) => sum + day.expense, 0)
+      getDailySummary(rows, rates).reduce((sum, day) => sum + day.expense, 0)
     ).toBe(177)
     expect(
       getWeekSummary(rows, rates).reduce((sum, day) => sum + day.amount, 0)
@@ -86,7 +86,7 @@ describe("ledger analytics", () => {
   })
 
   it("counts overlapping tags independently and distinct spending dates", () => {
-    expect(summarizeBy(rows, rates, (row) => row.category, true)).toEqual([
+    expect(summarizeBy(rows, rates, (row) => row.tags)).toEqual([
       { name: "演示 A", amount: 100, count: 1, days: new Set(["2026-01-05"]) },
       { name: "演示 B", amount: 100, count: 1, days: new Set(["2026-01-05"]) },
     ])

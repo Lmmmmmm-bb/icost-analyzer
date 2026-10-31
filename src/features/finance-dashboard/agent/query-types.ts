@@ -1,6 +1,7 @@
 import type { Filters, RateMap, Transaction } from "../model/types"
+import type { MetricStats, PeriodComparison } from "../model/analytics-types"
 import type { QueryFilters } from "./query-filters"
-import type { QueryWhere } from "./query-schema"
+import type { GroupInput, QueryWhere } from "./query-schema"
 
 export type QueryScope = "current_view" | "all_data"
 
@@ -62,6 +63,59 @@ export type QuerySuccess<T> = {
 }
 
 export type QueryResult<T> = QuerySuccess<T> | QueryError
+
+export type LedgerContextData = {
+  totalRows: number
+  currentViewRows: number
+  ledgerDateRange: { from: string; to: string } | null
+  currencies: string[]
+  rateNote: string
+}
+
+export type SummaryData = MetricStats & { unit: "CNY"; method: string }
+
+export type MonthlyGroup = MissingRateInfo & {
+  name: string
+  count: number
+  expense: number
+  income: number
+  net: number
+}
+
+export type ExpenseGroup = MissingRateInfo & {
+  name: string
+  count: number
+  amount: number
+  currency: "CNY"
+}
+
+export type BreakdownData = {
+  totalGroups: number
+  note: string | null
+} & (
+  | { dimension: "month"; order: "month_descending"; groups: MonthlyGroup[] }
+  | {
+      dimension: Exclude<GroupInput["dimension"], "month">
+      order: "expense_amount_descending"
+      groups: ExpenseGroup[]
+    }
+)
+
+type ComparisonPeriod = MissingRateInfo & {
+  from: string
+  to: string
+  matchedRows: number
+}
+
+export type ComparisonData = Omit<
+  PeriodComparison,
+  "currentLabel" | "previousLabel"
+> & {
+  currentPeriod: ComparisonPeriod
+  previousPeriod: ComparisonPeriod
+  unit: "CNY"
+  dateRule: string
+}
 
 export function queryError(
   code: QueryErrorCode,

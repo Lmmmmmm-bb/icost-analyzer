@@ -121,7 +121,9 @@ describe("agent query core", () => {
     expect(result.data.note).toContain("重叠")
     expect(JSON.stringify(result)).not.toContain("只用于测试的备注")
     expect(result.data.groups[0].conversionStatus).toBe("partial")
-    expect(result.data.groups[0].amount).toBe(120)
+    expect(
+      result.data.dimension !== "month" && result.data.groups[0].amount
+    ).toBe(120)
   })
 
   it("compares explicit dates while preserving non-date page filters", () => {

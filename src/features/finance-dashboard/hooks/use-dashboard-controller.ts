@@ -5,6 +5,7 @@ import { unique } from "../model/collections"
 import type { Transaction } from "../model/types"
 import { useWorkbookUpload } from "../upload/use-workbook-upload"
 import { useDashboardAnalysis } from "./use-dashboard-analysis"
+import { useDashboardViewModel } from "./use-dashboard-view-model"
 import { useDashboardViewState } from "./use-dashboard-view-state"
 import { useExchangeRates } from "./use-exchange-rates"
 
@@ -22,7 +23,8 @@ export function useDashboardController() {
     () => ({ transactions, filters, rates, asOf: new Date().toISOString() }),
     [transactions, filters, rates]
   )
-  const analysis = useDashboardAnalysis({ ...view, ...context })
+  const analysis = useDashboardAnalysis(context)
+  const display = useDashboardViewModel({ analysis, view, rates })
   const agentAccess = useAgentAccess({
     ...context,
     currentViewRows: analysis.filtered,
@@ -50,6 +52,7 @@ export function useDashboardController() {
     actions,
     exchange,
     analysis,
+    display,
     agentAccess,
     uploadState,
     uploadWorkbook,

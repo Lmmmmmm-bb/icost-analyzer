@@ -20,7 +20,7 @@ type DashboardWorkspaceProps = {
 }
 
 export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
-  const { analysis, uploadState, view, actions, exchange } = dashboard
+  const { analysis, display, uploadState, view, actions, exchange } = dashboard
   const handleWorkspaceFileDrop = useCallback(
     (file: File) => {
       if (!uploadState.isParsing) dashboard.uploadWorkbook(file)
@@ -47,7 +47,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
       ) : null}
       <WorkspaceHero
         fileName={dashboard.fileName}
-        rangeText={analysis.rangeText}
+        rangeText={display.rangeText}
         stats={analysis.stats}
         periodComparison={analysis.periodComparison}
         yearComparison={analysis.yearComparison}
@@ -104,9 +104,9 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
       {dashboard.hasAnalysisCharts ? (
         <>
           <SummaryTables
-            categoryRows={analysis.sortedCategoryRows}
-            tagRows={analysis.sortedTagRows}
-            expenseTotal={analysis.expenseTotal}
+            categoryRows={display.sortedCategoryRows}
+            tagRows={display.sortedTagRows}
+            expenseTotal={display.expenseTotal}
             summarySort={view.summarySort}
             tagSort={view.tagSort}
             onSummarySortChange={actions.sortCategories}
@@ -116,8 +116,9 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
           />
 
           <AnalysisCharts
-            data={analysis.chartData}
-            accountRows={analysis.sortedAccountRows}
+            data={display.chartData}
+            detailQueries={display.detailQueries}
+            accountRows={display.sortedAccountRows}
             drillCategory={view.drillCategory}
             rankLevel={view.rankLevel}
             accountSort={view.accountSort}
@@ -136,10 +137,10 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
       )}
 
       <TransactionTable
-        rows={analysis.detailRows}
-        pagedRows={analysis.pagedRows}
-        safePage={analysis.safePage}
-        totalPages={analysis.totalPages}
+        rows={display.detailRows}
+        pagedRows={display.pagedRows}
+        safePage={display.safePage}
+        totalPages={display.totalPages}
         pageSize={view.pageSize}
         detailSort={view.detailSort}
         rates={exchange.rates}

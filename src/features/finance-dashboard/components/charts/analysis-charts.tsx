@@ -2,10 +2,9 @@ import { useMemo, useState } from "react"
 
 import { useTheme } from "@/components/theme-provider"
 
-import type {
-  DashboardChartData,
-  SummaryItem,
-} from "../../model/analytics-types"
+import type { SummaryItem } from "../../model/analytics-types"
+import type { DashboardChartData } from "../../hooks/dashboard-view-types"
+import type { TransactionDetailQueries } from "../../model/transaction-details"
 import {
   type AccountSort,
   type RankLevel,
@@ -29,6 +28,7 @@ import type { HeatmapColorScaleMode } from "./types"
 
 type AnalysisChartsProps = {
   data: DashboardChartData
+  detailQueries: TransactionDetailQueries
   accountRows: SummaryItem[]
   drillCategory: string
   rankLevel: RankLevel
@@ -45,6 +45,7 @@ type AnalysisChartsProps = {
 
 export function AnalysisCharts({
   data,
+  detailQueries,
   accountRows,
   drillCategory,
   rankLevel,
@@ -109,7 +110,7 @@ export function AnalysisCharts({
       <div className="grid gap-6">
         <MonthlyTrendPanel
           option={monthlyOption}
-          monthlyReview={data.monthly}
+          detailQueries={detailQueries}
           reviewOpen={reviewOpen}
           onReviewOpenChange={setReviewOpen}
           onApplyMonth={onApplyMonth}
@@ -146,7 +147,10 @@ export function AnalysisCharts({
         scaleMode={heatmapScaleMode}
         onScaleModeChange={setHeatmapScaleMode}
       />
-      <DailyCashflowPanel dailyCashflow={data.dailyCashflow} />
+      <DailyCashflowPanel
+        dailyCashflow={data.dailyCashflow}
+        selectDetails={detailQueries.day}
+      />
     </>
   )
 }

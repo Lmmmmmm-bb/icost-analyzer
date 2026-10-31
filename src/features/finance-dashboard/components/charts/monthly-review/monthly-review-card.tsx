@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 import type {
-  MonthlyItem,
+  MonthlyReviewItem,
   MonthlyLargestExpense,
-} from "../../../model/analytics-types"
+} from "../../../model/transaction-details"
 import { formatMoney } from "../../../model/money"
 
 type MonthlyReviewCardProps = {
-  month: MonthlyItem
+  month: MonthlyReviewItem
   onSelect: () => void
 }
 

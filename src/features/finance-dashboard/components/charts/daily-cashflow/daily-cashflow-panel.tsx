@@ -4,17 +4,22 @@ import { zhCN } from "react-day-picker/locale"
 
 import { Calendar } from "@/components/ui/calendar"
 
-import type { DailyCashflowItem } from "../../../model/analytics-types"
+import type { TransactionDetailQueries } from "../../../model/transaction-details"
+import type { DailySummary } from "../../../model/analytics-types"
 import { dateKey } from "../../../model/date"
 import { DashboardPanel } from "../../shared/dashboard-panel"
 import { DailyCashflowDayButton } from "./daily-cashflow-day-button"
 import { DailyCashflowDetail } from "./daily-cashflow-detail"
 
 type DailyCashflowPanelProps = {
-  dailyCashflow: DailyCashflowItem[]
+  dailyCashflow: DailySummary[]
+  selectDetails: TransactionDetailQueries["day"]
 }
 
-export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
+export function DailyCashflowPanel({
+  dailyCashflow,
+  selectDetails,
+}: DailyCashflowPanelProps) {
   const dailyCashflowByDay = useMemo(
     () => new Map(dailyCashflow.map((item) => [item.day, item])),
     [dailyCashflow]
@@ -34,6 +39,12 @@ export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
   const safeVisibleMonth = isMonthAvailable(visibleMonth, dailyCashflow)
     ? visibleMonth
     : selectedCashflowDate
+
+  const bills = useMemo(
+    () =>
+      safeSelectedCashflowDay ? selectDetails(safeSelectedCashflowDay) : [],
+    [safeSelectedCashflowDay, selectDetails]
+  )
 
   return (
     <DashboardPanel
@@ -78,7 +89,10 @@ export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
           />
         </div>
 
-        <DailyCashflowDetail selectedCashflow={selectedCashflow} />
+        <DailyCashflowDetail
+          selectedCashflow={selectedCashflow}
+          bills={bills}
+        />
       </div>
     </DashboardPanel>
   )
@@ -86,7 +100,7 @@ export function DailyCashflowPanel({ dailyCashflow }: DailyCashflowPanelProps) {
 
 function isMonthAvailable(
   month: Date | undefined,
-  dailyCashflow: DailyCashflowItem[]
+  dailyCashflow: DailySummary[]
 ) {
   if (!month) return false
 

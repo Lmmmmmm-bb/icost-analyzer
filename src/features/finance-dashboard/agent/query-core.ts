@@ -1,6 +1,6 @@
 import {
   getDateRange,
-  getMonthly,
+  getMonthlySummary,
   getPeriodComparison,
   getStats,
   summarizeBy,
@@ -27,6 +27,11 @@ import type {
 import {
   queryError,
   type LedgerSnapshot,
+  type LedgerContextData,
+  type SummaryData,
+  type BreakdownData,
+  type ComparisonData,
+  type ExpenseGroup,
   type MissingRateInfo,
   type QueryContext,
   type QueryResult,
@@ -110,7 +115,7 @@ function makeContext(
   where?: QueryWhere,
   dateRange = effectiveDateRange(snapshot, scope, where),
   pageFilters: Filters | null = scope === "current_view"
-    ? (snapshot.filters as Filters)
+    ? snapshot.filters
     : null
 ): QueryContext {
   return {
@@ -162,13 +167,9 @@ function checkQuery(
   return null
 }
 
-export function getContext(snapshot: LedgerSnapshot): QueryResult<{
-  totalRows: number
-  currentViewRows: number
-  ledgerDateRange: { from: string; to: string } | null
-  currencies: string[]
-  rateNote: string
-}> {
+export function getContext(
+  snapshot: LedgerSnapshot
+): QueryResult<LedgerContextData> {
   const range = getDateRange(snapshot.transactions)
   return {
     ok: true,
@@ -191,8 +192,8 @@ export function getContext(snapshot: LedgerSnapshot): QueryResult<{
 function summarizeStats(
   rows: readonly Transaction[],
   snapshot: LedgerSnapshot
-) {
-  const stats = getStats(rows, snapshot.rates as Record<string, number>)
+): SummaryData {
+  const stats = getStats(rows, snapshot.rates)
   return {
     totalExpense: money(stats.totalExpense),
     totalIncome: money(stats.totalIncome),
@@ -221,7 +222,7 @@ function summarizeStats(
 export function getSummary(
   snapshot: LedgerSnapshot,
   input: SummaryInput
-): QueryResult<ReturnType<typeof summarizeStats>> {
+): QueryResult<SummaryData> {
   const scope = input.scope ?? "current_view"
   const error = checkQuery(
     snapshot,
@@ -242,13 +243,7 @@ export function getSummary(
 export function getBreakdown(
   snapshot: LedgerSnapshot,
   input: GroupInput
-): QueryResult<{
-  dimension: GroupInput["dimension"]
-  order: string
-  totalGroups: number
-  groups: Array<Record<string, unknown>>
-  note: string | null
-}> {
+): QueryResult<BreakdownData> {
   const scope = input.scope ?? "current_view"
   const error = checkQuery(
     snapshot,
@@ -259,27 +254,30 @@ export function getBreakdown(
   if (error) return error
   const rows = selectRows(snapshot, scope, input.where)
   const limit = input.limit ?? 20
-  let groups: Array<Record<string, unknown>>
-  let order: string
+  let data: BreakdownData
   if (input.dimension === "month") {
-    const counts = new Map<string, number>()
     const monthlyRows = new Map<string, Transaction[]>()
     for (const row of rows) {
-      counts.set(row.monthKey, (counts.get(row.monthKey) ?? 0) + 1)
       const group = monthlyRows.get(row.monthKey) ?? []
       group.push(row)
       monthlyRows.set(row.monthKey, group)
     }
-    const monthly = getMonthly(rows, snapshot.rates as Record<string, number>)
-    groups = monthly.reverse().map((item) => ({
+    const monthly = getMonthlySummary(rows, snapshot.rates)
+    const groups = monthly.reverse().map((item) => ({
       name: item.month,
-      count: counts.get(item.month) ?? 0,
+      count: item.count,
       expense: money(item.expense),
       income: money(item.income),
       net: money(item.net),
       ...missingRateInfo(monthlyRows.get(item.month) ?? [], snapshot),
     }))
-    order = "month_descending"
+    data = {
+      dimension: "month",
+      order: "month_descending",
+      groups: groups.slice(0, limit),
+      totalGroups: groups.length,
+      note: null,
+    }
   } else {
     const expenseRows =
       input.dimension === "account"
@@ -312,11 +310,10 @@ export function getBreakdown(
     }
     const summaries = summarizeBy(
       expenseRows,
-      snapshot.rates as Record<string, number>,
-      pickName,
-      input.dimension === "tag"
+      snapshot.rates,
+      input.dimension === "tag" ? (row) => row.tags : pickName
     )
-    groups = summaries.map((item) => {
+    const groups = summaries.map((item): ExpenseGroup => {
       return {
         name: sanitizeLabel(item.name),
         count: item.count,
@@ -325,29 +322,29 @@ export function getBreakdown(
         ...missingRateInfo(groupedRows.get(item.name) ?? [], snapshot),
       }
     })
-    order = "expense_amount_descending"
-  }
-  return {
-    ok: true,
-    context: makeContext(snapshot, rows, scope, input.where),
-    data: {
+    data = {
       dimension: input.dimension,
-      order,
+      order: "expense_amount_descending",
       totalGroups: groups.length,
       groups: groups.slice(0, limit),
       note:
         input.dimension === "tag"
           ? "同一笔支出可有多个标签；标签组之间会重叠，不能相加作为总支出。"
           : null,
-    },
-    truncated: groups.length > limit,
+    }
+  }
+  return {
+    ok: true,
+    context: makeContext(snapshot, rows, scope, input.where),
+    data,
+    truncated: data.totalGroups > limit,
   }
 }
 
 export function comparePeriods(
   snapshot: LedgerSnapshot,
   input: CompareInput
-): QueryResult<Record<string, unknown>> {
+): QueryResult<ComparisonData> {
   const error = checkQuery(
     snapshot,
     input.expectedContextId,
@@ -362,9 +359,7 @@ export function comparePeriods(
     return queryError("INVALID_FILTER", "比较期间的起止日期无效。")
   const scope = input.scope ?? "current_view"
   const baseFilters =
-    scope === "current_view"
-      ? nonDateFilters(snapshot.filters as Filters)
-      : EMPTY_FILTERS
+    scope === "current_view" ? nonDateFilters(snapshot.filters) : EMPTY_FILTERS
   const baseRows = filterTransactions(
     snapshot.transactions,
     baseFilters,
@@ -390,7 +385,7 @@ export function comparePeriods(
     previousRows,
     `${input.currentPeriod.from} 至 ${input.currentPeriod.to}`,
     `${input.previousPeriod.from} 至 ${input.previousPeriod.to}`,
-    snapshot.rates as Record<string, number>
+    snapshot.rates
   )
   const combinedRows = [...currentRows, ...previousRows]
   const roundTrend = (trend: {
