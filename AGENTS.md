@@ -1,366 +1,92 @@
-# AGENTS.md
+# Agent Guidelines
 
-## Project Overview
+Keep this file focused on instructions for future changes. Read source files,
+tests, and configuration for implementation details; do not duplicate file maps,
+feature inventories, configuration values, or completed-work records here.
 
-- This repository is a Vite single-page React application using TypeScript,
-  Tailwind CSS v4, and shadcn/ui.
-- The product is a local-first iCost Excel analyzer. Users upload `.xlsx` or
-  `.xls` exports in the browser, then inspect spending metrics, linked charts,
-  summary tables, filters, exchange rates, and paginated transaction details.
-- The dashboard also exposes four read-only WebMCP site tools to compatible
-  agent browsers after each workbook's explicit, in-page user opt-in. Only
-  aggregate results are returned; no transaction-list tool is exposed.
-- This is an open-source, third-party companion project for iCost exports. Do
-  not imply official iCost affiliation in product copy, documentation, package
-  metadata, or repository materials unless the user explicitly provides that
-  relationship.
-- There is no backend service in this repo. Workbook parsing happens in the
-  browser through a lazy `xlsx` import, and the app must not upload personal
-  finance data to any remote service.
-- `src/main.tsx` mounts React in `StrictMode`, wraps the app in
-  `ThemeProvider` and `TooltipProvider`, and renders `App`.
-- `src/App.tsx` lazy-loads `FinanceDashboard` from
-  `src/features/finance-dashboard`.
-- The theme system stores the selected theme in `localStorage` under the
-  `theme` key, supports `dark`, `light`, and `system`, applies the resolved
-  class to `<html>`, syncs across tabs, and toggles with the `d` key when focus
-  is not in an editable element.
+## Documentation & Product Scope
 
-## Open Source & Documentation
+- Keep `README.md` user-facing and in Simplified Chinese. Explain usage,
+  supported inputs, calculation caveats, and privacy. Put engineering setup and
+  architecture guidance in dedicated contributor docs when needed.
+- Update the README in the same change when parsing, analytics, exchange rates,
+  storage, privacy, or user workflows change. Keep user-facing explanations in
+  sync with the UI; do not add implementation walkthroughs or test-run records.
+- Describe the project as open source, third-party, unofficial, and local-first.
+  Do not imply an official iCost relationship or introduce internal company
+  context into public materials.
+- Do not introduce remote upload, cloud parsing, telemetry, live exchange-rate
+  fetching, account features, or ledger persistence without an explicit product
+  decision and matching README/UI disclosure.
+- Do not change package publication settings unless requested. If adding a
+  license, update the README license statement in the same change.
 
-- `README.md` is the public entry point for the project. Keep it friendly to
-  non-internal users and update it whenever product behavior, supported iCost
-  export fields, privacy boundaries, or contribution expectations change.
-- Treat the README as user documentation only, not an implementation tour or
-  developer setup guide. Do not add local development commands, package manager
-  instructions, framework notes, source-file walkthroughs, or internal
-  architecture details to `README.md`.
-- Put engineering setup, command references, and codebase guidance in
-  `AGENTS.md` or a dedicated contributor document instead of the README.
-- Public-facing documentation should default to Simplified Chinese unless the
-  user asks for another language. Technical agent guidance in `AGENTS.md` may
-  remain in English for tool compatibility and precision.
-- Public copy should consistently describe the project as open source,
-  third-party, unofficial, and local-first. Avoid internal company context,
-  private deployment assumptions, or wording that implies an official iCost
-  partnership.
-- Treat this project as local-first by default. Do not introduce remote upload,
-  telemetry, cloud parsing, live exchange-rate fetching, or account features
-  without an explicit product decision and matching README/UI disclosure.
-- If a product change affects parsing rules, analytics semantics, exchange-rate
-  behavior, persistence, browser storage, privacy boundaries, or expected user
-  workflow, update README.md in the same change.
-- Agent tool results leave the page for the user's chosen agent when invoked.
-  Keep this disclosure visible in the UI and README. Do not claim that every
-  agent, browser, CLI, or extension supports WebMCP without a real call test.
-- Use fictional, anonymized, or generated examples only. Never add real finance
-  exports, private screenshots, personal categories, or sensitive sample data to
-  docs, fixtures, or commits.
-- If a license file is added later, update the README license section in the
-  same change. Do not change `package.json` publication settings only because
-  the repository is open source.
+## Privacy & Agent Access
 
-## Product Behavior
+- Keep ledger data in the current page session. Do not write it to browser
+  storage, cookies, logs, or remote services. Never persist Agent authorization.
+- Require fresh manual, in-page opt-in for each workbook and after refresh.
+  Revoke authorization synchronously when an upload starts, even if parsing
+  later fails. Browser-level tool permission is not a substitute for this check.
+- Validate every WebMCP call's input, authorization, parsing state, and latest
+  context ID. Keep tools read-only and limited to aggregates and query context;
+  do not expose transaction lists or page mutations.
+- Preserve the public WebMCP contract during internal refactors. Keep page and
+  Agent calculations on the same domain rules and analysis clock.
+- Keep the UI and README disclosure that tool results, filters (including
+  keywords), and group names enter the user's chosen Agent session. Do not claim
+  client compatibility without an actual tool discovery and call test.
+- Use fictional, generated, or fully anonymized examples and fixtures. Never
+  commit real finance exports, private screenshots, secrets, `demo.html`, or
+  generated `dist` output. Report invalid-row counts without logging row contents.
+- Validate external data at its entry boundary. Keep credentials out of client
+  code and configuration; document required environment variables without secrets.
 
-- The upload flow accepts `.xlsx` and `.xls` files via full-page drag-and-drop
-  or a hidden file input.
-- Uploaded workbook data lives only in React state during the current page
-  session. Do not persist transaction data to `localStorage`, `sessionStorage`,
-  IndexedDB, cookies, or remote services without an explicit product decision
-  and matching README/UI disclosure.
-- `src/features/finance-dashboard/upload/workbook-parser.ts` reads the first
-  worksheet and maps supported column aliases into `Transaction` records.
-- Required data is date plus amount. Rows with invalid dates or non-numeric
-  amounts are skipped.
-- Empty amount cells are invalid. Numeric Excel dates respect the workbook's
-  1900/1904 date system; date strings are validated strictly. The UI shows a
-  count of skipped invalid rows without logging their contents.
-- Missing transaction type falls back to `支出` for negative amounts and `收入`
-  for non-negative amounts.
-- Missing currency falls back to `CNY`; missing categories fall back to
-  `未分类`.
-- Tags are split from comma-like separators, semicolons, pipes, whitespace, and
-  `#tag` style strings. Year-like tag fragments such as `2024` are ignored.
-- `CNY` is the base currency and is fixed at exchange rate `1`.
-- Default exchange rates in `model/constants.ts` are static application values,
-  not live market data.
-- Empty, invalid, or non-positive non-base exchange-rate inputs do not
-  overwrite the active calculation rate.
-- Analytics treat transactions as expense, income, reimbursement, and other
-  according to helpers in `model/transaction-rules.ts`; keep those domain rules
-  centralized.
-- Time filters are a discriminated union in `model/filters.ts`; UI labels are
-  presentation only. Resolve boundaries through `model/time-filter.ts` using
-  the page context clock shared with Agent snapshots. Calendar end dates include
-  the complete local day. Preserve existing month-end and leap-day rollover rules.
-- `agent/query-filters.ts` maps internal filters to the existing public tool DTO;
-  do not expose internal representation changes through the WebMCP contract.
-- Account filtering matches `account1` for normal transactions and either
-  `account1` or `account2` for `转账` transactions.
-- Keyword filtering searches notes, category, subcategory, accounts, book,
-  tags, location, and currency.
+## Implementation Boundaries
 
-## Feature Architecture
+- Keep domain rules and calculations in pure model helpers, workbook mapping in
+  the parser, and upload coordination separate from rendering. Reuse centralized
+  transaction, filtering, date, and money rules instead of duplicating them in UI
+  components or Agent queries.
+- Keep query-core code independent of React, ECharts, and browser APIs. Use
+  explicit aggregate result types rather than exposing internal transaction data.
+- Route shared view changes through semantic actions. Give child components
+  narrow value/action contracts instead of the complete dashboard controller or
+  unrestricted state setters.
+- Keep analytics independent of pagination, sorting, and chart drilldown. Select
+  transaction details on demand; pass only current-page rows to detail tables and
+  keep raw transactions out of monthly/daily summaries.
+- Keep rate drafts and active rates consistent: invalid drafts must preserve
+  active calculations and Agent context. Preserve date boundaries and month-end
+  and leap-day behavior when refactoring time filters; labels are presentation,
+  not domain values.
+- Preserve lazy workbook parsing dependencies. Add ECharts modules deliberately
+  and review the bundle impact of new imports.
 
-See `docs/architecture.md` for dependency boundaries, transition semantics, and
-the staged refactor validation record. No additional ESLint rules are required.
+## UI & Code Style
 
-- `src/features/finance-dashboard/index.tsx`: feature entry point, top-level
-  dashboard shell, entry hero/workspace switch, and backdrop composition.
-- `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: workbook
-  ownership and composition of upload, view state, rates, analysis, and Agent access.
-- `hooks/use-dashboard-view-state.ts` wraps the pure `model/dashboard-state.ts`
-  reducer. All global filter changes clear category drilldown and reset pagination;
-  detail sorting/page-size changes reset pagination. UI components call semantic
-  actions instead of receiving React state setters.
-- `hooks/use-exchange-rates.ts` wraps `model/rate-inputs.ts`; draft input and active
-  rates update atomically. Invalid drafts preserve the active rates object, so
-  they do not change calculations or Agent context.
-- `hooks/use-dashboard-analysis.ts`: derived analytics, comparisons, dimensions,
-  and filtered rows. It does not depend on pagination, sorting, or chart drilldown.
-- `hooks/use-dashboard-view-model.ts`: sorting, pagination, chart projection,
-  and deferred detail queries. Chart data contracts live in `hooks/dashboard-view-types.ts`.
-- `model/analytics.ts` re-exports pure metric, summary, comparison, and time-series
-  modules from `model/analytics/`. Monthly and daily summaries contain no bills.
-- `model/transaction-details.ts`: selects one month/day of bill details on demand;
-  monthly review metadata is computed only while the review dialog is open.
-  Agent queries use aggregates and explicit result DTOs from `agent/query-types.ts`.
-- `src/features/finance-dashboard/model`: pure data helpers for types,
-  constants, transaction rules, controls, rows, dates, date periods, money
-  conversion, filtering, rate inputs, collections, and analytics.
-- `src/features/finance-dashboard/upload`: workbook parsing, file drop handling,
-  and upload/parsing state.
-- `src/features/finance-dashboard/agent`: Zod tool schemas, pure read-only
-  queries, the WebMCP adapter, and the React authorization bridge. Query-core
-  files must not import React, ECharts, or browser APIs.
-- `components/entry`: landing copy, upload card, and entry-page composition.
-- `components/overview`: loaded-workbook overview, metrics, and comparisons.
-- `components/agent`: authorization UI, depending on `agent/access-types.ts`,
-  never the complete dashboard controller.
-- `src/features/finance-dashboard/components/filters`: quick range, date, type,
-  currency, category, account, book, tag, excluded tag, keyword, active-filter,
-  panel, dock, and chip controls.
-- `src/features/finance-dashboard/components/rates`: editable exchange-rate
-  inputs and reset behavior.
-- `src/features/finance-dashboard/components/charts`: ECharts wrapper, chart
-  theme helpers, chart option builders, chart panels, category/account
-  analysis, monthly review, heatmap, and daily cashflow views.
-- `src/features/finance-dashboard/components/summaries`: category and tag
-  summary tables.
-- `src/features/finance-dashboard/components/transactions`: transaction table,
-  rows, controls, sorting, and pagination.
-- `src/features/finance-dashboard/components/shared`: reusable dashboard panel,
-  visual accents, shared primitives, and transaction badge presentation. Domain
-  transaction rules must not contain UI variants.
-- `src/features/finance-dashboard/components/feedback`: alert and empty-state
-  surfaces, parsing status, and drop overlays shared by entry and workspace.
-- `components/dashboard-workspace.tsx` is the composition root allowed to
-  receive the controller. Child components declare narrow value/action contracts;
-  transaction tables receive a row count plus current-page rows, not all rows.
-- `src/features/finance-dashboard/components/layout`: dashboard background and
-  layout decoration.
+- Follow repository formatter, linter, and TypeScript configuration rather than
+  restating or overriding their rules. Use `@/` for imports from `src` and `cn()`
+  for class composition.
+- Reuse existing UI components and variants. Add new shadcn components through
+  the CLI with `pnpm`, review generated code, and confirm Base UI APIs before
+  assuming Radix-specific behavior.
+- Use semantic theme tokens and component variants. Keep global theme styles in
+  `src/index.css`; avoid a second token stylesheet and manual dark-mode overrides
+  when tokens suffice.
+- Prefer `flex` with `gap-*`, `size-*` for equal dimensions, and `truncate` for
+  truncated text. Avoid `space-x-*` and `space-y-*`.
+- Mark button icons with `data-icon="inline-start"` or `data-icon="inline-end"`
+  and let the button component handle sizing.
 
-## Build & Commands
+## Verification
 
-Use `pnpm` for project commands because this repo has `pnpm-lock.yaml` and
-`pnpm-workspace.yaml`.
-
-```bash
-pnpm install
-pnpm dev
-pnpm build
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm format
-pnpm preview
-```
-
-- `pnpm dev`: start the Vite dev server.
-- `pnpm build`: run `tsc -b` and then `vite build`.
-- `pnpm lint`: run ESLint across the repository.
-- `pnpm typecheck`: type-check both the app and Vite configuration projects.
-- `pnpm test`: run Vitest unit tests for parsing, agent queries, and WebMCP
-  authorization guards.
-- `pnpm format`: run Prettier over `**/*.{ts,tsx}`.
-- `pnpm preview`: preview the production build locally.
-- `pnpm exec node scripts/benchmark-analytics.mjs`: benchmark pure analytics
-  with 1k/10k/50k generated records. Excludes parsing and browser rendering;
-  use repeated runs on the same machine for comparisons, not a CI time threshold.
-- No deployment command is defined in `package.json`; production output is the
-  Vite `dist` directory produced by `pnpm build`.
-- `package.json` currently has `private: true` to prevent accidental npm
-  publication. Do not change that unless the user asks.
-
-## Code Style
-
-- TypeScript is strict for app code. `tsconfig.app.json` enables `strict`,
-  `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`, and
-  `erasableSyntaxOnly`.
-- Use the `@/` alias for imports from `src`; it is configured in both Vite and
-  TypeScript.
-- Prettier settings:
-  - LF line endings
-  - no semicolons
-  - double quotes
-  - 2-space indentation
-  - trailing commas where valid in ES5
-  - 80-character print width
-  - `prettier-plugin-tailwindcss` with Tailwind stylesheet `src/index.css`
-  - Tailwind-aware class sorting for `cn` and `cva`
-- ESLint applies recommended JavaScript, TypeScript, React Hooks, and Vite React
-  Refresh rules to `*.ts` and `*.tsx`; `dist` is ignored.
-- `src/components/ui/**/*.{ts,tsx}` disables the React Refresh
-  only-export-components rule because shadcn/ui files often export variants and
-  components together.
-- Use `cn()` from `src/lib/utils.ts` for class composition. It combines `clsx`
-  with `tailwind-merge`.
-- Keep business/data logic in `model` files where possible. Components should
-  mostly coordinate state and rendering.
-- Keep upload/parsing coordination in `upload` files and pure workbook mapping
-  in `upload/workbook-parser.ts`.
-- Preserve the lazy import of `xlsx` unless there is a clear reason to increase
-  the initial bundle.
-- The ECharts wrapper registers only the chart/component modules this app uses.
-  Add ECharts imports deliberately when introducing a new chart type or ECharts
-  component.
-
-## shadcn/ui & Styling
-
-- shadcn project configuration:
-  - framework: Vite
-  - TypeScript: enabled
-  - React Server Components: disabled
-  - Tailwind: v4 with global CSS at `src/index.css`
-  - style: `base-lyra`
-  - base primitive library: `base`
-  - icon library: `remixicon`
-  - import alias: `@` for `src`
-- Current shadcn-owned UI components live under `src/components/ui`:
-  `alert`, `badge`, `button`, `calendar`, `card`, `collapsible`, `dialog`,
-  `empty`, `input`, `popover`, `select`, `separator`, `table`, and `tooltip`.
-- Prefer existing components and variants before custom markup.
-- Add UI components through the shadcn CLI with the project package runner,
-  then review generated files before using them.
-- Because this project uses shadcn `base`, confirm Base UI APIs before assuming
-  Radix-specific APIs.
-- Use semantic tokens such as `bg-background`, `text-muted-foreground`,
-  `border-border`, and component variants instead of raw color utilities.
-- Use `flex` plus `gap-*`; avoid `space-x-*` and `space-y-*`.
-- Use `size-*` when width and height are equal.
-- Use `truncate` instead of manually combining overflow/text-ellipsis/whitespace
-  classes.
-- Do not add manual dark-mode color overrides when semantic tokens can express
-  the design.
-- Icons inside buttons should use `data-icon="inline-start"` or
-  `data-icon="inline-end"`; component CSS handles sizing.
-- Theme variables, fonts, Tailwind imports, custom shadows, animations, and base
-  CSS live in `src/index.css`. Do not create a second global stylesheet for
-  theme tokens.
-
-## Testing
-
-- Vitest is configured for small deterministic unit tests. Browser validation
-  for WebMCP must still be performed in an actual compatible agent browser.
-- Current verification commands are:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-```
-
-- Tests live beside the code they verify as `*.test.ts`; use generated or
-  fictional records/workbooks only.
-- For parser or analytics changes, extend deterministic tests around model
-  helpers and workbook parsing.
-
-## Security & Privacy
-
-- This is currently a client-only Vite app. Do not place secrets, credentials,
-  private API keys, or service tokens in source files or client-side
-  configuration.
-- No environment example file or runtime configuration file is present. Add one
-  before introducing required environment variables, and keep secret values out
-  of git.
-- Do not add network upload, telemetry, or remote parsing for workbook data
-  without an explicit product decision and visible user-facing disclosure.
-- The existing `ThemeProvider` reads and writes only the theme preference in
-  `localStorage`; avoid storing sensitive user or application data in browser
-  storage.
-- WebMCP tool definitions are registered in the top-level page. Every execute
-  call validates input and checks authorization, parsing state, and the latest
-  context ID. Upload start synchronously revokes authorization, including when
-  parsing later fails. Do not rely on the browser's tool permission alone.
-- Page refresh and replacement workbook require a fresh manual opt-in. Never
-  persist agent authorization or raw ledger data to browser storage.
-- Treat anything rendered in React as user-visible client code. Validate and
-  sanitize any future external data at the boundary where it enters the app.
-- Keep dependencies and generated UI component code reviewable; shadcn
-  components are copied into this repository and should be audited like local
-  source.
-- Do not commit real finance exports, private sample workbooks, `demo.html`, or
-  generated `dist` output. These are ignored by `.gitignore`.
-
-## Configuration
-
-- `vite.config.ts` enables React and Tailwind CSS plugins, maps `@` to `./src`,
-  and separates ECharts, its renderer, XLSX, and Zod with code-splitting groups.
-- `components.json` defines shadcn/ui settings:
-  - Tailwind CSS file: `src/index.css`
-  - aliases: `@/components`, `@/components/ui`, `@/lib`, `@/lib/utils`,
-    `@/hooks`
-  - icon library: `remixicon`
-  - RTL: disabled
-  - registries: none beyond the default shadcn registry reported by the CLI
-- `src/index.css` imports Tailwind, `tw-animate-css`, `shadcn/tailwind.css`,
-  Inter, and DM Sans; it also defines light/dark CSS variables and Tailwind
-  theme tokens.
-- `tsconfig.json` uses project references for app and node configs and defines
-  the shared `@/*` path mapping.
-- `tsconfig.node.json` covers `vite.config.ts` and includes Node types.
-- `pnpm-workspace.yaml` declares an empty workspace package list and
-  `allowBuilds` entries for `esbuild: true` and `msw: false`.
-- `.prettierignore` ignores dependencies, coverage, package-lock/yarn lock
-  files, and the pnpm lockfile.
-- There are no `.cursor/rules/`, `.github/copilot-instructions.md`, or
-  `.trae/rules/` files to merge into this overview. The repository does contain
-  local agent skills under `.agents/skills`, including shadcn guidance reflected
-  in the Code Style section.
-
-## Entry Points & Key Files
-
-- `index.html`: Vite HTML entry point with `#root` and `/src/main.tsx` script.
-- `src/main.tsx`: React root setup and provider composition.
-- `src/App.tsx`: lazy application entry that renders `FinanceDashboard`.
-- `src/components/theme-provider.tsx`: theme context, localStorage persistence,
-  system-theme detection, cross-tab sync, and keyboard toggle.
-- `src/components/theme/theme-utils.ts`: pure theme helpers and view-transition
-  utilities.
-- `src/components/theme/use-theme-keyboard-shortcut.ts`: keyboard shortcut
-  handling for theme toggling.
-- `src/features/finance-dashboard/index.tsx`: dashboard feature shell.
-- `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: dashboard
-  composition and workbook ownership.
-- `src/features/finance-dashboard/hooks/use-dashboard-analysis.ts`: derived
-  dashboard calculations.
-- `src/features/finance-dashboard/hooks/use-dashboard-view-model.ts`: display
-  projections, sorting, pagination, and deferred detail selectors.
-- `src/features/finance-dashboard/upload/workbook-parser.ts`: workbook parser
-  and column alias mapping.
-- `src/features/finance-dashboard/upload/use-workbook-upload.ts`: upload,
-  parsing, error, and status-overlay state.
-- `src/features/finance-dashboard/model/transaction-rules.ts`: transaction
-  direction, income, expense, and reimbursement rules.
-- `src/features/finance-dashboard/model/analytics.ts`: metric, summary, trend,
-  period comparison, week, daily cashflow, and heatmap calculations.
-- `src/features/finance-dashboard/model/filtering.ts`: filter application.
-- `src/features/finance-dashboard/model/constants.ts`: base currency, default
-  rates, and empty filter state.
-- `src/features/finance-dashboard/components/charts/e-chart.tsx`: ECharts
-  lifecycle wrapper.
-- `src/features/finance-dashboard/components/charts/options`: chart option
-  builders split by chart family.
-- `src/components/ui`: shadcn/Base UI components currently available to the app.
-- `src/lib/utils.ts`: `cn()` class-name helper.
+- Use `pnpm` for project commands; consult `package.json` for available scripts.
+- For application changes, run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and
+  `pnpm build`. For documentation-only changes, check formatting, references, and
+  consistency with the implementation.
+- Add deterministic tests beside affected code as `*.test.ts` when changing
+  parsing or analytics rules. Cover changed boundary cases and authorization
+  guards rather than mirroring the implementation.
+- Verify WebMCP browser behavior in an actual compatible Agent browser; unit
+  tests alone do not establish client support.

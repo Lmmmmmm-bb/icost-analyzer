@@ -1,7 +1,7 @@
 import { dateKey, monthKey } from "../model/date"
 import type { Transaction } from "../model/types"
 
-/** Fictional records only; usable by deterministic tests and local benchmarks. */
+/** Fictional records for deterministic tests. */
 export function makeTransaction(
   id: string,
   overrides: Partial<Transaction> = {}
@@ -26,17 +26,4 @@ export function makeTransaction(
     location: "虚构地点",
     ...overrides,
   }
-}
-
-export function generateTransactions(count: number): Transaction[] {
-  return Array.from({ length: count }, (_, index) =>
-    makeTransaction(`generated-${index}`, {
-      date: new Date(2022 + (index % 5), index % 12, (index % 28) + 1, 12),
-      type: index % 9 === 0 ? "收入" : "支出",
-      amount: (index % 9 === 0 ? 1 : -1) * ((index % 900) + 1),
-      currency: index % 7 === 0 ? "USD" : "CNY",
-      category: `演示分类 ${index % 8}`,
-      tags: [`演示标签 ${index % 6}`],
-    })
-  )
 }
