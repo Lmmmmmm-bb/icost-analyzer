@@ -27,20 +27,7 @@ export type Transaction = {
   location: string
 }
 
-export type Filters = {
-  quickRange: string
-  year: string
-  startDate: string
-  endDate: string
-  types: string[]
-  currencies: string[]
-  categories: string[]
-  accounts: string[]
-  books: string[]
-  tags: string[]
-  excludedTags: string[]
-  keyword: string
-}
+export type { Filters } from "./filters"
 
 export type RateMap = Record<string, number>
 

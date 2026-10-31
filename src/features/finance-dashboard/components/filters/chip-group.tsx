@@ -21,6 +21,7 @@ type ChipGroupProps = {
   titleInline?: boolean
   separatorBefore?: string
   describe?: (item: string) => string | null
+  label?: (item: string) => string
   className?: string
   listClassName?: string
   chipClassName?: string
@@ -48,6 +49,7 @@ export function ChipGroup({
   titleInline = false,
   separatorBefore,
   describe,
+  label = (item) => item,
   className,
   listClassName,
   chipClassName,
@@ -67,14 +69,15 @@ export function ChipGroup({
       ) : null}
       <div className={cn("flex flex-wrap gap-1.5", listClassName)}>
         {visible.map((item) => {
+          const itemLabel = label(item)
           const hint = describe?.(item) ?? null
           const selected = value.includes(item)
           const excluded = excludedValue.includes(item)
           const nextLabel = selected
-            ? `排除 ${item}`
+            ? `排除 ${itemLabel}`
             : excluded
-              ? `取消排除 ${item}`
-              : `筛选 ${item}`
+              ? `取消排除 ${itemLabel}`
+              : `筛选 ${itemLabel}`
           const chip = (
             <Button
               type="button"
@@ -108,7 +111,7 @@ export function ChipGroup({
                 onChange(toggleValue(value, item))
               }}
             >
-              {item}
+              {itemLabel}
             </Button>
           )
 

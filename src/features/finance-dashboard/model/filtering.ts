@@ -1,14 +1,14 @@
-import { ALL_RANGE } from "./constants"
+import { resolveTimeFilter, type DateBounds } from "./time-filter"
 import type { Filters, Transaction } from "./types"
 
 export function filterTransactions(
   transactions: readonly Transaction[],
   filters: Filters,
-  invalidDateRange: boolean,
-  now: Date = new Date()
+  now: Date,
+  bounds: DateBounds = resolveTimeFilter(filters.time, now)
 ) {
-  if (invalidDateRange) return []
-  const { start, end } = getFilterDateBounds(filters, now)
+  if (!bounds.valid) return []
+  const { start, end } = bounds
   const keyword = filters.keyword.trim().toLowerCase()
   const typeSet = filters.types.length ? new Set(filters.types) : null
   const currencySet = filters.currencies.length
@@ -56,31 +56,6 @@ export function filterTransactions(
       matchesKeyword
     )
   })
-}
-
-export function getFilterDateBounds(filters: Filters, now: Date = new Date()) {
-  let start: Date | null = filters.startDate
-    ? new Date(`${filters.startDate}T00:00:00`)
-    : null
-  let end: Date | null = filters.endDate
-    ? new Date(`${filters.endDate}T23:59:59`)
-    : null
-
-  if (!start && !end && filters.year) {
-    start = new Date(`${filters.year}-01-01T00:00:00`)
-    end = new Date(`${filters.year}-12-31T23:59:59`)
-  } else if (!start && !end && filters.quickRange !== ALL_RANGE) {
-    if (filters.quickRange === "今年") {
-      start = new Date(`${now.getFullYear()}-01-01T00:00:00`)
-    } else {
-      const months = Number(filters.quickRange.match(/\d+/)?.[0] ?? 0)
-      start = new Date(now)
-      start.setMonth(start.getMonth() - months)
-    }
-    end = now
-  }
-
-  return { start, end }
 }
 
 function matchesAccount(tx: Transaction, accountSet: Set<string>) {

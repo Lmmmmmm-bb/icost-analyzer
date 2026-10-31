@@ -7,7 +7,14 @@ import {
 } from "../model/analytics"
 import { BASE_CURRENCY, EMPTY_FILTERS } from "../model/constants"
 import { dateKey } from "../model/date"
-import { filterTransactions, getFilterDateBounds } from "../model/filtering"
+import { customTime } from "../model/filters"
+import { resolveTimeFilter } from "../model/time-filter"
+import {
+  filterFromWhere,
+  nonDateFilters,
+  toQueryFilters,
+} from "./query-filters"
+import { filterTransactions } from "../model/filtering"
 import { getEffectiveRate, getMissingRates } from "../model/money"
 import { isExpenseTransaction } from "../model/transaction-rules"
 import type { Filters, Transaction } from "../model/types"
@@ -37,32 +44,6 @@ function isInvalidDateRange(from?: string, to?: string) {
 
 function sanitizeLabel(value: string) {
   return value.length > 120 ? `${value.slice(0, 119)}…` : value
-}
-
-function filterFromWhere(where: QueryWhere): Filters {
-  return {
-    ...EMPTY_FILTERS,
-    startDate: where.from ?? "",
-    endDate: where.to ?? "",
-    types: where.types ?? [],
-    categories: where.categories ?? [],
-    currencies: where.currencies ?? [],
-    accounts: where.accounts ?? [],
-    books: where.books ?? [],
-    tags: where.tags ?? [],
-    excludedTags: where.excludedTags ?? [],
-    keyword: where.keyword ?? "",
-  }
-}
-
-function nonDateFilters(filters: Filters): Filters {
-  return {
-    ...filters,
-    quickRange: EMPTY_FILTERS.quickRange,
-    year: "",
-    startDate: "",
-    endDate: "",
-  }
 }
 
 function missingRateInfo(
@@ -112,10 +93,7 @@ function effectiveDateRange(
 ) {
   const pageBounds =
     scope === "current_view"
-      ? getFilterDateBounds(
-          snapshot.filters as Filters,
-          new Date(snapshot.asOf)
-        )
+      ? resolveTimeFilter(snapshot.filters.time, new Date(snapshot.asOf))
       : { start: null, end: null }
   const from = pageBounds.start ? dateKey(pageBounds.start) : null
   const to = pageBounds.end ? dateKey(pageBounds.end) : null
@@ -139,7 +117,7 @@ function makeContext(
     contextId: snapshot.contextId,
     source: "current_page",
     scope,
-    filters: pageFilters,
+    filters: pageFilters ? toQueryFilters(pageFilters) : null,
     where: where ?? null,
     effectiveDateRange: dateRange,
     matchedRows: rows.length,
@@ -159,12 +137,7 @@ function selectRows(
   const base =
     scope === "all_data" ? snapshot.transactions : snapshot.currentViewRows
   return where
-    ? filterTransactions(
-        base,
-        filterFromWhere(where),
-        false,
-        new Date(snapshot.asOf)
-      )
+    ? filterTransactions(base, filterFromWhere(where), new Date(snapshot.asOf))
     : [...base]
 }
 
@@ -181,7 +154,7 @@ function checkQuery(
     )
   if (
     checkPageDates &&
-    isInvalidDateRange(snapshot.filters.startDate, snapshot.filters.endDate)
+    !resolveTimeFilter(snapshot.filters.time, new Date(snapshot.asOf)).valid
   )
     return queryError("INVALID_FILTER", "页面的起止日期无效。")
   if (isInvalidDateRange(where?.from, where?.to))
@@ -395,22 +368,19 @@ export function comparePeriods(
   const baseRows = filterTransactions(
     snapshot.transactions,
     baseFilters,
-    false,
     new Date(snapshot.asOf)
   )
   const extraRows = input.where
     ? filterTransactions(
         baseRows,
         filterFromWhere(input.where),
-        false,
         new Date(snapshot.asOf)
       )
     : baseRows
   const periodRows = (period: { from: string; to: string }) =>
     filterTransactions(
       extraRows,
-      { ...EMPTY_FILTERS, startDate: period.from, endDate: period.to },
-      false,
+      { ...EMPTY_FILTERS, time: customTime(period.from, period.to) },
       new Date(snapshot.asOf)
     )
   const currentRows = periodRows(input.currentPeriod)

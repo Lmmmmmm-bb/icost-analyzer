@@ -1,8 +1,13 @@
-import { ALL_RANGE } from "../../model/constants"
-import { describeTimeRange } from "../../model/date"
+import {
+  describeTimeRange,
+  QUICK_RANGES,
+  quickRangeValue,
+} from "./filter-options"
+import type { FilterKey, ListFilterKey } from "../../model/filters"
 import type { Filters } from "../../model/types"
 
 export type ActiveFilterSummary = {
+  key: FilterKey
   label: string
   detail: string
   tooltip?: string
@@ -10,60 +15,64 @@ export type ActiveFilterSummary = {
 }
 
 export function getActiveFilterSummaries(
-  filters: Filters
+  filters: Filters,
+  now: Date
 ): ActiveFilterSummary[] {
   const summaries: ActiveFilterSummary[] = []
   const keyword = filters.keyword.trim()
 
-  if (filters.startDate || filters.endDate) {
+  const time = filters.time
+  if (time.kind !== "all") {
     summaries.push({
-      label: "日期",
-      detail: formatDateRange(filters.startDate, filters.endDate),
-      count: 1,
-    })
-  } else if (filters.year) {
-    summaries.push({
-      label: "年份",
-      detail: filters.year,
-      count: 1,
-    })
-  } else if (filters.quickRange !== ALL_RANGE) {
-    const tooltip = describeTimeRange(filters.quickRange) ?? undefined
-
-    summaries.push({
-      label: "时间",
-      detail: filters.quickRange,
-      tooltip,
+      key: "time",
+      label:
+        time.kind === "custom"
+          ? "日期"
+          : time.kind === "year"
+            ? "年份"
+            : "时间",
+      detail:
+        time.kind === "custom"
+          ? formatDateRange(time.from ?? "", time.to ?? "")
+          : time.kind === "year"
+            ? String(time.year)
+            : QUICK_RANGES.find(
+                (option) => option.value === quickRangeValue(time)
+              )!.label,
+      tooltip: describeTimeRange(time, now) ?? undefined,
       count: 1,
     })
   }
 
   if (keyword) {
     summaries.push({
+      key: "keyword",
       label: "关键词",
       detail: keyword,
       count: 1,
     })
   }
 
-  appendListSummary(summaries, "类型", filters.types)
-  appendListSummary(summaries, "币种", filters.currencies)
-  appendListSummary(summaries, "账本", filters.books)
-  appendListSummary(summaries, "账户", filters.accounts)
-  appendListSummary(summaries, "分类", filters.categories)
-  appendListSummary(summaries, "包含标签", filters.tags)
-  appendListSummary(summaries, "排除标签", filters.excludedTags)
+  appendListSummary(summaries, "types", "类型", filters.types)
+  appendListSummary(summaries, "currencies", "币种", filters.currencies)
+  appendListSummary(summaries, "books", "账本", filters.books)
+  appendListSummary(summaries, "accounts", "账户", filters.accounts)
+  appendListSummary(summaries, "categories", "分类", filters.categories)
+  appendListSummary(summaries, "tags", "包含标签", filters.tags)
+  appendListSummary(summaries, "excludedTags", "排除标签", filters.excludedTags)
 
   return summaries
 }
 
 function appendListSummary(
   summaries: ActiveFilterSummary[],
+  key: ListFilterKey,
   label: string,
   values: string[]
 ) {
   if (!values.length) return
   summaries.push({
+    key,
     label,
     detail: values.join("、"),
     count: values.length,

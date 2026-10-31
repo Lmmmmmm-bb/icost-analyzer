@@ -58,7 +58,6 @@ function snapshot(filters: Filters = EMPTY_FILTERS): LedgerSnapshot {
     currentViewRows: filterTransactions(
       transactions,
       filters,
-      false,
       new Date("2026-09-17T00:00:00+08:00")
     ),
     filters,
@@ -73,8 +72,7 @@ describe("agent query core", () => {
   it("defaults to the current filtered view and intersects extra conditions", () => {
     const state = snapshot({
       ...EMPTY_FILTERS,
-      startDate: "2026-08-01",
-      endDate: "2026-08-31",
+      time: { kind: "custom", from: "2026-08-01", to: "2026-08-31" },
       categories: ["餐饮"],
     })
     const context = getContext(state)
@@ -129,8 +127,7 @@ describe("agent query core", () => {
   it("compares explicit dates while preserving non-date page filters", () => {
     const state = snapshot({
       ...EMPTY_FILTERS,
-      startDate: "2026-08-01",
-      endDate: "2026-08-31",
+      time: { kind: "custom", from: "2026-08-01", to: "2026-08-31" },
       categories: ["餐饮"],
     })
     const result = comparePeriods(state, {
@@ -153,8 +150,7 @@ describe("agent query core", () => {
   it("can compare explicit periods even when page dates are invalid", () => {
     const state = snapshot({
       ...EMPTY_FILTERS,
-      startDate: "2026-09-01",
-      endDate: "2026-08-01",
+      time: { kind: "custom", from: "2026-09-01", to: "2026-08-01" },
       categories: ["餐饮"],
     })
     const result = comparePeriods(state, {

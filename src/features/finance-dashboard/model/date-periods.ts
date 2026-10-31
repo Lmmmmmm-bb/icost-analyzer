@@ -1,6 +1,5 @@
-import { ALL_RANGE } from "./constants"
 import { dateKey } from "./date"
-import type { Filters, Transaction } from "./types"
+import type { DateBounds } from "./time-filter"
 
 type DatePeriod = {
   start: Date
@@ -43,46 +42,13 @@ function createDatePeriod(start: Date, end: Date): DatePeriod {
 }
 
 export function getCurrentDatePeriod(
-  filters: Filters,
-  filtered: Transaction[],
+  bounds: DateBounds,
   dataRange: { start: Date; end: Date } | null
 ): DatePeriod | null {
-  if (filters.startDate || filters.endDate) {
-    const start = filters.startDate
-      ? new Date(`${filters.startDate}T00:00:00`)
-      : dataRange?.start
-    const end = filters.endDate
-      ? new Date(`${filters.endDate}T23:59:59`)
-      : dataRange?.end
-    return start && end ? createDatePeriod(start, end) : null
-  }
-
-  if (filters.year) {
-    return createDatePeriod(
-      new Date(`${filters.year}-01-01T00:00:00`),
-      new Date(`${filters.year}-12-31T23:59:59`)
-    )
-  }
-
-  if (filters.quickRange !== ALL_RANGE) {
-    const now = new Date()
-    if (filters.quickRange === "今年") {
-      return createDatePeriod(
-        new Date(`${now.getFullYear()}-01-01T00:00:00`),
-        now
-      )
-    }
-
-    const months = Number(filters.quickRange.match(/\d+/)?.[0] ?? 0)
-    const start = new Date(now)
-    start.setMonth(start.getMonth() - months)
-    return createDatePeriod(start, now)
-  }
-
-  const filteredRange = filtered.length ? dataRange : null
-  return filteredRange
-    ? createDatePeriod(filteredRange.start, filteredRange.end)
-    : null
+  if (!bounds.valid) return null
+  const start = bounds.start ?? dataRange?.start
+  const end = bounds.end ?? dataRange?.end
+  return start && end ? createDatePeriod(start, end) : null
 }
 
 export function getPreviousDatePeriod(period: DatePeriod): DatePeriod {

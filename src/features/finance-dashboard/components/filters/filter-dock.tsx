@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
+import { clearFilterGroup } from "../../model/filters"
 import { EMPTY_FILTERS } from "../../model/constants"
 import type { Filters } from "../../model/types"
 import { LedgerEdgeNotch } from "../shared/ledger-accents"
@@ -32,6 +33,7 @@ const numberFormatter = new Intl.NumberFormat("zh-CN")
 
 type FilterDockProps = {
   filters: Filters
+  asOf: string
   filteredCount: number
   totalCount: number
   onFiltersChange: (filters: Filters | ((current: Filters) => Filters)) => void
@@ -41,6 +43,7 @@ type FilterDockProps = {
 
 export function FilterDock({
   filters,
+  asOf,
   filteredCount,
   totalCount,
   onFiltersChange,
@@ -51,7 +54,7 @@ export function FilterDock({
   const barRef = useRef<HTMLDivElement>(null)
   const [isDocked, setIsDocked] = useState(false)
   const [barHeight, setBarHeight] = useState(0)
-  const activeFilters = getActiveFilterSummaries(filters)
+  const activeFilters = getActiveFilterSummaries(filters, new Date(asOf))
   const activeFilterCount = activeFilters.reduce(
     (total, filter) => total + filter.count,
     0
@@ -99,9 +102,9 @@ export function FilterDock({
   }
 
   const clearFilter = (filter: ActiveFilterSummary) => {
-    onFiltersChange((current) => clearFilterGroup(current, filter.label))
+    onFiltersChange((current) => clearFilterGroup(current, filter.key))
 
-    if (filter.label === "分类") {
+    if (filter.key === "categories") {
       onResetDrill()
     }
   }
@@ -142,7 +145,7 @@ export function FilterDock({
                       <>
                         {visibleFilters.map((filter) => (
                           <VisibleFilterChip
-                            key={filter.label}
+                            key={filter.key}
                             filter={filter}
                             onClear={() => clearFilter(filter)}
                           />
@@ -261,7 +264,7 @@ function HiddenFilterBadge({ filters }: { filters: ActiveFilterSummary[] }) {
         className="flex max-w-xs flex-col items-start gap-1.5 text-left"
       >
         {filters.map((filter) => (
-          <span key={filter.label}>
+          <span key={filter.key}>
             <span className="text-background/70">{filter.label}：</span>
             {filter.detail}
             {filter.tooltip ? (
@@ -272,39 +275,6 @@ function HiddenFilterBadge({ filters }: { filters: ActiveFilterSummary[] }) {
       </TooltipContent>
     </Tooltip>
   )
-}
-
-function clearFilterGroup(filters: Filters, label: string): Filters {
-  switch (label) {
-    case "日期":
-    case "年份":
-    case "时间":
-      return {
-        ...filters,
-        quickRange: EMPTY_FILTERS.quickRange,
-        year: "",
-        startDate: "",
-        endDate: "",
-      }
-    case "关键词":
-      return { ...filters, keyword: "" }
-    case "类型":
-      return { ...filters, types: [] }
-    case "币种":
-      return { ...filters, currencies: [] }
-    case "账本":
-      return { ...filters, books: [] }
-    case "账户":
-      return { ...filters, accounts: [] }
-    case "分类":
-      return { ...filters, categories: [] }
-    case "包含标签":
-      return { ...filters, tags: [] }
-    case "排除标签":
-      return { ...filters, excludedTags: [] }
-    default:
-      return filters
-  }
 }
 
 function formatResultCount(filteredCount: number, totalCount: number) {

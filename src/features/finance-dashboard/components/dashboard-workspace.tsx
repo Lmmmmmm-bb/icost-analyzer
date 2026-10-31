@@ -72,6 +72,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
 
       <FilterPanel
         filters={dashboard.filters}
+        asOf={dashboard.asOf}
         dimensions={analysis.dimensions}
         onFiltersChange={dashboard.setFilters}
         onResetDrill={dashboard.resetDrill}
@@ -79,6 +80,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
 
       <FilterDock
         filters={dashboard.filters}
+        asOf={dashboard.asOf}
         filteredCount={analysis.filtered.length}
         totalCount={dashboard.transactions.length}
         onFiltersChange={dashboard.setFilters}
@@ -86,6 +88,7 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
       >
         <FilterPanel
           filters={dashboard.filters}
+          asOf={dashboard.asOf}
           dimensions={analysis.dimensions}
           onFiltersChange={dashboard.setFilters}
           onResetDrill={dashboard.resetDrill}

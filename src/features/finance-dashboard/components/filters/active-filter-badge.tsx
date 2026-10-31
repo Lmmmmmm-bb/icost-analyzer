@@ -32,7 +32,7 @@ export function ActiveFilterBadge({ count, filters }: ActiveFilterBadgeProps) {
         className="flex max-w-xs flex-col items-start gap-1.5 text-left"
       >
         {filters.map((filter) => (
-          <span key={filter.label}>
+          <span key={filter.key}>
             <span className="text-background/70">{filter.label}：</span>
             {filter.detail}
             {filter.tooltip ? (

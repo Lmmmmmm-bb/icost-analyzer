@@ -10,19 +10,25 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-import { ALL_RANGE, EMPTY_FILTERS } from "../../model/constants"
-import { describeTimeRange } from "../../model/date"
+import { EMPTY_FILTERS } from "../../model/constants"
+import { customTime } from "../../model/filters"
 import type { Dimensions, Filters } from "../../model/types"
 import { ActiveFilterBadge } from "./active-filter-badge"
 import { getActiveFilterSummaries } from "./active-filter-summary"
 import { ChipGroup } from "./chip-group"
 import { DateRangePickerField } from "./date-picker-field"
-import { QUICK_RANGES, TRANSACTION_TYPES } from "./filter-options"
+import {
+  QUICK_RANGES,
+  TRANSACTION_TYPES,
+  quickRangeValue,
+  describeTimeRange,
+} from "./filter-options"
 import { FilterRow } from "./filter-row"
 import { LedgerEdgeNotch, LedgerTitleTicks } from "../shared/ledger-accents"
 
 type FilterPanelProps = {
   filters: Filters
+  asOf: string
   dimensions: Dimensions
   onFiltersChange: (filters: Filters | ((current: Filters) => Filters)) => void
   onResetDrill: () => void
@@ -33,6 +39,7 @@ type FilterPanelProps = {
 
 export function FilterPanel({
   filters,
+  asOf,
   dimensions,
   onFiltersChange,
   onResetDrill,
@@ -41,7 +48,7 @@ export function FilterPanel({
   headerActionClassName,
 }: FilterPanelProps) {
   const isDialog = variant === "dialog"
-  const activeFilters = getActiveFilterSummaries(filters)
+  const activeFilters = getActiveFilterSummaries(filters, new Date(asOf))
   const activeFilterCount = activeFilters.reduce(
     (total, filter) => total + filter.count,
     0
@@ -116,21 +123,28 @@ export function FilterPanel({
           <div className="grid gap-2.5">
             <ChipGroup
               title="快捷时间"
-              items={QUICK_RANGES}
-              value={filters.year ? [] : [filters.quickRange]}
+              items={QUICK_RANGES.map((option) => option.value)}
+              label={(value) =>
+                QUICK_RANGES.find((option) => option.value === value)!.label
+              }
+              value={[quickRangeValue(filters.time)]}
               showTitle={false}
-              describe={(item) => describeTimeRange(item)}
+              describe={(item) =>
+                describeTimeRange(
+                  QUICK_RANGES.find((option) => option.value === item)!.time,
+                  new Date(asOf)
+                )
+              }
               listClassName="grid grid-cols-2 gap-1.5 min-[420px]:flex min-[420px]:flex-wrap"
               chipClassName="w-full justify-center min-[420px]:w-auto"
               onChange={(next) => {
-                const selected = next.at(-1) ?? ALL_RANGE
+                const selected = QUICK_RANGES.find(
+                  (option) => option.value === next.at(-1)
+                )?.time ?? { kind: "all" as const }
 
                 onFiltersChange((current) => ({
                   ...current,
-                  quickRange: selected,
-                  year: "",
-                  startDate: "",
-                  endDate: "",
+                  time: selected,
                 }))
               }}
             />
@@ -144,7 +158,11 @@ export function FilterPanel({
                 <ChipGroup
                   title="年份"
                   items={dimensions.years}
-                  value={filters.year ? [filters.year] : []}
+                  value={
+                    filters.time.kind === "year"
+                      ? [String(filters.time.year)]
+                      : []
+                  }
                   showTitle={false}
                   className="min-w-0 flex-1"
                   listClassName="grid grid-cols-[repeat(auto-fit,minmax(4.75rem,1fr))] gap-1.5 sm:flex sm:flex-wrap"
@@ -154,10 +172,9 @@ export function FilterPanel({
 
                     onFiltersChange((current) => ({
                       ...current,
-                      quickRange: selected ? ALL_RANGE : current.quickRange,
-                      year: selected,
-                      startDate: "",
-                      endDate: "",
+                      time: selected
+                        ? { kind: "year", year: Number(selected) }
+                        : { kind: "all" },
                     }))
                   }}
                 />
@@ -166,15 +183,16 @@ export function FilterPanel({
           </div>
           <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
             <DateRangePickerField
-              startDate={filters.startDate}
-              endDate={filters.endDate}
+              startDate={
+                filters.time.kind === "custom" ? (filters.time.from ?? "") : ""
+              }
+              endDate={
+                filters.time.kind === "custom" ? (filters.time.to ?? "") : ""
+              }
               onChange={({ startDate, endDate }) =>
                 onFiltersChange((current) => ({
                   ...current,
-                  startDate,
-                  endDate,
-                  quickRange: ALL_RANGE,
-                  year: "",
+                  time: customTime(startDate, endDate),
                 }))
               }
             />

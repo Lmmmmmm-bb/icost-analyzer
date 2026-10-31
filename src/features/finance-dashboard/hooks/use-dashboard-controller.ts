@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { DEFAULT_RATES, EMPTY_FILTERS } from "../model/constants"
 import {
@@ -12,6 +12,7 @@ import {
 import { createRatesForCurrencies, makeRateInputs } from "../model/rate-inputs"
 import type { Filters, RateMap, Transaction } from "../model/types"
 import { unique } from "../model/collections"
+import { customTime } from "../model/filters"
 import { getMonthDateRange } from "../model/date"
 import { useWorkbookUpload } from "../upload/use-workbook-upload"
 import { useDashboardAnalysis } from "./use-dashboard-analysis"
@@ -34,10 +35,13 @@ export function useDashboardController() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
+  const context = useMemo(
+    () => ({ transactions, filters, rates, asOf: new Date().toISOString() }),
+    [transactions, filters, rates]
+  )
+
   const analysis = useDashboardAnalysis({
-    transactions,
-    filters,
-    rates,
+    ...context,
     drillCategory,
     rankLevel,
     summarySort,
@@ -49,10 +53,8 @@ export function useDashboardController() {
   })
 
   const agentAccess = useAgentAccess({
-    transactions,
+    ...context,
     currentViewRows: analysis.filtered,
-    filters,
-    rates,
   })
 
   const resetAnalysisControls = useCallback(() => {
@@ -88,9 +90,10 @@ export function useDashboardController() {
   const applyMonth = useCallback((month: string) => {
     setFilters((current) => ({
       ...current,
-      quickRange: EMPTY_FILTERS.quickRange,
-      year: "",
-      ...getMonthDateRange(month),
+      time: customTime(
+        getMonthDateRange(month).startDate,
+        getMonthDateRange(month).endDate
+      ),
     }))
   }, [])
 
@@ -111,6 +114,7 @@ export function useDashboardController() {
   return {
     transactions,
     fileName,
+    asOf: context.asOf,
     filters,
     rates,
     rateInputs,

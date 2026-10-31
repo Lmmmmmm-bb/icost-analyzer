@@ -1,4 +1,5 @@
 import type { Filters, RateMap, Transaction } from "../model/types"
+import type { QueryFilters } from "./query-filters"
 import type { QueryWhere } from "./query-schema"
 
 export type QueryScope = "current_view" | "all_data"
@@ -43,7 +44,7 @@ export type QueryContext = MissingRateInfo & {
   contextId: string
   source: "current_page"
   scope: QueryScope
-  filters: Filters | null
+  filters: QueryFilters | null
   where: QueryWhere | null
   effectiveDateRange: { from: string | null; to: string | null }
   matchedRows: number

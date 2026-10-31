@@ -33,8 +33,7 @@ describe("dashboard filtering", () => {
     ]
     const result = filterTransactions(
       rows,
-      { ...EMPTY_FILTERS, quickRange: "近 3 个月" },
-      false,
+      { ...EMPTY_FILTERS, time: { kind: "rolling-months", months: 3 } },
       new Date("2026-09-17T12:00:00")
     )
     expect(result.map((item) => item.dayKey)).toEqual(["2026-08-01"])
@@ -53,10 +52,9 @@ describe("dashboard filtering", () => {
       rows,
       {
         ...EMPTY_FILTERS,
-        startDate: "2026-08-01",
-        endDate: "2026-08-02",
+        time: { kind: "custom", from: "2026-08-01", to: "2026-08-02" },
       },
-      false
+      new Date(2026, 9, 31)
     )
     expect(result.map((item) => item.dayKey)).toEqual([
       "2026-08-01",
@@ -72,7 +70,7 @@ describe("dashboard filtering", () => {
     const result = filterTransactions(
       rows,
       { ...EMPTY_FILTERS, accounts: ["B"] },
-      false
+      new Date(2026, 9, 31)
     )
     expect(result.map((item) => item.type)).toEqual(["转账"])
   })

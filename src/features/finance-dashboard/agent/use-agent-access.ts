@@ -18,6 +18,7 @@ type UseAgentAccessOptions = {
   currentViewRows: Transaction[]
   filters: Filters
   rates: RateMap
+  asOf: string
 }
 
 function hasSiteToolSupport() {
@@ -34,6 +35,7 @@ export function useAgentAccess({
   currentViewRows,
   filters,
   rates,
+  asOf,
 }: UseAgentAccessOptions) {
   const [enabled, setEnabled] = useState(false)
   const [supportStatus, setSupportStatus] = useState<AgentSupportStatus>(() =>
@@ -53,11 +55,11 @@ export function useAgentAccess({
       currentViewRows,
       filters,
       rates,
-      asOf: new Date().toISOString(),
+      asOf,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       uploadEpoch,
     }),
-    [transactions, currentViewRows, filters, rates, uploadEpoch]
+    [transactions, currentViewRows, filters, rates, asOf, uploadEpoch]
   )
 
   useLayoutEffect(() => {

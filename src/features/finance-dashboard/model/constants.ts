@@ -1,6 +1,6 @@
-import type { Filters, RateMap } from "./types"
+import { createEmptyFilters } from "./filters"
+import type { RateMap } from "./types"
 
-export const ALL_RANGE = "全部"
 export const BASE_CURRENCY = "CNY"
 
 export const DEFAULT_RATES: RateMap = {
@@ -26,17 +26,4 @@ export const DEFAULT_RATES: RateMap = {
   IDR: 0.000379,
 }
 
-export const EMPTY_FILTERS: Filters = {
-  quickRange: ALL_RANGE,
-  year: "",
-  startDate: "",
-  endDate: "",
-  types: [],
-  currencies: [],
-  categories: [],
-  accounts: [],
-  books: [],
-  tags: [],
-  excludedTags: [],
-  keyword: "",
-}
+export const EMPTY_FILTERS = createEmptyFilters()

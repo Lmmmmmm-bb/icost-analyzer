@@ -32,7 +32,8 @@ import {
   getWeekSummary,
   summarizeBy,
 } from "../model/analytics"
-import { ALL_RANGE } from "../model/constants"
+import { customTime } from "../model/filters"
+import { resolveTimeFilter } from "../model/time-filter"
 import { dateKey } from "../model/date"
 import { filterTransactions } from "../model/filtering"
 import { getMissingRates } from "../model/money"
@@ -42,6 +43,7 @@ type DashboardAnalysisParams = {
   transactions: Transaction[]
   filters: Filters
   rates: RateMap
+  asOf: string
   drillCategory: string
   rankLevel: RankLevel
   summarySort: SummarySort
@@ -56,6 +58,7 @@ export function useDashboardAnalysis({
   transactions,
   filters,
   rates,
+  asOf,
   drillCategory,
   rankLevel,
   summarySort,
@@ -67,22 +70,20 @@ export function useDashboardAnalysis({
 }: DashboardAnalysisParams) {
   const dimensions = useMemo(() => getDimensions(transactions), [transactions])
   const dateRange = useMemo(() => getDateRange(transactions), [transactions])
-  const invalidDateRange = Boolean(
-    filters.startDate &&
-    filters.endDate &&
-    new Date(filters.startDate) > new Date(filters.endDate)
+  const now = useMemo(() => new Date(asOf), [asOf])
+  const bounds = useMemo(
+    () => resolveTimeFilter(filters.time, now),
+    [filters.time, now]
   )
+  const invalidDateRange = !bounds.valid
   const filtered = useMemo(
-    () => filterTransactions(transactions, filters, invalidDateRange),
-    [filters, invalidDateRange, transactions]
+    () => filterTransactions(transactions, filters, now, bounds),
+    [filters, bounds, now, transactions]
   )
   const filteredDateRange = useMemo(() => getDateRange(filtered), [filtered])
   const currentPeriod = useMemo(
-    () =>
-      invalidDateRange
-        ? null
-        : getCurrentDatePeriod(filters, filtered, filteredDateRange),
-    [filtered, filteredDateRange, filters, invalidDateRange]
+    () => getCurrentDatePeriod(bounds, filteredDateRange),
+    [bounds, filteredDateRange]
   )
   const previousPeriod = useMemo(
     () => (currentPeriod ? getPreviousDatePeriod(currentPeriod) : null),
@@ -99,14 +100,14 @@ export function useDashboardAnalysis({
       transactions,
       {
         ...filters,
-        quickRange: ALL_RANGE,
-        year: "",
-        startDate: dateKey(previousPeriod.start),
-        endDate: dateKey(previousPeriod.end),
+        time: customTime(
+          dateKey(previousPeriod.start),
+          dateKey(previousPeriod.end)
+        ),
       },
-      false
+      now
     )
-  }, [filters, invalidDateRange, previousPeriod, transactions])
+  }, [filters, invalidDateRange, previousPeriod, transactions, now])
   const yearOverYearScope = useMemo(() => {
     if (!yearOverYearPeriod) return []
     if (invalidDateRange) return []
@@ -114,14 +115,14 @@ export function useDashboardAnalysis({
       transactions,
       {
         ...filters,
-        quickRange: ALL_RANGE,
-        year: "",
-        startDate: dateKey(yearOverYearPeriod.start),
-        endDate: dateKey(yearOverYearPeriod.end),
+        time: customTime(
+          dateKey(yearOverYearPeriod.start),
+          dateKey(yearOverYearPeriod.end)
+        ),
       },
-      false
+      now
     )
-  }, [filters, invalidDateRange, transactions, yearOverYearPeriod])
+  }, [filters, invalidDateRange, transactions, yearOverYearPeriod, now])
   const missingRates = useMemo(
     () => getMissingRates(filtered, rates),
     [filtered, rates]

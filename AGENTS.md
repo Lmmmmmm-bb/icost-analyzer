@@ -89,6 +89,12 @@
 - Analytics treat transactions as expense, income, reimbursement, and other
   according to helpers in `model/transaction-rules.ts`; keep those domain rules
   centralized.
+- Time filters are a discriminated union in `model/filters.ts`; UI labels are
+  presentation only. Resolve boundaries through `model/time-filter.ts` using
+  the page context clock shared with Agent snapshots. Calendar end dates include
+  the complete local day. Preserve existing month-end and leap-day rollover rules.
+- `agent/query-filters.ts` maps internal filters to the existing public tool DTO;
+  do not expose internal representation changes through the WebMCP contract.
 - Account filtering matches `account1` for normal transactions and either
   `account1` or `account2` for `转账` transactions.
 - Keyword filtering searches notes, category, subcategory, accounts, book,
