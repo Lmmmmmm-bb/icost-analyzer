@@ -1,42 +1,65 @@
 import { describe, expect, it } from "vitest"
 
 import {
-  createHeatmapYears,
+  createHeatmapData,
   fillYearHeatmap,
 } from "@/features/finance-dashboard/components/charts/options/heatmap-data"
 
 describe("heatmap presentation data", () => {
-  it("uses the same global P95 in each year without capping actual amounts", () => {
+  it("computes one global P95 across years without capping actual amounts", () => {
     const input: [string, number][] = [
       ["2024-02-29", 10],
       ["2024-03-01", 20],
       ["2025-01-01", 1000],
     ]
-    const years = createHeatmapYears(input, "robust", "2026")
-    expect(years.map((year) => year.colorMaxValue)).toEqual([20, 20])
-    expect(years.map((year) => year.cappedDays)).toEqual([0, 1])
-    expect(years[1].values).toEqual([["2025-01-01", 1000]])
-    expect(years.map((year) => year.actualMaxValue)).toEqual([1000, 1000])
-    expect(
-      createHeatmapYears(input, "full", "2026").map(
-        (year) => year.colorMaxValue
-      )
-    ).toEqual([1000, 1000])
+    const data = createHeatmapData(input, "robust", "2026")
+    expect(data).toMatchObject({
+      colorMaxValue: 20,
+      cappedDays: 1,
+      actualMaxValue: 1000,
+    })
+    expect(data.years).toEqual([
+      { year: "2024", values: input.slice(0, 2) },
+      { year: "2025", values: [["2025-01-01", 1000]] },
+    ])
+    expect(createHeatmapData(input, "full", "2026")).toMatchObject({
+      colorMaxValue: 1000,
+      cappedDays: 0,
+      actualMaxValue: 1000,
+    })
+  })
+
+  it("keeps fractional thresholds and real maxima separate from the minimum full scale", () => {
+    const input: [string, number][] = [
+      ["2024-01-01", 0.1],
+      ["2024-01-02", 0.2],
+      ["2025-01-01", 0.3],
+    ]
+    expect(createHeatmapData(input, "robust", "2026")).toMatchObject({
+      colorMaxValue: 0.2,
+      actualMaxValue: 0.3,
+      cappedDays: 1,
+    })
+    expect(createHeatmapData(input, "full", "2026")).toMatchObject({
+      colorMaxValue: 1,
+      actualMaxValue: 0.3,
+      cappedDays: 0,
+    })
   })
 
   it("keeps zero days and uses an explicit year for an income-only selection", () => {
-    expect(createHeatmapYears([], "robust", "2026")).toEqual([
-      {
-        year: "2026",
-        values: [],
-        cappedDays: 0,
-        colorMaxValue: 1,
-        actualMaxValue: 1,
-      },
-    ])
-    expect(
-      createHeatmapYears([["2024-01-01", 0]], "robust", "2026")[0].colorMaxValue
-    ).toBe(1)
+    expect(createHeatmapData([], "robust", "2026")).toEqual({
+      years: [{ year: "2026", values: [] }],
+      cappedDays: 0,
+      colorMaxValue: 1,
+      actualMaxValue: 0,
+    })
+    expect(createHeatmapData([["2024-01-01", 0]], "robust", "2026")).toEqual({
+      years: [{ year: "2024", values: [["2024-01-01", 0]] }],
+      cappedDays: 0,
+      colorMaxValue: 1,
+      actualMaxValue: 0,
+    })
   })
 
   it("fills leap and non-leap years without moving transactions across dates", () => {

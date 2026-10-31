@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button"
 import { RANK_LEVELS, type RankLevel } from "../../model/dashboard-controls"
 import { DashboardPanel } from "../shared/dashboard-panel"
 import { EChart } from "./e-chart"
-import type { ChartPanelOptions } from "./types"
+import type { ChartOptionFactory } from "@/features/finance-dashboard/components/charts/types"
 
 type CategoryAnalysisGridProps = {
-  options: Pick<ChartPanelOptions, "pieOption" | "rankingOption">
+  options: {
+    pieOption: ChartOptionFactory
+    rankingOption: ChartOptionFactory
+  }
   drillCategory: string
   rankLevel: RankLevel
   onDrillCategoryChange: (category: string) => void

@@ -12,6 +12,9 @@ type WorkerPort = Pick<
   postMessage: (message: WorkbookParseRequest, transfer: Transferable[]) => void
 }
 type WorkerFactory = () => WorkerPort
+type ParseOutcome =
+  | { ok: true; result: WorkbookParseResult }
+  | { ok: false; error: unknown }
 class WorkerUnavailableError extends Error {}
 let nextTaskId = 0
 
@@ -54,7 +57,7 @@ export async function parseWorkbookInBackground(
       const id = ++nextTaskId
       let transferred = false
       let settled = false
-      const finish = (result?: WorkbookParseResult, error?: unknown) => {
+      const finish = (outcome: ParseOutcome) => {
         if (settled) return
         settled = true
         clearTimeout(startTimer)
@@ -63,26 +66,27 @@ export async function parseWorkbookInBackground(
         worker.onerror = null
         worker.onmessageerror = null
         worker.terminate()
-        if (error) reject(error)
-        else resolve(result!)
+        if (outcome.ok) resolve(outcome.result)
+        else reject(outcome.error)
       }
-      const abort = () => finish(undefined, signal.reason)
+      const fail = (error: unknown) => finish({ ok: false, error })
+      const failWorker = () =>
+        fail(
+          transferred
+            ? new Error(WORKBOOK_PARSE_ERROR)
+            : new WorkerUnavailableError()
+        )
+      const abort = () => fail(signal.reason)
       const startTimer = setTimeout(
-        () => finish(undefined, new WorkerUnavailableError()),
+        () => fail(new WorkerUnavailableError()),
         10000
       )
       signal.addEventListener("abort", abort, { once: true })
       worker.onerror = (event) => {
         event.preventDefault()
-        finish(
-          undefined,
-          transferred
-            ? new Error(WORKBOOK_PARSE_ERROR)
-            : new WorkerUnavailableError()
-        )
+        failWorker()
       }
-      worker.onmessageerror = () =>
-        finish(undefined, new Error(WORKBOOK_PARSE_ERROR))
+      worker.onmessageerror = failWorker
       worker.onmessage = ({ data }: MessageEvent<WorkbookParseResponse>) => {
         if (!data || settled) return
         if (data.type === "ready") {
@@ -92,14 +96,14 @@ export async function parseWorkbookInBackground(
           try {
             worker.postMessage({ id, buffer }, [buffer])
           } catch {
-            finish(undefined, new Error(WORKBOOK_PARSE_ERROR))
+            fail(new Error(WORKBOOK_PARSE_ERROR))
           }
           return
         }
         if (!transferred || data.id !== id) return
-        if (data.type === "error")
-          finish(undefined, new Error(WORKBOOK_PARSE_ERROR))
-        else if (data.type === "result") finish(data.result)
+        if (data.type === "error") fail(new Error(WORKBOOK_PARSE_ERROR))
+        else if (data.type === "result")
+          finish({ ok: true, result: data.result })
       }
     })
   } catch (error) {

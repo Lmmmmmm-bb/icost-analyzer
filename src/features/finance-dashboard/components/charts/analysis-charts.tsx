@@ -16,15 +16,13 @@ import {
   createRankingOption,
   createTagOption,
   createWeekOption,
-} from "./chart-options"
-import { createHeatmapYears } from "@/features/finance-dashboard/components/charts/options/heatmap-data"
+} from "@/features/finance-dashboard/components/charts/options"
 import { AccountAnalysisGrid } from "./account-analysis-grid"
 import { CategoryAnalysisGrid } from "./category-analysis-grid"
 import { DailyCashflowPanel } from "./daily-cashflow/daily-cashflow-panel"
 import { DistributionChartsGrid } from "./distribution-charts-grid"
 import { HeatmapPanel } from "./heatmap-panel"
 import { MonthlyTrendPanel } from "./monthly-trend-panel"
-import type { HeatmapColorScaleMode } from "./types"
 
 type AnalysisChartsProps = {
   data: DashboardChartData
@@ -61,8 +59,6 @@ export function AnalysisCharts({
 }: AnalysisChartsProps) {
   const { resolvedTheme } = useTheme()
   const [reviewOpen, setReviewOpen] = useState(false)
-  const [heatmapScaleMode, setHeatmapScaleMode] =
-    useState<HeatmapColorScaleMode>("robust")
   const monthlyOption = useCallback(
     () => createMonthlyOption(data.monthly, resolvedTheme),
     [data.monthly, resolvedTheme]
@@ -90,15 +86,6 @@ export function AnalysisCharts({
   const tagOption = useCallback(
     () => createTagOption(data.tagSummary, resolvedTheme),
     [data.tagSummary, resolvedTheme]
-  )
-  const heatmapYears = useMemo(
-    () =>
-      createHeatmapYears(
-        data.heatmap,
-        heatmapScaleMode,
-        String(new Date().getFullYear())
-      ),
-    [data.heatmap, heatmapScaleMode]
   )
   const categoryOptions = useMemo(
     () => ({ pieOption, rankingOption }),
@@ -146,11 +133,7 @@ export function AnalysisCharts({
         />
       </div>
 
-      <HeatmapPanel
-        years={heatmapYears}
-        scaleMode={heatmapScaleMode}
-        onScaleModeChange={setHeatmapScaleMode}
-      />
+      <HeatmapPanel heatmap={data.heatmap} />
       <DailyCashflowPanel
         dailyCashflow={data.dailyCashflow}
         selectDetails={detailQueries.day}

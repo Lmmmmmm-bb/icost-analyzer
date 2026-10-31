@@ -1,8 +1,10 @@
-import { useCallback } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useTheme } from "@/components/theme-provider"
 import { createHeatmapOption } from "@/features/finance-dashboard/components/charts/options/heatmap-option"
 import {
   fillYearHeatmap,
+  createHeatmapData,
+  type HeatmapColorScaleMode,
   type HeatmapYearData,
 } from "@/features/finance-dashboard/components/charts/options/heatmap-data"
 import {
@@ -17,12 +19,9 @@ import {
 import { formatMoney } from "../../model/money"
 import { DashboardPanel } from "../shared/dashboard-panel"
 import { EChart } from "./e-chart"
-import type { HeatmapColorScaleMode } from "./types"
 
 type HeatmapPanelProps = {
-  years: HeatmapYearData[]
-  scaleMode: HeatmapColorScaleMode
-  onScaleModeChange: (mode: HeatmapColorScaleMode) => void
+  heatmap: readonly [string, number][]
 }
 
 const heatmapScaleOptions = [
@@ -36,22 +35,12 @@ const heatmapScaleOptions = [
   },
 ] satisfies { value: HeatmapColorScaleMode; label: string }[]
 
-export function HeatmapPanel({
-  years,
-  scaleMode,
-  onScaleModeChange,
-}: HeatmapPanelProps) {
-  const cappedDays = years.reduce(
-    (total, heatmap) => total + heatmap.cappedDays,
-    0
-  )
-  const colorMaxValue = Math.max(
-    ...years.map((heatmap) => heatmap.colorMaxValue),
-    1
-  )
-  const actualMaxValue = Math.max(
-    ...years.map((heatmap) => heatmap.actualMaxValue),
-    1
+export function HeatmapPanel({ heatmap }: HeatmapPanelProps) {
+  const [scaleMode, setScaleMode] = useState<HeatmapColorScaleMode>("robust")
+  const { years, cappedDays, colorMaxValue, actualMaxValue } = useMemo(
+    () =>
+      createHeatmapData(heatmap, scaleMode, String(new Date().getFullYear())),
+    [heatmap, scaleMode]
   )
   const selectedScaleLabel =
     heatmapScaleOptions.find((option) => option.value === scaleMode)?.label ??
@@ -80,9 +69,9 @@ export function HeatmapPanel({
           </div>
           <Select
             value={scaleMode}
-            onValueChange={(value) =>
-              onScaleModeChange(value as HeatmapColorScaleMode)
-            }
+            onValueChange={(value) => {
+              if (value === "robust" || value === "full") setScaleMode(value)
+            }}
           >
             <SelectTrigger
               aria-label="热力图颜色范围"
@@ -109,7 +98,7 @@ export function HeatmapPanel({
               {heatmap.year}
               <span className="h-px flex-1 bg-border" />
             </div>
-            <YearHeatmap data={heatmap} />
+            <YearHeatmap data={heatmap} colorMaxValue={colorMaxValue} />
           </div>
         ))}
       </div>
@@ -117,7 +106,13 @@ export function HeatmapPanel({
   )
 }
 
-function YearHeatmap({ data }: { data: HeatmapYearData }) {
+function YearHeatmap({
+  data,
+  colorMaxValue,
+}: {
+  data: HeatmapYearData
+  colorMaxValue: number
+}) {
   const { resolvedTheme } = useTheme()
   const createOption = useCallback(
     () =>
@@ -125,9 +120,9 @@ function YearHeatmap({ data }: { data: HeatmapYearData }) {
         fillYearHeatmap(data.year, data.values),
         resolvedTheme,
         data.year,
-        data.colorMaxValue
+        colorMaxValue
       ),
-    [data, resolvedTheme]
+    [data, colorMaxValue, resolvedTheme]
   )
   return <EChart createOption={createOption} className="h-40" />
 }

@@ -116,11 +116,6 @@ export function useWorkbookUpload({
     isParsingRef.current = false
   }, [clearStatusDelayTimer, clearStatusExitTimer])
 
-  const resetUpload = useCallback(() => {
-    cancelPendingUpload()
-    setUploadState(IDLE_UPLOAD_STATE)
-  }, [cancelPendingUpload])
-
   const uploadWorkbook = useCallback(
     async (file: File) => {
       if (isParsingRef.current) return
@@ -200,6 +195,5 @@ export function useWorkbookUpload({
   return {
     uploadState,
     uploadWorkbook,
-    resetUpload,
   }
 }

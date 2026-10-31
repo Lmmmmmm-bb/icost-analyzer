@@ -1,12 +1,13 @@
 import { DashboardPanel } from "../shared/dashboard-panel"
 import { EChart } from "./e-chart"
-import type { ChartPanelOptions } from "./types"
+import type { ChartOptionFactory } from "@/features/finance-dashboard/components/charts/types"
 
 type DistributionChartsGridProps = {
-  options: Pick<
-    ChartPanelOptions,
-    "currencyOption" | "weekOption" | "tagOption"
-  >
+  options: {
+    currencyOption: ChartOptionFactory
+    weekOption: ChartOptionFactory
+    tagOption: ChartOptionFactory
+  }
   onTagSelect: (tag: string) => void
 }
 

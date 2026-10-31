@@ -25,6 +25,9 @@ class FakeWorker {
       { preventDefault: vi.fn() } as unknown as ErrorEvent
     )
   }
+  failMessage() {
+    this.onmessageerror?.call(this as unknown as Worker, {} as MessageEvent)
+  }
   get taskId() {
     return (this.postMessage.mock.calls[0][0] as { id: number }).id
   }
@@ -115,6 +118,38 @@ describe("background workbook parsing", () => {
     expect(factory).not.toHaveBeenCalled()
   })
 
+  it.each([null, false, 0, ""])(
+    "rejects cancellation with a falsy reason: %s",
+    async (reason) => {
+      const worker = new FakeWorker()
+      const controller = new AbortController()
+      const result = parseWorkbookInBackground(
+        fixture(),
+        controller.signal,
+        () => worker
+      )
+      const rejected = expect(result).rejects.toBe(reason)
+      controller.abort(reason)
+      await rejected
+      expect(worker.terminate).toHaveBeenCalledOnce()
+    }
+  )
+
+  it("falls back on a message failure before transferring the workbook", async () => {
+    const buffer = fixture()
+    const expected = await parseWorkbookWithDiagnostics(buffer)
+    const worker = new FakeWorker()
+    const result = parseWorkbookInBackground(
+      buffer,
+      new AbortController().signal,
+      () => worker
+    )
+    worker.failMessage()
+    expect(await result).toEqual(expected)
+    expect(worker.postMessage).not.toHaveBeenCalled()
+    expect(worker.terminate).toHaveBeenCalledOnce()
+  })
+
   it("falls back to the same parser when construction or startup fails", async () => {
     const buffer = fixture()
     const expected = await parseWorkbookWithDiagnostics(buffer)
@@ -165,11 +200,7 @@ describe("background workbook parsing", () => {
       worker.send({ type: "ready" })
       if (mode === "error") worker.send({ type: "error", id: worker.taskId })
       else if (mode === "crash") worker.fail()
-      else
-        worker.onmessageerror?.call(
-          worker as unknown as Worker,
-          {} as MessageEvent
-        )
+      else worker.failMessage()
       await rejected
       expect(worker.terminate).toHaveBeenCalledOnce()
     }
