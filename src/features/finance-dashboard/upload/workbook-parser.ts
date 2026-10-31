@@ -76,7 +76,14 @@ function splitTags(raw: string) {
     .filter((tag) => tag && !/^(?:19|20)\d{2}年?$/.test(tag))
 }
 
-export async function parseWorkbookWithDiagnostics(buffer: ArrayBuffer) {
+export type WorkbookParseResult = {
+  transactions: Transaction[]
+  skippedRows: number
+}
+
+export async function parseWorkbookWithDiagnostics(
+  buffer: ArrayBuffer
+): Promise<WorkbookParseResult> {
   const XLSX = await import("xlsx")
   const workbook = XLSX.read(buffer, { type: "array", cellDates: false })
   const sheet = workbook.Sheets[workbook.SheetNames[0]]

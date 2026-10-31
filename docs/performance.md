@@ -27,6 +27,7 @@ pnpm performance --chrome /path/to/chrome --output artifacts/baseline.local
 - `--counts 1000,10000,50000 --cpus 1,4`：默认数据规模；包含一万笔时，降速只测一万笔。
 - `--mode snapshot`：一万笔看板的浅色、深色可访问性及截图。
 - `--mode charts`：图表延迟加载、离屏暂停、重新进入、空结果、下钻、主题和尺寸变化。
+- `--mode uploads`：实际 Worker 与不可用回退下的两种 Excel 格式、日期体系、无效行、失败替换和重试。
 - `--runs 1`：调试时缩短执行；正式比较至少三轮。
 
 默认报告保存在 Git 忽略的 `artifacts/performance.local`。
@@ -46,6 +47,7 @@ pnpm performance --chrome /path/to/chrome --output artifacts/baseline.local
 状态；懒挂载不能仅让首次测量好看。1 万笔和 5 万笔本机交互目标为 200 ms
 以内，一万笔 CPU 4 倍降速先争取 300 ms，最终目标仍为 200 ms。
 Worker 解析重点观察页面响应与最长任务，不能只比较总导入时间。
+浏览器模拟 CPU 降速不代表设备所有线程（包括 Worker）等比例变慢；同时比较未降速的本机结果。
 
 这些是实验室结果，不证明线上用户 Core Web Vitals 的 p75 达标。脚本不引入
 线上遥测，也不测试 WebMCP 客户端兼容性。涉及 Agent 生命周期的变化还需要
@@ -59,6 +61,7 @@ Worker 解析重点观察页面响应与最长任务，不能只比较总导入�
 - 图表容器负责可见性；配置工厂只在需要显示时运行；动态渲染模块统一注册 ECharts、管理实例及尺寸监听。离屏保留实例，卸载时释放资源。
 - 热力图的全局色阶取自完整筛选结果，不能随可见年份变化。
 - 后台解析复用同一解析器；上传协调负责任务生命周期和同步撤权，UI 只接收状态及动作。
+- Worker 适配器负责启动握手、缓冲区转移、任务编号与取消；每次导入独立创建并释放。仅启动失败可回退，已转移文件后的异常不重复解析。错误跨线程只传固定代码，不携带工作簿内容。
 - 账单、搜索索引和授权只在当前页面会话中存在；错误日志不得包含工作簿行内容。
 
 每阶段修改通过 `pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`

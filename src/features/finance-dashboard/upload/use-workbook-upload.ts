@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import type { Transaction } from "../model/types"
-import { parseWorkbookWithDiagnostics } from "./workbook-parser"
+import { parseWorkbookInBackground } from "@/features/finance-dashboard/upload/worker/parse-in-background"
 
 const PARSING_STATUS_DELAY_MS = 650
 const PARSING_STATUS_MIN_VISIBLE_MS = 700
@@ -36,6 +36,7 @@ export function useWorkbookUpload({
 }: UseWorkbookUploadOptions) {
   const uploadSeq = useRef(0)
   const isParsingRef = useRef(false)
+  const parsingTask = useRef<AbortController | null>(null)
   const statusDelayTimer = useRef<number | null>(null)
   const statusExitTimer = useRef<number | null>(null)
   const resolveStatusExitWait = useRef<(() => void) | null>(null)
@@ -104,6 +105,8 @@ export function useWorkbookUpload({
 
   const cancelPendingUpload = useCallback(() => {
     uploadSeq.current += 1
+    parsingTask.current?.abort()
+    parsingTask.current = null
     clearStatusDelayTimer()
     clearStatusExitTimer()
     statusVisibleAt.current = null
@@ -121,6 +124,8 @@ export function useWorkbookUpload({
 
       onStart?.()
       const seq = (uploadSeq.current += 1)
+      const task = new AbortController()
+      parsingTask.current = task
       isParsingRef.current = true
       setUploadState({
         error: "",
@@ -145,7 +150,7 @@ export function useWorkbookUpload({
         }
 
         const { transactions: parsed, skippedRows } =
-          await parseWorkbookWithDiagnostics(buffer)
+          await parseWorkbookInBackground(buffer, task.signal)
         if (seq !== uploadSeq.current) return
         if (!parsed.length)
           throw new Error("未识别到有效交易记录，请确认是 iCost 导出的 Excel。")
@@ -153,6 +158,7 @@ export function useWorkbookUpload({
         await waitBeforeLeavingParsingStatus()
         if (seq !== uploadSeq.current) return
         await onParsed(parsed, file)
+        if (seq !== uploadSeq.current) return
         setUploadState((current) => ({ ...current, skippedRows }))
       } catch (uploadError) {
         if (seq !== uploadSeq.current) return
@@ -167,6 +173,7 @@ export function useWorkbookUpload({
         }))
       } finally {
         if (seq === uploadSeq.current) {
+          parsingTask.current = null
           finishParsing()
           onFinish?.()
         }

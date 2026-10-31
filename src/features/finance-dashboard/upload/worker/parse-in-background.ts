@@ -1,0 +1,110 @@
+import type { WorkbookParseResult } from "@/features/finance-dashboard/upload/workbook-parser"
+import {
+  WORKBOOK_PARSE_ERROR,
+  type WorkbookParseRequest,
+  type WorkbookParseResponse,
+} from "@/features/finance-dashboard/upload/worker/protocol"
+
+type WorkerPort = Pick<
+  Worker,
+  "onmessage" | "onerror" | "onmessageerror" | "terminate"
+> & {
+  postMessage: (message: WorkbookParseRequest, transfer: Transferable[]) => void
+}
+type WorkerFactory = () => WorkerPort
+class WorkerUnavailableError extends Error {}
+let nextTaskId = 0
+
+function createWorker(): WorkerPort {
+  return new Worker(new URL("./workbook.worker.ts", import.meta.url), {
+    type: "module",
+  })
+}
+
+async function parseOnMainThread(buffer: ArrayBuffer, signal: AbortSignal) {
+  signal.throwIfAborted()
+  const { parseWorkbookWithDiagnostics } =
+    await import("@/features/finance-dashboard/upload/workbook-parser")
+  signal.throwIfAborted()
+  try {
+    const result = await parseWorkbookWithDiagnostics(buffer)
+    signal.throwIfAborted()
+    return result
+  } catch {
+    signal.throwIfAborted()
+    throw new Error(WORKBOOK_PARSE_ERROR)
+  }
+}
+
+/** One worker per upload. Fall back only before transferring the workbook. */
+export async function parseWorkbookInBackground(
+  buffer: ArrayBuffer,
+  signal: AbortSignal,
+  factory: WorkerFactory = createWorker
+): Promise<WorkbookParseResult> {
+  signal.throwIfAborted()
+  let worker: WorkerPort
+  try {
+    worker = factory()
+  } catch {
+    return parseOnMainThread(buffer, signal)
+  }
+  try {
+    return await new Promise<WorkbookParseResult>((resolve, reject) => {
+      const id = ++nextTaskId
+      let transferred = false
+      let settled = false
+      const finish = (result?: WorkbookParseResult, error?: unknown) => {
+        if (settled) return
+        settled = true
+        clearTimeout(startTimer)
+        signal.removeEventListener("abort", abort)
+        worker.onmessage = null
+        worker.onerror = null
+        worker.onmessageerror = null
+        worker.terminate()
+        if (error) reject(error)
+        else resolve(result!)
+      }
+      const abort = () => finish(undefined, signal.reason)
+      const startTimer = setTimeout(
+        () => finish(undefined, new WorkerUnavailableError()),
+        10000
+      )
+      signal.addEventListener("abort", abort, { once: true })
+      worker.onerror = (event) => {
+        event.preventDefault()
+        finish(
+          undefined,
+          transferred
+            ? new Error(WORKBOOK_PARSE_ERROR)
+            : new WorkerUnavailableError()
+        )
+      }
+      worker.onmessageerror = () =>
+        finish(undefined, new Error(WORKBOOK_PARSE_ERROR))
+      worker.onmessage = ({ data }: MessageEvent<WorkbookParseResponse>) => {
+        if (!data || settled) return
+        if (data.type === "ready") {
+          if (transferred) return
+          clearTimeout(startTimer)
+          transferred = true
+          try {
+            worker.postMessage({ id, buffer }, [buffer])
+          } catch {
+            finish(undefined, new Error(WORKBOOK_PARSE_ERROR))
+          }
+          return
+        }
+        if (!transferred || data.id !== id) return
+        if (data.type === "error")
+          finish(undefined, new Error(WORKBOOK_PARSE_ERROR))
+        else if (data.type === "result") finish(data.result)
+      }
+    })
+  } catch (error) {
+    if (error instanceof WorkerUnavailableError)
+      return parseOnMainThread(buffer, signal)
+    throw error
+  }
+}
