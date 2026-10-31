@@ -34,7 +34,7 @@ type TransactionTableProps = {
   pageSize: number
   detailSort: DetailSort
   rates: RateMap
-  onPageChange: (page: number | ((current: number) => number)) => void
+  onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
   onDetailSortChange: (sort: DetailSort) => void
 }
@@ -68,7 +68,6 @@ export function TransactionTable({
           <TransactionTableControls
             pageSize={pageSize}
             detailSort={detailSort}
-            onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
             onDetailSortChange={onDetailSortChange}
           />

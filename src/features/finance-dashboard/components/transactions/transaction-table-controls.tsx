@@ -25,7 +25,6 @@ const PAGE_SIZE_SELECT_OPTIONS = PAGE_SIZE_OPTIONS.map((size) => ({
 type TransactionTableControlsProps = {
   pageSize: number
   detailSort: DetailSort
-  onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
   onDetailSortChange: (sort: DetailSort) => void
 }
@@ -33,7 +32,6 @@ type TransactionTableControlsProps = {
 export function TransactionTableControls({
   pageSize,
   detailSort,
-  onPageChange,
   onPageSizeChange,
   onDetailSortChange,
 }: TransactionTableControlsProps) {
@@ -61,7 +59,6 @@ export function TransactionTableControls({
         items={PAGE_SIZE_SELECT_OPTIONS}
         value={String(pageSize)}
         onValueChange={(value) => {
-          onPageChange(1)
           onPageSizeChange(Number(value))
         }}
       >

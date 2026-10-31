@@ -5,7 +5,7 @@ type TransactionPaginationProps = {
   pageCount: number
   safePage: number
   totalPages: number
-  onPageChange: (page: number | ((current: number) => number)) => void
+  onPageChange: (page: number) => void
 }
 
 export function TransactionPagination({
@@ -51,11 +51,7 @@ export function TransactionPagination({
           variant="outline"
           size="xs"
           disabled={safePage === 1}
-          onClick={() =>
-            onPageChange((current) =>
-              Math.max(1, Math.min(current, totalPages) - 1)
-            )
-          }
+          onClick={() => onPageChange(safePage - 1)}
         >
           上一页
         </Button>
@@ -63,11 +59,7 @@ export function TransactionPagination({
           variant="outline"
           size="xs"
           disabled={safePage === totalPages}
-          onClick={() =>
-            onPageChange((current) =>
-              Math.min(totalPages, Math.min(current, totalPages) + 1)
-            )
-          }
+          onClick={() => onPageChange(safePage + 1)}
         >
           下一页
         </Button>

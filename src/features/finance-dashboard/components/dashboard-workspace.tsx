@@ -20,7 +20,7 @@ type DashboardWorkspaceProps = {
 }
 
 export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
-  const { analysis, uploadState } = dashboard
+  const { analysis, uploadState, view, actions, exchange } = dashboard
   const handleWorkspaceFileDrop = useCallback(
     (file: File) => {
       if (!uploadState.isParsing) dashboard.uploadWorkbook(file)
@@ -71,37 +71,34 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
       />
 
       <FilterPanel
-        filters={dashboard.filters}
+        filters={view.filters}
         asOf={dashboard.asOf}
         dimensions={analysis.dimensions}
-        onFiltersChange={dashboard.setFilters}
-        onResetDrill={dashboard.resetDrill}
+        actions={actions.filters}
       />
 
       <FilterDock
-        filters={dashboard.filters}
+        filters={view.filters}
         asOf={dashboard.asOf}
         filteredCount={analysis.filtered.length}
         totalCount={dashboard.transactions.length}
-        onFiltersChange={dashboard.setFilters}
-        onResetDrill={dashboard.resetDrill}
+        actions={actions.filters}
       >
         <FilterPanel
-          filters={dashboard.filters}
+          filters={view.filters}
           asOf={dashboard.asOf}
           dimensions={analysis.dimensions}
-          onFiltersChange={dashboard.setFilters}
-          onResetDrill={dashboard.resetDrill}
+          actions={actions.filters}
           variant="dialog"
           className="shadow-none"
         />
       </FilterDock>
 
       <RateSettings
-        dimensions={analysis.dimensions}
-        rateInputs={dashboard.rateInputs}
-        onRateInputsChange={dashboard.setRateInputs}
-        onRatesChange={dashboard.setRates}
+        currencies={analysis.dimensions.currencies}
+        inputs={exchange.inputs}
+        errors={exchange.errors}
+        actions={exchange.actions}
       />
 
       {dashboard.hasAnalysisCharts ? (
@@ -110,28 +107,28 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
             categoryRows={analysis.sortedCategoryRows}
             tagRows={analysis.sortedTagRows}
             expenseTotal={analysis.expenseTotal}
-            summarySort={dashboard.summarySort}
-            tagSort={dashboard.tagSort}
-            onSummarySortChange={dashboard.setSummarySort}
-            onTagSortChange={dashboard.setTagSort}
-            onCategorySelect={dashboard.selectCategory}
-            onTagSelect={dashboard.selectTag}
+            summarySort={view.summarySort}
+            tagSort={view.tagSort}
+            onSummarySortChange={actions.sortCategories}
+            onTagSortChange={actions.sortTags}
+            onCategorySelect={actions.selectCategory}
+            onTagSelect={actions.selectTag}
           />
 
           <AnalysisCharts
             data={analysis.chartData}
             accountRows={analysis.sortedAccountRows}
-            drillCategory={dashboard.drillCategory}
-            rankLevel={dashboard.rankLevel}
-            accountSort={dashboard.accountSort}
-            activeAccounts={dashboard.filters.accounts}
-            onApplyMonth={dashboard.applyMonth}
-            onDrillCategoryChange={dashboard.setDrillCategory}
-            onRankLevelChange={dashboard.setRankLevel}
-            onAccountSortChange={dashboard.setAccountSort}
-            onAccountSelect={dashboard.selectAccount}
-            onResetAccounts={dashboard.resetAccountFilter}
-            onTagSelect={dashboard.selectTag}
+            drillCategory={view.drillCategory}
+            rankLevel={view.rankLevel}
+            accountSort={view.accountSort}
+            activeAccounts={view.filters.accounts}
+            onApplyMonth={actions.applyMonth}
+            onDrillCategoryChange={actions.drillCategory}
+            onRankLevelChange={actions.changeRankLevel}
+            onAccountSortChange={actions.sortAccounts}
+            onAccountSelect={actions.selectAccount}
+            onResetAccounts={actions.resetAccountFilter}
+            onTagSelect={actions.selectTag}
           />
         </>
       ) : (
@@ -143,12 +140,12 @@ export function DashboardWorkspace({ dashboard }: DashboardWorkspaceProps) {
         pagedRows={analysis.pagedRows}
         safePage={analysis.safePage}
         totalPages={analysis.totalPages}
-        pageSize={dashboard.pageSize}
-        detailSort={dashboard.detailSort}
-        rates={dashboard.rates}
-        onPageChange={dashboard.setPage}
-        onPageSizeChange={dashboard.setPageSize}
-        onDetailSortChange={dashboard.setDetailSort}
+        pageSize={view.pageSize}
+        detailSort={view.detailSort}
+        rates={exchange.rates}
+        onPageChange={actions.goToPage}
+        onPageSizeChange={actions.changePageSize}
+        onDetailSortChange={actions.sortDetails}
       />
     </div>
   )

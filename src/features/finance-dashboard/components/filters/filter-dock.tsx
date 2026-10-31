@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
-import { clearFilterGroup } from "../../model/filters"
-import { EMPTY_FILTERS } from "../../model/constants"
+import type { FilterActions } from "../../model/dashboard-state"
 import type { Filters } from "../../model/types"
 import { LedgerEdgeNotch } from "../shared/ledger-accents"
 import {
@@ -36,8 +35,7 @@ type FilterDockProps = {
   asOf: string
   filteredCount: number
   totalCount: number
-  onFiltersChange: (filters: Filters | ((current: Filters) => Filters)) => void
-  onResetDrill: () => void
+  actions: Pick<FilterActions, "clearFilter" | "resetFilters">
   children: ReactNode
 }
 
@@ -46,8 +44,7 @@ export function FilterDock({
   asOf,
   filteredCount,
   totalCount,
-  onFiltersChange,
-  onResetDrill,
+  actions,
   children,
 }: FilterDockProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -96,19 +93,6 @@ export function FilterDock({
     return () => observer.disconnect()
   }, [])
 
-  const resetFilters = () => {
-    onFiltersChange(EMPTY_FILTERS)
-    onResetDrill()
-  }
-
-  const clearFilter = (filter: ActiveFilterSummary) => {
-    onFiltersChange((current) => clearFilterGroup(current, filter.key))
-
-    if (filter.key === "categories") {
-      onResetDrill()
-    }
-  }
-
   return (
     <div className="relative transform-none! animate-none!">
       <div ref={sentinelRef} aria-hidden="true" className="h-px" />
@@ -147,7 +131,7 @@ export function FilterDock({
                           <VisibleFilterChip
                             key={filter.key}
                             filter={filter}
-                            onClear={() => clearFilter(filter)}
+                            onClear={() => actions.clearFilter(filter.key)}
                           />
                         ))}
                         {hiddenFilters.length ? (
@@ -190,7 +174,7 @@ export function FilterDock({
                     variant="outline"
                     size="sm"
                     disabled={!activeFilterCount}
-                    onClick={resetFilters}
+                    onClick={actions.resetFilters}
                   >
                     <RiRefreshLine data-icon="inline-start" />
                     清空

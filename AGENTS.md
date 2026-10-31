@@ -104,9 +104,15 @@
 
 - `src/features/finance-dashboard/index.tsx`: feature entry point, top-level
   dashboard shell, entry hero/workspace switch, and backdrop composition.
-- `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: page-level
-  state, workbook application, rates, filters, chart drilldowns, sorting,
-  pagination, and action handlers.
+- `src/features/finance-dashboard/hooks/use-dashboard-controller.ts`: workbook
+  ownership and composition of upload, view state, rates, analysis, and Agent access.
+- `hooks/use-dashboard-view-state.ts` wraps the pure `model/dashboard-state.ts`
+  reducer. All global filter changes clear category drilldown and reset pagination;
+  detail sorting/page-size changes reset pagination. UI components call semantic
+  actions instead of receiving React state setters.
+- `hooks/use-exchange-rates.ts` wraps `model/rate-inputs.ts`; draft input and active
+  rates update atomically. Invalid drafts preserve the active rates object, so
+  they do not change calculations or Agent context.
 - `src/features/finance-dashboard/hooks/use-dashboard-analysis.ts`: derived
   analytics, comparisons, dimensions, chart data, filtered rows, sorted rows,
   and pagination calculations.

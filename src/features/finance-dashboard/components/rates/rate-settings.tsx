@@ -6,8 +6,7 @@ import { cn } from "@/lib/utils"
 
 import { BASE_CURRENCY, DEFAULT_RATES } from "../../model/constants"
 import { unique } from "../../model/collections"
-import { makeRateInputs } from "../../model/rate-inputs"
-import type { Dimensions, RateMap } from "../../model/types"
+import type { ExchangeRateActions } from "../../model/rate-inputs"
 import { DashboardPanel } from "../shared/dashboard-panel"
 
 const CURRENCY_LABELS: Record<string, string> = {
@@ -68,42 +67,22 @@ function getRateCellBorderClass(index: number, total: number) {
 }
 
 type RateSettingsProps = {
-  dimensions: Dimensions
-  rateInputs: Record<string, string>
-  onRateInputsChange: (
-    inputs:
-      | Record<string, string>
-      | ((current: Record<string, string>) => Record<string, string>)
-  ) => void
-  onRatesChange: (rates: RateMap | ((current: RateMap) => RateMap)) => void
+  currencies: string[]
+  inputs: Record<string, string>
+  errors: Record<string, string>
+  actions: ExchangeRateActions
 }
 
 export function RateSettings({
-  dimensions,
-  rateInputs,
-  onRateInputsChange,
-  onRatesChange,
+  currencies: availableCurrencies,
+  inputs,
+  errors,
+  actions,
 }: RateSettingsProps) {
   const currencies = useMemo(
-    () => unique(dimensions.currencies).sort(compareCurrencies),
-    [dimensions.currencies]
+    () => unique(availableCurrencies).sort(compareCurrencies),
+    [availableCurrencies]
   )
-
-  function resetRates() {
-    const nextRates = { ...DEFAULT_RATES }
-    for (const currency of currencies)
-      if (!nextRates[currency]) nextRates[currency] = 0
-    onRatesChange(nextRates)
-    onRateInputsChange(makeRateInputs(nextRates))
-  }
-
-  function updateRate(currency: string, raw: string) {
-    onRateInputsChange((current) => ({ ...current, [currency]: raw }))
-    const value = Number(raw)
-    if (currency === BASE_CURRENCY) return
-    if (raw.trim() === "" || !Number.isFinite(value) || value <= 0) return
-    onRatesChange((current) => ({ ...current, [currency]: value }))
-  }
 
   return (
     <DashboardPanel
@@ -111,7 +90,7 @@ export function RateSettings({
       description={`${BASE_CURRENCY} 固定为 1；默认汇率为内置参考值，非实时行情。留空或无效输入不会更新计算。`}
       interactive={false}
       action={
-        <Button variant="outline" size="xs" onClick={resetRates}>
+        <Button variant="outline" size="xs" onClick={actions.resetRates}>
           恢复内置汇率
         </Button>
       }
@@ -119,11 +98,9 @@ export function RateSettings({
     >
       <div className="grid sm:grid-cols-2 lg:grid-cols-5">
         {currencies.map((currency, index) => {
-          const raw = rateInputs[currency] ?? ""
-          const value = Number(raw)
+          const raw = inputs[currency] ?? ""
           const isBaseCurrency = currency === BASE_CURRENCY
-          const invalid =
-            !isBaseCurrency && (!raw || value <= 0 || !Number.isFinite(value))
+          const invalid = Boolean(errors[currency])
           return (
             <label
               key={currency}
@@ -156,7 +133,9 @@ export function RateSettings({
                   disabled={isBaseCurrency}
                   aria-invalid={invalid}
                   className="h-7 text-right font-mono"
-                  onChange={(event) => updateRate(currency, event.target.value)}
+                  onChange={(event) =>
+                    actions.updateInput(currency, event.target.value)
+                  }
                 />
                 <span className="font-mono tracking-[0.08em] text-muted-foreground uppercase">
                   ¥

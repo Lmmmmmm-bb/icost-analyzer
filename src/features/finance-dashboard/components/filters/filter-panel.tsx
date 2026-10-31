@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-import { EMPTY_FILTERS } from "../../model/constants"
+import type { FilterActions } from "../../model/dashboard-state"
 import { customTime } from "../../model/filters"
 import type { Dimensions, Filters } from "../../model/types"
 import { ActiveFilterBadge } from "./active-filter-badge"
@@ -30,8 +30,7 @@ type FilterPanelProps = {
   filters: Filters
   asOf: string
   dimensions: Dimensions
-  onFiltersChange: (filters: Filters | ((current: Filters) => Filters)) => void
-  onResetDrill: () => void
+  actions: FilterActions
   variant?: "page" | "dialog"
   className?: string
   headerActionClassName?: string
@@ -41,8 +40,7 @@ export function FilterPanel({
   filters,
   asOf,
   dimensions,
-  onFiltersChange,
-  onResetDrill,
+  actions,
   variant = "page",
   className,
   headerActionClassName,
@@ -94,14 +92,7 @@ export function FilterPanel({
                 filters={activeFilters}
               />
             ) : null}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                onFiltersChange(EMPTY_FILTERS)
-                onResetDrill()
-              }}
-            >
+            <Button variant="outline" size="sm" onClick={actions.resetFilters}>
               重置筛选
             </Button>
           </div>
@@ -142,10 +133,7 @@ export function FilterPanel({
                   (option) => option.value === next.at(-1)
                 )?.time ?? { kind: "all" as const }
 
-                onFiltersChange((current) => ({
-                  ...current,
-                  time: selected,
-                }))
+                actions.setTimeFilter(selected)
               }}
             />
             {dimensions.years.length ? (
@@ -170,12 +158,11 @@ export function FilterPanel({
                   onChange={(next) => {
                     const selected = next.at(-1) ?? ""
 
-                    onFiltersChange((current) => ({
-                      ...current,
-                      time: selected
+                    actions.setTimeFilter(
+                      selected
                         ? { kind: "year", year: Number(selected) }
-                        : { kind: "all" },
-                    }))
+                        : { kind: "all" }
+                    )
                   }}
                 />
               </div>
@@ -190,10 +177,7 @@ export function FilterPanel({
                 filters.time.kind === "custom" ? (filters.time.to ?? "") : ""
               }
               onChange={({ startDate, endDate }) =>
-                onFiltersChange((current) => ({
-                  ...current,
-                  time: customTime(startDate, endDate),
-                }))
+                actions.setTimeFilter(customTime(startDate, endDate))
               }
             />
           </div>
@@ -204,12 +188,7 @@ export function FilterPanel({
             placeholder="搜索备注、分类、账本、账户、标签、地点、币种……"
             className="bg-background/70"
             value={filters.keyword}
-            onChange={(event) =>
-              onFiltersChange((current) => ({
-                ...current,
-                keyword: event.target.value,
-              }))
-            }
+            onChange={(event) => actions.setKeyword(event.target.value)}
           />
         </FilterRow>
 
@@ -219,9 +198,7 @@ export function FilterPanel({
             items={TRANSACTION_TYPES}
             value={filters.types}
             showTitle={false}
-            onChange={(types) =>
-              onFiltersChange((current) => ({ ...current, types }))
-            }
+            onChange={actions.setTypes}
           />
         </FilterRow>
 
@@ -231,9 +208,7 @@ export function FilterPanel({
             items={dimensions.currencies}
             value={filters.currencies}
             showTitle={false}
-            onChange={(currencies) =>
-              onFiltersChange((current) => ({ ...current, currencies }))
-            }
+            onChange={actions.setCurrencies}
           />
         </FilterRow>
 
@@ -244,9 +219,7 @@ export function FilterPanel({
               items={dimensions.books}
               value={filters.books}
               showTitle={false}
-              onChange={(books) =>
-                onFiltersChange((current) => ({ ...current, books }))
-              }
+              onChange={actions.setBooks}
               limit={18}
             />
           </FilterRow>
@@ -259,9 +232,7 @@ export function FilterPanel({
               items={dimensions.accounts}
               value={filters.accounts}
               showTitle={false}
-              onChange={(accounts) =>
-                onFiltersChange((current) => ({ ...current, accounts }))
-              }
+              onChange={actions.setAccounts}
               limit={24}
             />
           </FilterRow>
@@ -273,9 +244,7 @@ export function FilterPanel({
             items={dimensions.categories}
             value={filters.categories}
             showTitle={false}
-            onChange={(categories) =>
-              onFiltersChange((current) => ({ ...current, categories }))
-            }
+            onChange={actions.setCategories}
             limit={18}
           />
         </FilterRow>
@@ -287,22 +256,8 @@ export function FilterPanel({
             value={filters.tags}
             excludedValue={filters.excludedTags}
             showTitle={false}
-            onChange={(tags) => {
-              onFiltersChange((current) => ({
-                ...current,
-                tags,
-                excludedTags: current.excludedTags.filter(
-                  (tag) => !tags.includes(tag)
-                ),
-              }))
-            }}
-            onExcludedChange={(excludedTags) => {
-              onFiltersChange((current) => ({
-                ...current,
-                tags: current.tags.filter((tag) => !excludedTags.includes(tag)),
-                excludedTags,
-              }))
-            }}
+            onChange={actions.setIncludedTags}
+            onExcludedChange={actions.setExcludedTags}
           />
         </FilterRow>
       </CardContent>
