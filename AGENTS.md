@@ -85,8 +85,10 @@ feature inventories, configuration values, or completed-work records here.
 - For application changes, run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and
   `pnpm build`. For documentation-only changes, check formatting, references, and
   consistency with the implementation.
-- Add deterministic tests beside affected code as `*.test.ts` when changing
-  parsing or analytics rules. Cover changed boundary cases and authorization
-  guards rather than mirroring the implementation.
-- Verify WebMCP browser behavior in an actual compatible Agent browser; unit
-  tests alone do not establish client support.
+- Maintain deterministic unit tests beside affected code as `*.test.ts`, focused
+  on core parsing, calculations, filtering, state transitions, and authorization.
+  Do not add E2E, browser automation, screenshot, or performance test suites.
+- Isolate platform dependencies in unit tests. Cover meaningful boundaries and
+  failure modes rather than duplicating cases or asserting incidental details
+  such as batch sizes, display copy, or internal call counts.
+- Mocked WebMCP unit tests do not establish browser client compatibility.

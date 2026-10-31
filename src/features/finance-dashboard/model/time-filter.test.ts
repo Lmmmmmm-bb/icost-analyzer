@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import { makeTransaction } from "../testing/transactions"
-import { filterTransactions } from "./filtering"
-import { createEmptyFilters, customTime } from "./filters"
-import { resolveTimeFilter } from "./time-filter"
+import { makeTransaction } from "@/features/finance-dashboard/testing/transactions"
+import { filterTransactions } from "@/features/finance-dashboard/model/filtering"
+import {
+  createEmptyFilters,
+  customTime,
+} from "@/features/finance-dashboard/model/filters"
+import { resolveTimeFilter } from "@/features/finance-dashboard/model/time-filter"
 
 const now = new Date(2026, 9, 31, 12, 30)
 
@@ -24,8 +27,12 @@ describe("time filter resolution", () => {
     })
   })
 
-  it("includes the complete local end day, including subsecond records", () => {
+  it("includes the complete local start and end days, including subsecond records", () => {
     const rows = [
+      makeTransaction("before", {
+        date: new Date(2026, 9, 30, 23, 59, 59, 999),
+      }),
+      makeTransaction("start", { date: new Date(2026, 9, 31) }),
       makeTransaction("inside", {
         date: new Date(2026, 9, 31, 23, 59, 59, 999),
       }),
@@ -40,7 +47,7 @@ describe("time filter resolution", () => {
         },
         now
       ).map((row) => row.id)
-    ).toEqual(["inside"])
+    ).toEqual(["start", "inside"])
   })
 
   it.each([

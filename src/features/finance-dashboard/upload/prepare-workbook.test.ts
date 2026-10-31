@@ -1,25 +1,23 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import { makeTransaction } from "@/features/finance-dashboard/testing/transactions"
 import { prepareWorkbook } from "@/features/finance-dashboard/upload/prepare-workbook"
 
 describe("workbook preparation", () => {
-  it("keeps parsed data and skipped counts while indexing every batch", async () => {
+  it("keeps parsed data and skipped counts while indexing the complete workbook", async () => {
     const transactions = Array.from({ length: 4001 }, (_, i) =>
       makeTransaction(String(i), { note: `Fictional ${i}` })
     )
-    const yieldTask = vi.fn(async () => {})
     const prepared = await prepareWorkbook(
       { transactions, skippedRows: 2 },
       new AbortController().signal,
-      yieldTask
+      async () => {}
     )
-    expect(prepared.transactions).toBe(transactions)
+    expect(prepared.transactions).toEqual(transactions)
     expect(prepared.skippedRows).toBe(2)
     expect(prepared.searchIndex.size).toBe(4001)
     expect(prepared.searchIndex.get(transactions[4000])).toContain(
       "fictional 4000"
     )
-    expect(yieldTask).toHaveBeenCalledTimes(3)
   })
 
   it("rejects cancellation during preparation instead of returning a partial workbook", async () => {

@@ -1,13 +1,10 @@
 import { describe, expect, it } from "vitest"
 
-import { makeTransaction } from "../testing/transactions"
-import { summarizeBy } from "./analytics"
 import {
   createDashboardViewState,
   dashboardReducer,
   type DashboardAction,
-} from "./dashboard-state"
-import { filterTransactions } from "./filtering"
+} from "@/features/finance-dashboard/model/dashboard-state"
 
 describe("dashboard state transitions", () => {
   it("clears an old category drill before applying a new category filter", () => {
@@ -21,23 +18,24 @@ describe("dashboard state transitions", () => {
       key: "categories",
       values: ["演示交通"],
     })
-    const rows = [
-      makeTransaction("food"),
-      makeTransaction("travel", { category: "演示交通" }),
-    ]
-    const filtered = filterTransactions(
-      rows,
-      next.filters,
-      new Date(2026, 9, 31)
-    )
     expect(next.drillCategory).toBe("")
     expect(next.page).toBe(1)
-    expect(
-      summarizeBy(filtered, { CNY: 1 }, (row) => row.category).map(
-        (group) => group.name
-      )
-    ).toEqual(["演示交通"])
+    expect(next.filters.categories).toEqual(["演示交通"])
     expect(drilled.drillCategory).toBe("演示餐饮")
+  })
+
+  it("clears only the requested filter group without mutating the previous state", () => {
+    const initial = createDashboardViewState()
+    const state = {
+      ...initial,
+      filters: { ...initial.filters, categories: ["演示"], tags: ["旅行"] },
+    }
+    const next = dashboardReducer(state, {
+      type: "clear-filter",
+      key: "categories",
+    })
+    expect(next.filters).toEqual({ ...state.filters, categories: [] })
+    expect(state.filters.categories).toEqual(["演示"])
   })
 
   it.each([

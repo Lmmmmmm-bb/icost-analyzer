@@ -47,12 +47,11 @@ describe("ledger dimensions", () => {
 })
 
 describe("ledger date range", () => {
-  it("retains exact boundary instants and the original Date references", () => {
+  it("finds exact boundary instants and handles empty or single-row ledgers", () => {
     const dates = [new Date(1), new Date(-1), new Date(0), new Date(1)]
     const rows = dates.map((date, i) => makeTransaction(String(i), { date }))
     const result = getDateRange(rows)
-    expect(result?.start).toBe(dates[1])
-    expect(result?.end).toBe(dates[0])
+    expect(result).toEqual({ start: new Date(-1), end: new Date(1) })
     expect(getDateRange([])).toBeNull()
     expect(getDateRange([rows[2]])).toEqual({ start: dates[2], end: dates[2] })
   })

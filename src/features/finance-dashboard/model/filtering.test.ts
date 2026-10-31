@@ -1,28 +1,17 @@
 import { describe, expect, it } from "vitest"
 
-import { EMPTY_FILTERS } from "./constants"
-import { filterTransactions } from "./filtering"
-import type { Transaction } from "./types"
+import { EMPTY_FILTERS } from "@/features/finance-dashboard/model/constants"
+import { filterTransactions } from "@/features/finance-dashboard/model/filtering"
+import { createTransactionSearchIndex } from "@/features/finance-dashboard/model/transaction-search"
+import { makeTransaction } from "@/features/finance-dashboard/testing/transactions"
 
 function row(day: string, type: string, account1: string, account2 = "") {
-  return {
-    id: day,
+  return makeTransaction(day, {
     date: new Date(`${day}T12:00:00`),
-    dateText: day,
-    dayKey: day,
-    monthKey: day.slice(0, 7),
     type,
-    amount: -10,
-    currency: "CNY",
-    category: "演示",
-    subcategory: "演示",
     account1,
     account2,
-    book: "",
-    note: "",
-    tags: [],
-    location: "",
-  } satisfies Transaction
+  })
 }
 
 describe("dashboard filtering", () => {
@@ -41,27 +30,39 @@ describe("dashboard filtering", () => {
     ).toEqual(["0", "1"])
   })
 
-  it.each([
-    "note",
-    "category",
-    "subcategory",
-    "account1",
-    "account2",
-    "book",
-    "location",
-    "currency",
-  ])("keeps case-insensitive substring searches in %s", (field) => {
-    const match = {
-      ...row("2024-02-29", "支出", "A"),
-      [field]: "before FiXtUrE after",
+  it.each([false, true])(
+    "matches keywords across all searchable fields (indexed: %s)",
+    (indexed) => {
+      const fields = [
+        "note",
+        "category",
+        "subcategory",
+        "account1",
+        "account2",
+        "book",
+        "location",
+        "currency",
+      ]
+      const matches = [
+        ...fields.map((field) =>
+          makeTransaction(field, { [field]: "before FiXtUrE after" })
+        ),
+        makeTransaction("tags", { tags: ["before", "FiXtUrE", "after"] }),
+      ]
+      const rows = [...matches, makeTransaction("unmatched")]
+      const index = indexed ? createTransactionSearchIndex(rows) : undefined
+      const search = (keyword: string) =>
+        filterTransactions(
+          rows,
+          { ...EMPTY_FILTERS, keyword },
+          new Date(2024, 2, 1),
+          undefined,
+          index
+        ).map((tx) => tx.id)
+      expect(search("  fixture  ")).toEqual(matches.map((tx) => tx.id))
+      expect(search("no-match")).toEqual([])
     }
-    const result = filterTransactions(
-      [match, row("2024-03-01", "支出", "B")],
-      { ...EMPTY_FILTERS, keyword: "  fixture  " },
-      new Date(2024, 2, 1)
-    )
-    expect(result.map((tx) => tx.id)).toEqual(["2024-02-29"])
-  })
+  )
 
   it("combines dates, type, tags and exclusions before matching the same keyword fields", () => {
     const base = { ...row("2024-02-29", "支出", "A"), tags: ["旅行", "coffee"] }
@@ -85,19 +86,41 @@ describe("dashboard filtering", () => {
     expect(result.map((tx) => tx.id)).toEqual(["2024-02-29"])
   })
 
-  it("preserves matches across adjacent fields", () => {
-    const match = {
-      ...row("2024-02-29", "支出", "A"),
-      note: "旅行",
-      category: "餐饮",
+  it("preserves matches across adjacent fields and tags with or without an index", () => {
+    const rows = [
+      makeTransaction("match", {
+        note: "旅行",
+        category: "餐饮",
+        tags: ["A", "B"],
+      }),
+    ]
+    for (const index of [undefined, createTransactionSearchIndex(rows)]) {
+      for (const keyword of ["旅行 餐饮", "A B"]) {
+        expect(
+          filterTransactions(
+            rows,
+            { ...EMPTY_FILTERS, keyword },
+            new Date(2024, 2, 1),
+            undefined,
+            index
+          )
+        ).toEqual(rows)
+      }
     }
+  })
+
+  it("ignores stale index entries when a replacement workbook reuses row IDs", () => {
+    const oldRows = [makeTransaction("same-id", { note: "old" })]
+    const newRows = [makeTransaction("same-id", { note: "new" })]
     expect(
       filterTransactions(
-        [match],
-        { ...EMPTY_FILTERS, keyword: "旅行 餐饮" },
-        new Date(2024, 2, 1)
+        newRows,
+        { ...EMPTY_FILTERS, keyword: "new" },
+        new Date(2024, 2, 1),
+        undefined,
+        createTransactionSearchIndex(oldRows)
       )
-    ).toEqual([match])
+    ).toEqual(newRows)
   })
 
   it("uses the supplied clock for quick ranges", () => {
@@ -111,29 +134,6 @@ describe("dashboard filtering", () => {
       new Date("2026-09-17T12:00:00")
     )
     expect(result.map((item) => item.dayKey)).toEqual(["2026-08-01"])
-  })
-
-  it("includes the whole local start and end dates", () => {
-    const rows = [
-      { ...row("2026-08-01", "支出", "A"), date: new Date(2026, 7, 1, 0, 0) },
-      {
-        ...row("2026-08-02", "支出", "A"),
-        date: new Date(2026, 7, 2, 23, 59, 59),
-      },
-      row("2026-08-03", "支出", "A"),
-    ]
-    const result = filterTransactions(
-      rows,
-      {
-        ...EMPTY_FILTERS,
-        time: { kind: "custom", from: "2026-08-01", to: "2026-08-02" },
-      },
-      new Date(2026, 9, 31)
-    )
-    expect(result.map((item) => item.dayKey)).toEqual([
-      "2026-08-01",
-      "2026-08-02",
-    ])
   })
 
   it("matches either account for transfers, but only the first for spending", () => {

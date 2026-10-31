@@ -1,13 +1,22 @@
 import { describe, expect, it } from "vitest"
 
-import { DEFAULT_RATES } from "./constants"
+import { DEFAULT_RATES } from "@/features/finance-dashboard/model/constants"
 import {
   createExchangeRateState,
   exchangeRateReducer,
   getRateInputErrors,
-} from "./rate-inputs"
+} from "@/features/finance-dashboard/model/rate-inputs"
 
 describe("exchange rate editing", () => {
+  it("initializes independent rates and matching drafts for each workbook", () => {
+    const state = createExchangeRateState(["CNY", "XYZ"])
+    expect(state.rates).toEqual({ ...DEFAULT_RATES, XYZ: 0 })
+    expect(state.inputs).toMatchObject({ CNY: "1", XYZ: "0" })
+    state.rates.USD = 999
+    expect(DEFAULT_RATES.USD).not.toBe(999)
+    expect(createExchangeRateState(["USD"]).rates.USD).toBe(DEFAULT_RATES.USD)
+  })
+
   it.each(["", " ", "invalid", "0", "-1", "Infinity"])(
     "keeps the active rate when the draft is %j",
     (raw) => {
