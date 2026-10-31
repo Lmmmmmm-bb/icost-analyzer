@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, memo } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -37,7 +37,7 @@ function removeValue(values: string[], value: string) {
   return values.filter((item) => item !== value)
 }
 
-export function ChipGroup({
+export const ChipGroup = memo(function ChipGroup({
   title,
   items,
   value,
@@ -139,4 +139,4 @@ export function ChipGroup({
       </div>
     </div>
   )
-}
+})

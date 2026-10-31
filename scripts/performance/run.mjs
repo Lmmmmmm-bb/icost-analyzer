@@ -7,6 +7,7 @@ import { workflows } from "./workflow.mjs"
 import { snapshots } from "./snapshot.mjs"
 import { charts } from "./charts.mjs"
 import { uploads } from "./uploads.mjs"
+import { filters } from "./filters.mjs"
 
 const { values } = parseArgs({
   options: {
@@ -41,6 +42,7 @@ const modes = {
   snapshot: snapshots,
   charts,
   uploads,
+  filters,
 }
 if (values.mode !== "all" && !modes[values.mode])
   throw new Error("未知测试模式")

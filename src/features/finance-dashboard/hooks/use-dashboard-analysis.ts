@@ -22,12 +22,14 @@ import { dateKey } from "../model/date"
 import { filterTransactions } from "../model/filtering"
 import { getMissingRates } from "../model/money"
 import type { Filters, RateMap, Transaction } from "../model/types"
+import type { TransactionSearchIndex } from "@/features/finance-dashboard/model/transaction-search"
 
 type DashboardAnalysisParams = {
   transactions: Transaction[]
   filters: Filters
   rates: RateMap
   asOf: string
+  searchIndex: TransactionSearchIndex
 }
 
 export function useDashboardAnalysis({
@@ -35,6 +37,7 @@ export function useDashboardAnalysis({
   filters,
   rates,
   asOf,
+  searchIndex,
 }: DashboardAnalysisParams) {
   const dimensions = useMemo(() => getDimensions(transactions), [transactions])
   const dateRange = useMemo(() => getDateRange(transactions), [transactions])
@@ -45,8 +48,8 @@ export function useDashboardAnalysis({
   )
   const invalidDateRange = !bounds.valid
   const filtered = useMemo(
-    () => filterTransactions(transactions, filters, now, bounds),
-    [filters, bounds, now, transactions]
+    () => filterTransactions(transactions, filters, now, bounds, searchIndex),
+    [filters, bounds, now, transactions, searchIndex]
   )
   const filteredDateRange = useMemo(() => getDateRange(filtered), [filtered])
   const currentPeriod = useMemo(
@@ -73,9 +76,18 @@ export function useDashboardAnalysis({
           dateKey(previousPeriod.end)
         ),
       },
-      now
+      now,
+      undefined,
+      searchIndex
     )
-  }, [filters, invalidDateRange, previousPeriod, transactions, now])
+  }, [
+    filters,
+    invalidDateRange,
+    previousPeriod,
+    transactions,
+    now,
+    searchIndex,
+  ])
   const yearOverYearScope = useMemo(() => {
     if (!yearOverYearPeriod) return []
     if (invalidDateRange) return []
@@ -88,9 +100,18 @@ export function useDashboardAnalysis({
           dateKey(yearOverYearPeriod.end)
         ),
       },
-      now
+      now,
+      undefined,
+      searchIndex
     )
-  }, [filters, invalidDateRange, transactions, yearOverYearPeriod, now])
+  }, [
+    filters,
+    invalidDateRange,
+    transactions,
+    yearOverYearPeriod,
+    now,
+    searchIndex,
+  ])
   const missingRates = useMemo(
     () => getMissingRates(filtered, rates),
     [filtered, rates]

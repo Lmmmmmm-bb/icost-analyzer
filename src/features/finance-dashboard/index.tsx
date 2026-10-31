@@ -26,7 +26,7 @@ export function FinanceDashboard() {
 
   return (
     <main
-      className="relative min-h-svh overflow-hidden bg-background text-foreground"
+      className="relative min-h-svh overflow-clip bg-background text-foreground"
       data-skip-theme-view-transition={
         dashboard.hasAnalysisCharts ? "true" : undefined
       }

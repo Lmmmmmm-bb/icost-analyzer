@@ -1,14 +1,27 @@
 import { BASE_CURRENCY } from "./constants"
 import type { RateMap, Transaction } from "./types"
 
+const moneyFormatter = new Intl.NumberFormat("zh-CN", {
+  style: "currency",
+  currency: BASE_CURRENCY,
+  maximumFractionDigits: 2,
+})
+const wholeMoneyFormatter = new Intl.NumberFormat("zh-CN", {
+  style: "currency",
+  currency: BASE_CURRENCY,
+  maximumFractionDigits: 0,
+})
+const amountFormatters = new Map(
+  [2, 3].map((digits) => [
+    digits,
+    new Intl.NumberFormat("zh-CN", { maximumFractionDigits: digits }),
+  ])
+)
+
 export function formatMoney(value: number, compact = false) {
   const abs = Math.abs(value)
   if (compact && abs >= 10000) return `¥${(value / 10000).toFixed(1)} 万`
-  return new Intl.NumberFormat("zh-CN", {
-    style: "currency",
-    currency: BASE_CURRENCY,
-    maximumFractionDigits: abs >= 1000 ? 0 : 2,
-  }).format(value)
+  return (abs >= 1000 ? wholeMoneyFormatter : moneyFormatter).format(value)
 }
 
 export function formatOriginalAmount(
@@ -16,9 +29,11 @@ export function formatOriginalAmount(
   currency: string,
   maximumFractionDigits = 3
 ) {
-  return `${value.toLocaleString("zh-CN", {
-    maximumFractionDigits,
-  })} ${currency}`
+  const formatter = amountFormatters.get(maximumFractionDigits)
+  const amount = formatter
+    ? formatter.format(value)
+    : value.toLocaleString("zh-CN", { maximumFractionDigits })
+  return `${amount} ${currency}`
 }
 
 export function formatSignedMoney(value: number, compact = false) {
@@ -45,11 +60,9 @@ export function getMissingRates(
   transactions: readonly Transaction[],
   rates: RateMap
 ) {
-  return Array.from(
-    new Set(
-      transactions
-        .map((transaction) => transaction.currency)
-        .filter((currency) => getEffectiveRate(currency, rates) === 0)
-    )
+  const currencies = new Set<string>()
+  for (const tx of transactions) currencies.add(tx.currency)
+  return [...currencies].filter(
+    (currency) => getEffectiveRate(currency, rates) === 0
   )
 }

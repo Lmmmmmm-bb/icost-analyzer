@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import { writeFile } from "node:fs/promises"
-import { join } from "node:path"
+import { basename, join } from "node:path"
 import * as XLSX from "xlsx"
 import { expectRows, launchBrowser, upload } from "./browser.mjs"
 
@@ -40,6 +40,8 @@ export async function uploads(config) {
         let errors = 0
         page.on("pageerror", () => errors++)
         await page.evaluateOnNewDocument((fallback) => {
+          if (fallback)
+            Object.defineProperty(window, "scheduler", { value: undefined })
           const OriginalWorker = window.Worker
           window.__workerAudit = { created: 0, terminated: 0 }
           window.Worker = class extends OriginalWorker {
@@ -73,6 +75,15 @@ export async function uploads(config) {
         await expectRows(page, 2)
         assert.ok(await contains("2028-01-02 00:00"), "替换失败必须保留原账单")
         await upload(page, legacy, 2)
+        // Both files have two rows, so the old row count cannot signal completion.
+        await page.waitForFunction(
+          (name) =>
+            [...document.querySelectorAll("span")].some(
+              (element) => element.textContent.trim() === name
+            ) && !document.querySelector('input[type="file"]:disabled'),
+          {},
+          basename(legacy)
+        )
         assert.ok(await contains("2024-01-01 00:00"))
         assert.equal(await contains("2028-01-02 00:00"), false)
         assert.equal(await contains("解析失败"), false)

@@ -1,14 +1,21 @@
 import { resolveTimeFilter, type DateBounds } from "./time-filter"
 import type { Filters, Transaction } from "./types"
+import {
+  transactionSearchText,
+  type TransactionSearchIndex,
+} from "@/features/finance-dashboard/model/transaction-search"
 
 export function filterTransactions(
   transactions: readonly Transaction[],
   filters: Filters,
   now: Date,
-  bounds: DateBounds = resolveTimeFilter(filters.time, now)
+  bounds: DateBounds = resolveTimeFilter(filters.time, now),
+  searchIndex?: TransactionSearchIndex
 ) {
   if (!bounds.valid) return []
   const { start, end } = bounds
+  const startTime = start?.getTime()
+  const endTime = end?.getTime()
   const keyword = filters.keyword.trim().toLowerCase()
   const typeSet = filters.types.length ? new Set(filters.types) : null
   const currencySet = filters.currencies.length
@@ -24,36 +31,19 @@ export function filterTransactions(
     ? new Set(filters.excludedTags)
     : null
   return transactions.filter((tx) => {
-    const hasExcludedTag = excludedTagSet
-      ? tx.tags.some((tag) => excludedTagSet.has(tag))
-      : false
-    const matchesKeyword = keyword
-      ? [
-          tx.note,
-          tx.category,
-          tx.subcategory,
-          tx.account1,
-          tx.account2,
-          tx.book,
-          tx.tags.join(" "),
-          tx.location,
-          tx.currency,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(keyword)
-      : true
+    const time = start || end ? tx.date.getTime() : 0
     return (
-      (!start || tx.date >= start) &&
-      (!end || tx.date <= end) &&
+      (startTime === undefined || time >= startTime) &&
+      (endTime === undefined || time <= endTime) &&
       (!typeSet || typeSet.has(tx.type)) &&
       (!currencySet || currencySet.has(tx.currency)) &&
       (!categorySet || categorySet.has(tx.category)) &&
       (!accountSet || matchesAccount(tx, accountSet)) &&
       (!bookSet || bookSet.has(tx.book)) &&
       (!tagSet || tx.tags.some((tag) => tagSet.has(tag))) &&
-      !hasExcludedTag &&
-      matchesKeyword
+      (!excludedTagSet || !tx.tags.some((tag) => excludedTagSet.has(tag))) &&
+      (!keyword ||
+        (searchIndex?.get(tx) ?? transactionSearchText(tx)).includes(keyword))
     )
   })
 }

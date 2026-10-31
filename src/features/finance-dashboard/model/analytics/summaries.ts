@@ -34,17 +34,28 @@ export function summarizeBy(
 export function getDimensions(
   transactions: readonly Transaction[]
 ): Dimensions {
-  const tags = transactions.flatMap((tx) => tx.tags)
-  const accounts = transactions.flatMap((tx) => [tx.account1, tx.account2])
+  const currencies = new Set<string>()
+  const categories = new Set<string>()
+  const accounts = new Set<string>()
+  const books = new Set<string>()
+  const tags = new Set<string>()
+  const years = new Set<string>()
+  for (const tx of transactions) {
+    currencies.add(tx.currency)
+    categories.add(tx.category)
+    if (tx.account1) accounts.add(tx.account1)
+    if (tx.account2) accounts.add(tx.account2)
+    if (tx.book) books.add(tx.book)
+    for (const tag of tx.tags) tags.add(tag)
+    years.add(String(tx.date.getFullYear()))
+  }
   return {
-    currencies: unique(transactions.map((tx) => tx.currency)),
-    categories: unique(transactions.map((tx) => tx.category)),
-    accounts: unique(accounts.filter(Boolean)),
-    books: unique(transactions.map((tx) => tx.book).filter(Boolean)),
-    tags: unique(tags),
-    years: unique(
-      transactions.map((tx) => String(tx.date.getFullYear()))
-    ).reverse(),
+    currencies: unique([...currencies]),
+    categories: unique([...categories]),
+    accounts: unique([...accounts]),
+    books: unique([...books]),
+    tags: unique([...tags]),
+    years: unique([...years]).reverse(),
   }
 }
 
@@ -53,10 +64,19 @@ export function getDateRange(transactions: readonly Transaction[]) {
 
   let start = transactions[0].date
   let end = transactions[0].date
+  let startTime = start.getTime()
+  let endTime = end.getTime()
 
   for (const tx of transactions) {
-    if (tx.date < start) start = tx.date
-    if (tx.date > end) end = tx.date
+    const time = tx.date.getTime()
+    if (time < startTime) {
+      start = tx.date
+      startTime = time
+    }
+    if (time > endTime) {
+      end = tx.date
+      endTime = time
+    }
   }
 
   return { start, end }

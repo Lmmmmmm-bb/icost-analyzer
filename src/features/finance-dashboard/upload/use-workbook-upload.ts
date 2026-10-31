@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import type { Transaction } from "../model/types"
 import { parseWorkbookInBackground } from "@/features/finance-dashboard/upload/worker/parse-in-background"
+import {
+  prepareWorkbook,
+  type PreparedWorkbook,
+} from "@/features/finance-dashboard/upload/prepare-workbook"
 
 const PARSING_STATUS_DELAY_MS = 650
 const PARSING_STATUS_MIN_VISIBLE_MS = 700
@@ -24,7 +27,7 @@ const IDLE_UPLOAD_STATE: WorkbookUploadState = {
 }
 
 type UseWorkbookUploadOptions = {
-  onParsed: (parsed: Transaction[], file: File) => void | Promise<void>
+  onParsed: (workbook: PreparedWorkbook, file: File) => void | Promise<void>
   onStart?: () => void
   onFinish?: () => void
 }
@@ -149,15 +152,16 @@ export function useWorkbookUpload({
           await waitForNextPaint()
         }
 
-        const { transactions: parsed, skippedRows } =
-          await parseWorkbookInBackground(buffer, task.signal)
+        const result = await parseWorkbookInBackground(buffer, task.signal)
+        const { transactions: parsed, skippedRows } = result
         if (seq !== uploadSeq.current) return
         if (!parsed.length)
           throw new Error("未识别到有效交易记录，请确认是 iCost 导出的 Excel。")
 
+        const prepared = await prepareWorkbook(result, task.signal)
         await waitBeforeLeavingParsingStatus()
         if (seq !== uploadSeq.current) return
-        await onParsed(parsed, file)
+        await onParsed(prepared, file)
         if (seq !== uploadSeq.current) return
         setUploadState((current) => ({ ...current, skippedRows }))
       } catch (uploadError) {

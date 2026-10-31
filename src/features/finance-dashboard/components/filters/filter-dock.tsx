@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import type { ReactNode } from "react"
 import { RiCloseLine, RiFilter3Line, RiRefreshLine } from "@remixicon/react"
 
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 
 import type { FilterActions } from "../../model/dashboard-state"
 import type { Filters } from "../../model/types"
@@ -26,7 +25,6 @@ import {
   type ActiveFilterSummary,
 } from "./active-filter-summary"
 
-const DOCK_TOP_OFFSET = 12
 const VISIBLE_FILTER_LIMIT = 3
 const numberFormatter = new Intl.NumberFormat("zh-CN")
 
@@ -47,10 +45,6 @@ export function FilterDock({
   actions,
   children,
 }: FilterDockProps) {
-  const sentinelRef = useRef<HTMLDivElement>(null)
-  const barRef = useRef<HTMLDivElement>(null)
-  const [isDocked, setIsDocked] = useState(false)
-  const [barHeight, setBarHeight] = useState(0)
   const activeFilters = getActiveFilterSummaries(filters, new Date(asOf))
   const activeFilterCount = activeFilters.reduce(
     (total, filter) => total + filter.count,
@@ -59,132 +53,79 @@ export function FilterDock({
   const visibleFilters = activeFilters.slice(0, VISIBLE_FILTER_LIMIT)
   const hiddenFilters = activeFilters.slice(VISIBLE_FILTER_LIMIT)
 
-  useEffect(() => {
-    const updateDockState = () => {
-      const sentinelTop =
-        sentinelRef.current?.getBoundingClientRect().top ?? Infinity
-
-      setIsDocked(sentinelTop <= DOCK_TOP_OFFSET)
-    }
-
-    updateDockState()
-    window.addEventListener("scroll", updateDockState, { passive: true })
-    window.addEventListener("resize", updateDockState)
-
-    return () => {
-      window.removeEventListener("scroll", updateDockState)
-      window.removeEventListener("resize", updateDockState)
-    }
-  }, [])
-
-  useEffect(() => {
-    const bar = barRef.current
-    if (!bar) return
-
-    const updateBarHeight = () => setBarHeight(bar.offsetHeight)
-
-    updateBarHeight()
-
-    if (typeof ResizeObserver === "undefined") return
-
-    const observer = new ResizeObserver(updateBarHeight)
-    observer.observe(bar)
-
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <div className="relative transform-none! animate-none!">
-      <div ref={sentinelRef} aria-hidden="true" className="h-px" />
-      <div style={isDocked ? { minHeight: barHeight } : undefined}>
-        <div
-          ref={barRef}
-          className={cn(
-            isDocked &&
-              "fixed inset-x-0 top-3 z-40 mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10"
-          )}
-        >
-          <div>
-            <div
-              className={cn(
-                "relative overflow-hidden border border-border/80 bg-card/88 shadow-ledger-panel backdrop-blur-xl transition-shadow duration-300",
-                isDocked && "shadow-ledger-popover"
+    <div
+      data-slot="filter-dock"
+      className="sticky top-3 z-40 transform-none! animate-none!"
+    >
+      <div className="relative overflow-hidden border border-border/80 bg-card/88 shadow-ledger-panel backdrop-blur-xl">
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/40 via-transparent to-transparent" />
+        <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
+              <span className="font-heading text-sm font-medium">当前筛选</span>
+              <Badge variant="secondary" className="font-mono">
+                {formatResultCount(filteredCount, totalCount)}
+              </Badge>
+            </div>
+
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              {activeFilterCount ? (
+                <>
+                  {visibleFilters.map((filter) => (
+                    <VisibleFilterChip
+                      key={filter.key}
+                      filter={filter}
+                      onClear={() => actions.clearFilter(filter.key)}
+                    />
+                  ))}
+                  {hiddenFilters.length ? (
+                    <HiddenFilterBadge filters={hiddenFilters} />
+                  ) : null}
+                </>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="bg-background/65 font-mono text-muted-foreground"
+                >
+                  全部数据
+                </Badge>
               )}
-            >
-              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-foreground/40 via-transparent to-transparent" />
-              <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-                <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className="size-1.5 bg-primary shadow-ledger-glow-primary-soft" />
-                    <span className="font-heading text-sm font-medium">
-                      当前筛选
-                    </span>
-                    <Badge variant="secondary" className="font-mono">
-                      {formatResultCount(filteredCount, totalCount)}
-                    </Badge>
-                  </div>
-
-                  <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                    {activeFilterCount ? (
-                      <>
-                        {visibleFilters.map((filter) => (
-                          <VisibleFilterChip
-                            key={filter.key}
-                            filter={filter}
-                            onClear={() => actions.clearFilter(filter.key)}
-                          />
-                        ))}
-                        {hiddenFilters.length ? (
-                          <HiddenFilterBadge filters={hiddenFilters} />
-                        ) : null}
-                      </>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="bg-background/65 font-mono text-muted-foreground"
-                      >
-                        全部数据
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Dialog>
-                    <DialogTrigger
-                      render={
-                        <Button type="button" variant="default" size="sm" />
-                      }
-                    >
-                      <RiFilter3Line data-icon="inline-start" />
-                      调整筛选
-                    </DialogTrigger>
-                    <DialogContent className="flex max-h-[min(88svh,46rem)] w-[min(44rem,calc(100vw-1.5rem))] max-w-none flex-col gap-0 overflow-hidden border-border/80 bg-background p-0 shadow-ledger-popover sm:max-w-none lg:w-[min(60rem,calc(100vw-4rem))]">
-                      <DialogHeader className="sr-only">
-                        <DialogTitle>调整筛选</DialogTitle>
-                        <DialogDescription>
-                          修改当前账单分析的筛选条件。
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="min-h-0">{children}</div>
-                    </DialogContent>
-                  </Dialog>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={!activeFilterCount}
-                    onClick={actions.resetFilters}
-                  >
-                    <RiRefreshLine data-icon="inline-start" />
-                    清空
-                  </Button>
-                </div>
-              </div>
-              <LedgerEdgeNotch className="right-0 bottom-0 opacity-45" />
             </div>
           </div>
+
+          <div className="flex items-center gap-2">
+            <Dialog>
+              <DialogTrigger
+                render={<Button type="button" variant="default" size="sm" />}
+              >
+                <RiFilter3Line data-icon="inline-start" />
+                调整筛选
+              </DialogTrigger>
+              <DialogContent className="flex max-h-[min(88svh,46rem)] w-[min(44rem,calc(100vw-1.5rem))] max-w-none flex-col gap-0 overflow-hidden border-border/80 bg-background p-0 shadow-ledger-popover sm:max-w-none lg:w-[min(60rem,calc(100vw-4rem))]">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>调整筛选</DialogTitle>
+                  <DialogDescription>
+                    修改当前账单分析的筛选条件。
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="min-h-0">{children}</div>
+              </DialogContent>
+            </Dialog>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!activeFilterCount}
+              onClick={actions.resetFilters}
+            >
+              <RiRefreshLine data-icon="inline-start" />
+              清空
+            </Button>
+          </div>
         </div>
+        <LedgerEdgeNotch className="right-0 bottom-0 opacity-45" />
       </div>
     </div>
   )
